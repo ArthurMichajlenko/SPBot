@@ -2,7 +2,7 @@ package main
 
 // APIKeys API keys from provider
 type APIKeys struct {
-	TgbAPI string `json:"tgb"`
+	TgbAPI1 string `json:"tgb"`
 }
 
 func main() {}
