@@ -1,0 +1,8 @@
+{
+    "telegram": {
+        "apikey": "123",
+        "webhook": "https://dev.infinitloop.md",
+        "port": 8443,
+        "path_cert": ""
+    }
+}
