@@ -1,8 +1,16 @@
 {
-    "telegram": {
-        "apikey": "123",
-        "webhook": "https://dev.infinitloop.md",
-        "port": 8443,
-        "path_cert": ""
+    "bots": {
+        "telegram": {
+            "tg_apikey": "123",
+            "tg_webhook": "https://dev.infinitloop.md",
+            "tg_port": 8443,
+            "tg_path_cert": ""
+        },
+        "facebook": {
+            "fb_apikey": "321",
+            "fb_webhook": "https://dev.infinitloop.md",
+            "fb_port": 8443,
+            "fb_path_cert": ""
+        }
     }
 }
