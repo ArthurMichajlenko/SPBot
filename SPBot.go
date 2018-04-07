@@ -73,6 +73,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	noCmdText := `Извините, это не похоже на комманду. Попробуйте набрать "/help" для просмотра доступных комманд`
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	// Get updates from channel
