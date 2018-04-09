@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
@@ -85,13 +86,20 @@ func main() {
 			MessageID := update.Message.MessageID
 			Text := update.Message.Text
 			// UserId := update.Message.From.ID
-			UserName := update.Message.From.UserName
+			// UserName := update.Message.From.UserName
 			// FirstName := update.Message.From.FirstName
 			// LastName := update.Message.From.LastName
-			noCmdMsg := tgbotapi.NewMessage(ChatID, noCmdText)
-			toOriginal := false
+			// noCmdMsg := tgbotapi.NewMessage(ChatID, noCmdText)
+			// toOriginal := false
 			msg := tgbotapi.NewMessage(ChatID, "")
 			msg.ParseMode = "Markdown"
+
+			if !strings.HasPrefix(Text, "/") {
+				msg.ReplyToMessageID = MessageID
+				msg.Text = noCmdText
+				bot.Send(msg)
+				continue
+			}
 		}
 	}
 }
