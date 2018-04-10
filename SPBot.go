@@ -56,39 +56,39 @@ func LoadConfigBots(file string) (Config, error) {
 }
 
 func main() {
-	// Connect to bot
 	config, err := LoadConfigBots("config.json")
 	if err != nil {
 		log.Panic(err)
 	}
-	bot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
+	// Connect to Telegram bot
+	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
 	if err != nil {
 		log.Panic(err)
 	}
 	// TODO: Next 2 strings for development may remove in production
-	bot.Debug = true
-	fmt.Printf("Hello, I am %s", bot.Self.UserName)
+	tgBot.Debug = true
+	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Initialize webhook & channel for update from API
-	conURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(conURI + bot.Token))
+	tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
+	_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	noCmdText := `Извините, это не похоже на комманду. Попробуйте набрать "/help" для просмотра доступных комманд`
-	updates := bot.ListenForWebhook("/" + bot.Token)
+	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	// Get updates from channel
 	for {
 		select {
-		case update := <-updates:
-			ChatID := update.Message.Chat.ID
-			MessageID := update.Message.MessageID
-			Text := update.Message.Text
-			// UserId := update.Message.From.ID
-			// UserName := update.Message.From.UserName
-			// FirstName := update.Message.From.FirstName
-			// LastName := update.Message.From.LastName
+		case tgUpdate := <-tgUpdates:
+			ChatID := tgUpdate.Message.Chat.ID
+			MessageID := tgUpdate.Message.MessageID
+			Text := tgUpdate.Message.Text
+			// UserId := tgUpdate.Message.From.ID
+			// UserName := tgUpdate.Message.From.UserName
+			// FirstName := tgUpdate.Message.From.FirstName
+			// LastName := tgUpdate.Message.From.LastName
 			// noCmdMsg := tgbotapi.NewMessage(ChatID, noCmdText)
 			// toOriginal := false
 			msg := tgbotapi.NewMessage(ChatID, "")
@@ -97,7 +97,7 @@ func main() {
 			if !strings.HasPrefix(Text, "/") {
 				msg.ReplyToMessageID = MessageID
 				msg.Text = noCmdText
-				bot.Send(msg)
+				tgBot.Send(msg)
 				continue
 			}
 		}
