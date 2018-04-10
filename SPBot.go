@@ -75,7 +75,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	noCmdText := `Извините, это не похоже на комманду. Попробуйте набрать "/help" для просмотра доступных комманд`
+	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	// Get updates from channels
@@ -83,17 +83,28 @@ func main() {
 		select {
 		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
+			toOriginal := false
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
-
+			// If no command say to User
 			if !strings.HasPrefix(tgUpdate.Message.Text, "/") {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
 				tgBot.Send(tgMsg)
 				continue
 			}
-			tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
-			tgMsg.Text = tgUpdate.Message.Text
+
+			switch strings.ToLower(strings.Split(tgUpdate.Message.Text, " ")[0]) {
+			case "/help":
+				tgMsg.Text = tgUpdate.Message.Text
+			default:
+				toOriginal = true
+				tgMsg.Text = noCmdText
+			}
+
+			if toOriginal {
+				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
+			}
 			tgBot.Send(tgMsg)
 		}
 	}
