@@ -82,24 +82,18 @@ func main() {
 	for {
 		select {
 		case tgUpdate := <-tgUpdates:
-			ChatID := tgUpdate.Message.Chat.ID
-			MessageID := tgUpdate.Message.MessageID
-			Text := tgUpdate.Message.Text
-			// UserId := tgUpdate.Message.From.ID
-			// UserName := tgUpdate.Message.From.UserName
-			// FirstName := tgUpdate.Message.From.FirstName
-			// LastName := tgUpdate.Message.From.LastName
-			// noCmdMsg := tgbotapi.NewMessage(ChatID, noCmdText)
-			// toOriginal := false
-			msg := tgbotapi.NewMessage(ChatID, "")
-			msg.ParseMode = "Markdown"
+			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
+			tgMsg.ParseMode = "Markdown"
 
-			if !strings.HasPrefix(Text, "/") {
-				msg.ReplyToMessageID = MessageID
-				msg.Text = noCmdText
-				tgBot.Send(msg)
+			if !strings.HasPrefix(tgUpdate.Message.Text, "/") {
+				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
+				tgMsg.Text = noCmdText
+				tgBot.Send(tgMsg)
 				continue
 			}
+			tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
+			tgMsg.Text = tgUpdate.Message.Text
+			tgBot.Send(tgMsg)
 		}
 	}
 }
