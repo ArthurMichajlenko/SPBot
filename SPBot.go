@@ -78,9 +78,10 @@ func main() {
 	noCmdText := `Извините, это не похоже на комманду. Попробуйте набрать "/help" для просмотра доступных комманд`
 	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
-	// Get updates from channel
+	// Get updates from channels
 	for {
 		select {
+		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
