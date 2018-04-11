@@ -76,6 +76,7 @@ func main() {
 	}
 
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
+	// Listen Webhook
 	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	// Get updates from channels
