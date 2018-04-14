@@ -74,8 +74,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
+	stubMsgText := `_Извините, пока не реализовано_`
+	startMsgText := `Здравствуйте! Подключайтесь к новостному боту "СП"-умному ассистенту, который поможет Вам получать полезную и важную информацию в телефоне удобным для Вас образом.
+	Чтобы посмотреть, что я умею наберите "/help"`
+	helpMsgText := `Что я умею:
+	/help - выводит это сообщение.
+	/start - подключение к боту.
+	/subscriptions - управление Вашими подписками.
+	/beltsy - городские новости и уведомления.
+	/top - самое популярное в "СП".
+	/news - последние материалы на сайте "СП".
+	/search - поиск по сайту "СП".
+	/feedback - задать вопрос/сообщить новость.
+	/holidays - календарь праздников.
+	/games - поиграть в игру.
+	/donate - поддержать "СП".`
 	// Listen Webhook
 	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
@@ -97,7 +112,27 @@ func main() {
 
 			switch strings.ToLower(strings.Split(tgUpdate.Message.Text, " ")[0]) {
 			case "/help":
-				tgMsg.Text = tgUpdate.Message.Text
+				tgMsg.Text = helpMsgText
+			case "/start":
+				tgMsg.Text = startMsgText
+			case "/subscriptions":
+				tgMsg.Text = stubMsgText
+			case "/beltsy":
+				tgMsg.Text = stubMsgText
+			case "/top":
+				tgMsg.Text = stubMsgText
+			case "/news":
+				tgMsg.Text = stubMsgText
+			case "/search":
+				tgMsg.Text = stubMsgText
+			case "/feedback":
+				tgMsg.Text = stubMsgText
+			case "/holidays":
+				tgMsg.Text = stubMsgText
+			case "/games":
+				tgMsg.Text = stubMsgText
+			case "/donate":
+				tgMsg.Text = stubMsgText
 			default:
 				toOriginal = true
 				tgMsg.Text = noCmdText
