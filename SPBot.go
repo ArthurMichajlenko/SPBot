@@ -116,9 +116,9 @@ func main() {
 			case "/start":
 				tgMsg.Text = startMsgText
 			case "/subscriptions":
-				tgMsg.Text = "[SP](http://esp.md/sobytiya/2018/04/16/uznay-gde-ty-dolzhen-golosovat-na-vyborah-primara-belc)"
-			case "/beltsy":
 				tgMsg.Text = stubMsgText
+			case "/beltsy":
+				tgMsg.Text = "[SP](http://esp.md/sobytiya/2018/04/16/uznay-gde-ty-dolzhen-golosovat-na-vyborah-primara-belc)"
 			case "/top":
 				tgMsg.Text = stubMsgText
 			case "/news":
