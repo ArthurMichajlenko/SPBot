@@ -117,6 +117,11 @@ func main() {
 				tgMsg.Text = startMsgText
 			case "/subscriptions":
 				tgMsg.Text = stubMsgText
+				var row []tgbotapi.KeyboardButton
+				button := tgbotapi.NewKeyboardButton("/help")
+				row = append(row, button)
+				keyboard := tgbotapi.NewReplyKeyboard(row)
+				tgMsg.ReplyMarkup = keyboard
 			case "/beltsy":
 				tgMsg.Text = "[SP](http://esp.md/sobytiya/2018/04/16/uznay-gde-ty-dolzhen-golosovat-na-vyborah-primara-belc)"
 			case "/top":
