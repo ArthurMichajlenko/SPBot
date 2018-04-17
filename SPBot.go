@@ -103,7 +103,7 @@ func main() {
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
-			if !strings.HasPrefix(tgUpdate.Message.Text, "/") {
+			if !tgUpdate.Message.IsCommand() {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
 				tgBot.Send(tgMsg)
@@ -118,13 +118,15 @@ func main() {
 			case "/subscriptions":
 				tgMsg.Text = stubMsgText
 				var row []tgbotapi.KeyboardButton
-				button := tgbotapi.NewKeyboardButton("/help")
-				row = append(row, button)
+				buttonHelp := tgbotapi.NewKeyboardButton("/help")
+				buttonBeltsy := tgbotapi.NewKeyboardButton("/beltsy")
+				row = append(row, buttonHelp)
+				row = append(row, buttonBeltsy)
 				keyboard := tgbotapi.NewReplyKeyboard(row)
 				keyboard.OneTimeKeyboard = true
 				tgMsg.ReplyMarkup = keyboard
 			case "/beltsy":
-				tgMsg.Text = "[SP](http://esp.md/sobytiya/2018/04/16/uznay-gde-ty-dolzhen-golosovat-na-vyborah-primara-belc)"
+				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
 			case "/top":
 				tgMsg.Text = stubMsgText
 			case "/news":
