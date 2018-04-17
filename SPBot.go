@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
@@ -110,12 +109,12 @@ func main() {
 				continue
 			}
 
-			switch strings.ToLower(strings.Split(tgUpdate.Message.Text, " ")[0]) {
-			case "/help":
+			switch tgUpdate.Message.Command() {
+			case "help":
 				tgMsg.Text = helpMsgText
-			case "/start":
+			case "start":
 				tgMsg.Text = startMsgText
-			case "/subscriptions":
+			case "subscriptions":
 				tgMsg.Text = stubMsgText
 				var row []tgbotapi.KeyboardButton
 				buttonHelp := tgbotapi.NewKeyboardButton("/help")
@@ -125,21 +124,21 @@ func main() {
 				keyboard := tgbotapi.NewReplyKeyboard(row)
 				keyboard.OneTimeKeyboard = true
 				tgMsg.ReplyMarkup = keyboard
-			case "/beltsy":
+			case "beltsy":
 				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
-			case "/top":
+			case "top":
 				tgMsg.Text = stubMsgText
-			case "/news":
+			case "news":
 				tgMsg.Text = stubMsgText
-			case "/search":
+			case "search":
 				tgMsg.Text = stubMsgText
-			case "/feedback":
+			case "feedback":
 				tgMsg.Text = stubMsgText
-			case "/holidays":
+			case "holidays":
 				tgMsg.Text = stubMsgText
-			case "/games":
+			case "games":
 				tgMsg.Text = stubMsgText
-			case "/donate":
+			case "donate":
 				tgMsg.Text = stubMsgText
 			default:
 				toOriginal = true
