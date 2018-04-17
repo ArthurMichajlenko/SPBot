@@ -121,6 +121,7 @@ func main() {
 				button := tgbotapi.NewKeyboardButton("/help")
 				row = append(row, button)
 				keyboard := tgbotapi.NewReplyKeyboard(row)
+				keyboard.OneTimeKeyboard = true
 				tgMsg.ReplyMarkup = keyboard
 			case "/beltsy":
 				tgMsg.Text = "[SP](http://esp.md/sobytiya/2018/04/16/uznay-gde-ty-dolzhen-golosovat-na-vyborah-primara-belc)"
