@@ -140,12 +140,13 @@ func main() {
 				tgMsg.Text = startMsgText
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
-				var row []tgbotapi.InlineKeyboardButton
+				// var row []tgbotapi.InlineKeyboardButton
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
-				buttonBeltsy := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
-				row = append(row, buttonHelp)
-				row = append(row, buttonBeltsy)
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
+				buttonStart := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
+				// row = append(row, buttonHelp)
+				// row = append(row, buttonBeltsy)
+				// keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonHelp, buttonStart))
 				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
 				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
