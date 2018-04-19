@@ -99,6 +99,10 @@ func main() {
 		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
 			toOriginal := false
+			if tgUpdate.CallbackQuery != nil {
+				tgBot.AnswerCallbackQuery(tgbotapi.NewCallbackWithAlert(tgUpdate.CallbackQuery.ID, "test"))
+				continue
+			}
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
@@ -116,13 +120,12 @@ func main() {
 				tgMsg.Text = startMsgText
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
-				var row []tgbotapi.KeyboardButton
-				buttonHelp := tgbotapi.NewKeyboardButton("/help")
-				buttonBeltsy := tgbotapi.NewKeyboardButton("/beltsy")
+				var row []tgbotapi.InlineKeyboardButton
+				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
+				buttonBeltsy := tgbotapi.NewInlineKeyboardButtonData("Beltsy", "beltsy")
 				row = append(row, buttonHelp)
 				row = append(row, buttonBeltsy)
-				keyboard := tgbotapi.NewReplyKeyboard(row)
-				keyboard.OneTimeKeyboard = true
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
 				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
 				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
