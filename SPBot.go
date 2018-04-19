@@ -100,7 +100,15 @@ func main() {
 		case tgUpdate := <-tgUpdates:
 			toOriginal := false
 			if tgUpdate.CallbackQuery != nil {
-				tgBot.AnswerCallbackQuery(tgbotapi.NewCallbackWithAlert(tgUpdate.CallbackQuery.ID, "test"))
+				tgBot.AnswerCallbackQuery(tgbotapi.NewCallback(tgUpdate.CallbackQuery.ID, tgUpdate.CallbackQuery.Data))
+				tgCbMsg := tgbotapi.NewMessage(tgUpdate.CallbackQuery.Message.Chat.ID, "")
+				switch tgUpdate.CallbackQuery.Data {
+				case "help":
+					tgCbMsg.Text = helpMsgText
+				case "start":
+					tgCbMsg.Text = startMsgText
+				}
+				tgBot.Send(tgCbMsg)
 				continue
 			}
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
@@ -122,7 +130,7 @@ func main() {
 				tgMsg.Text = stubMsgText
 				var row []tgbotapi.InlineKeyboardButton
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
-				buttonBeltsy := tgbotapi.NewInlineKeyboardButtonData("Beltsy", "beltsy")
+				buttonBeltsy := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
 				row = append(row, buttonHelp)
 				row = append(row, buttonBeltsy)
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
