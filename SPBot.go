@@ -67,12 +67,6 @@ func main() {
 	// TODO: Next 2 strings for development may remove in production
 	tgBot.Debug = true
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
-	// Initialize webhook & channel for update from API
-	tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
-	_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
@@ -90,9 +84,25 @@ func main() {
 	/holidays - календарь праздников.
 	/games - поиграть в игру.
 	/donate - поддержать "СП".`
-	// Listen Webhook
-	tgUpdates := tgBot.ListenForWebhook("/" + tgBot.Token)
-	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
+	var ptgUpdates = new(tgbotapi.UpdatesChannel)
+	tgUpdates := *ptgUpdates
+	if config.Bots.Telegram.TgWebhook == "" {
+		// Initialize polling
+		tgBot.RemoveWebhook()
+		u := tgbotapi.NewUpdate(0)
+		u.Timeout = 60
+		tgUpdates, _ = tgBot.GetUpdatesChan(u)
+	} else {
+		// Initialize webhook & channel for update from API
+		tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
+		_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Listen Webhook
+		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
+		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
+	}
 	// Get updates from channels
 	for {
 		select {

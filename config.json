@@ -2,7 +2,7 @@
     "bots": {
         "telegram": {
             "tg_apikey": "579669561:AAFMhNNt7L4HnDNEgPEU3rqrYmHZ3lWpJAo",
-            "tg_webhook": "https://dev.infinitloop.md",
+            "tg_webhook": "",
             "tg_port": 8443,
             "tg_path_cert": ""
         },
