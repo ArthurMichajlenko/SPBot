@@ -99,6 +99,7 @@ func main() {
 		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
 			toOriginal := false
+			// Inline keyboard Callback Query handler
 			if tgUpdate.CallbackQuery != nil {
 				tgBot.AnswerCallbackQuery(tgbotapi.NewCallback(tgUpdate.CallbackQuery.ID, tgUpdate.CallbackQuery.Data))
 				tgCbMsg := tgbotapi.NewMessage(tgUpdate.CallbackQuery.Message.Chat.ID, "")
@@ -111,6 +112,7 @@ func main() {
 				tgBot.Send(tgCbMsg)
 				continue
 			}
+			//Simple Message Handler
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
