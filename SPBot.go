@@ -140,13 +140,24 @@ func main() {
 				tgMsg.Text = startMsgText
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
+				//For inline keyboard
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
 				buttonStart := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
+				// For keyboard
+				// buttonHelp := tgbotapi.NewKeyboardButton("/help")
+				// buttonStart := tgbotapi.NewKeyboardButton("/start")
+
 				// var row []tgbotapi.InlineKeyboardButton
 				// row = append(row, buttonHelp)
 				// row = append(row, buttonBeltsy)
 				// keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
+				// keyboard := tgbotapi.NewReplyKeyboard(row)
+
+				// For inline keyboard
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonHelp, buttonStart))
+				// For keyboard
+				// keyboard := tgbotapi.NewReplyKeyboard(tgbotapi.NewKeyboardButtonRow(buttonHelp, buttonStart))
+				// keyboard.OneTimeKeyboard = true
 				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
 				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
