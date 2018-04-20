@@ -187,10 +187,10 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 		default:
-			tgMsgTest := tgbotapi.NewMessage(474165300, "Ku-Ku")
-			if (strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())) == "1623" {
-				tgBot.Send(tgMsgTest)
-			}
+			// tgMsgTest := tgbotapi.NewMessage(474165300, "Ku-Ku")
+			// if (strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())) == "1623" {
+			// 	tgBot.Send(tgMsgTest)
+			// }
 		}
 	}
 }
