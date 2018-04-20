@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
@@ -105,6 +106,7 @@ func main() {
 	}
 	// Get updates from channels
 	for {
+
 		select {
 		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
@@ -170,9 +172,9 @@ func main() {
 			case "feedback":
 				tgMsg.Text = stubMsgText
 			case "holidays":
-				tgMsg.Text = stubMsgText
+				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
 			case "games":
-				tgMsg.Text = stubMsgText
+				tgMsg.Text = strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())
 			case "donate":
 				tgMsg.Text = stubMsgText
 			default:
@@ -184,6 +186,11 @@ func main() {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
 			tgBot.Send(tgMsg)
+		default:
+			tgMsgTest := tgbotapi.NewMessage(474165300, "Ku-Ku")
+			if (strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())) == "1623" {
+				tgBot.Send(tgMsgTest)
+			}
 		}
 	}
 }
