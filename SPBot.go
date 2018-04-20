@@ -140,9 +140,9 @@ func main() {
 				tgMsg.Text = startMsgText
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
-				// var row []tgbotapi.InlineKeyboardButton
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
 				buttonStart := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
+				// var row []tgbotapi.InlineKeyboardButton
 				// row = append(row, buttonHelp)
 				// row = append(row, buttonBeltsy)
 				// keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
