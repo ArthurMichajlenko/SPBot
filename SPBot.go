@@ -104,15 +104,17 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	}
-
+	// Cron for subscriptions
 	c := cron.New()
-	c.AddFunc("0 45 * * * *", func() {
-		tg45Msg := tgbotapi.NewMessage(474165300, "45 минутное сообщение")
-		tgBot.Send(tg45Msg)
+	c.AddFunc("0 20 * * * *", func() {
+		tg20Msg := tgbotapi.NewMessage(474165300, startMsgText)
+		tg20Msg.ParseMode = "Markdown"
+		tgBot.Send(tg20Msg)
 	})
-	c.AddFunc("0 55 * * * *", func() {
-		tg55Msg := tgbotapi.NewMessage(474165300, "55 минутное сообщение")
-		tgBot.Send(tg55Msg)
+	c.AddFunc("@hourly", func() {
+		tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
+		tg1hMsg.ParseMode = "Markdown"
+		tgBot.Send(tg1hMsg)
 	})
 	c.Start()
 
@@ -127,6 +129,7 @@ func main() {
 			if tgUpdate.CallbackQuery != nil {
 				tgBot.AnswerCallbackQuery(tgbotapi.NewCallback(tgUpdate.CallbackQuery.ID, tgUpdate.CallbackQuery.Data))
 				tgCbMsg := tgbotapi.NewMessage(tgUpdate.CallbackQuery.Message.Chat.ID, "")
+				tgCbMsg.ParseMode = "Markdown"
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
 					tgCbMsg.Text = helpMsgText
