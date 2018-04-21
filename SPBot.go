@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
+	"github.com/robfig/cron"
 )
 
 // Config bots configurations
@@ -104,6 +104,18 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	}
+
+	c := cron.New()
+	c.AddFunc("0 45 * * * *", func() {
+		tg45Msg := tgbotapi.NewMessage(474165300, "45 минутное сообщение")
+		tgBot.Send(tg45Msg)
+	})
+	c.AddFunc("0 55 * * * *", func() {
+		tg55Msg := tgbotapi.NewMessage(474165300, "55 минутное сообщение")
+		tgBot.Send(tg55Msg)
+	})
+	c.Start()
+
 	// Get updates from channels
 	for {
 
@@ -174,7 +186,7 @@ func main() {
 			case "holidays":
 				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
 			case "games":
-				tgMsg.Text = strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())
+				tgMsg.Text = stubMsgText
 			case "donate":
 				tgMsg.Text = stubMsgText
 			default:
@@ -187,10 +199,6 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 		default:
-			// tgMsgTest := tgbotapi.NewMessage(474165300, "Ku-Ku")
-			// if (strconv.Itoa(time.Now().Hour()) + strconv.Itoa(time.Now().Minute())) == "1623" {
-			// 	tgBot.Send(tgMsgTest)
-			// }
 		}
 	}
 }
