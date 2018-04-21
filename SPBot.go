@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/robfig/cron"
@@ -187,7 +188,7 @@ func main() {
 			case "feedback":
 				tgMsg.Text = stubMsgText
 			case "holidays":
-				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
+				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 			case "games":
 				tgMsg.Text = stubMsgText
 			case "donate":
