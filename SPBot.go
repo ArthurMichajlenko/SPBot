@@ -192,10 +192,13 @@ func main() {
 				case "help":
 					tgCbMsg.Text = helpMsgText
 				case "subscribestart":
-					tgCbMsg.Text = "Выберите подписку"
-					buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData("Дайджест за сутки\nУтром - в 9:00", "subscribe9")
-					buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData("Дайджест за сутки\nВечером - в 20:00", "subscribe20")
-					buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData("Свежие новости\nСообщения будут приходить часто", "subscribelast")
+					tgCbMsg.Text = `Выберите подписку:
+					Утром - получать дайджест за сутки утром - в 9:00
+					Вечером - получать дайджест за сутки вечером - в 20:00
+					Последние новости - получать новости сразу по мере их публикации _(сообщения будут приходить часто)_`
+					buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData("Утром", "subscribe9")
+					buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData("Вечером", "subscribe20")
+					buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData("Последние новости", "subscribelast")
 					var row []tgbotapi.InlineKeyboardButton
 					var row1 []tgbotapi.InlineKeyboardButton
 					var row2 []tgbotapi.InlineKeyboardButton
