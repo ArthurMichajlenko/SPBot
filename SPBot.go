@@ -258,10 +258,11 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Вернуться в главное меню", "help")
 				var row []tgbotapi.InlineKeyboardButton
 				var row1 []tgbotapi.InlineKeyboardButton
+				var row2 []tgbotapi.InlineKeyboardButton
 				row = append(row, buttonSubscribe)
-				row = append(row, buttonDonate)
-				row1 = append(row1, buttonHelp)
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1)
+				row1 = append(row1, buttonDonate)
+				row2 = append(row2, buttonHelp)
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 				tgMsg.ReplyMarkup = keyboard
 			default:
 				toOriginal = true
