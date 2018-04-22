@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
+	"github.com/asdine/storm"
 	"github.com/robfig/cron"
 )
 
@@ -61,6 +62,12 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+	// Bolt
+	db, err := storm.Open("user.db")
+	if err != nil {
+		log.Panic(err)
+	}
+	defer db.Close()
 	// Connect to Telegram bot
 	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
 	if err != nil {
