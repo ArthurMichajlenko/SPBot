@@ -68,6 +68,7 @@ func main() {
 		log.Panic(err)
 	}
 	defer db.Close()
+
 	// Connect to Telegram bot
 	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
 	if err != nil {
