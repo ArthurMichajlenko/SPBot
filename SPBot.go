@@ -129,8 +129,7 @@ func main() {
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
-	startMsgText := `Здравствуйте! Подключайтесь к новостному боту "СП"-умному ассистенту, который поможет Вам получать полезную и важную информацию в телефоне удобным для Вас образом.
-	Чтобы посмотреть, что я умею наберите "/help"`
+	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
@@ -143,6 +142,7 @@ func main() {
 	/holidays - календарь праздников.
 	/games - поиграть в игру.
 	/donate - поддержать "СП".`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if config.Bots.Telegram.TgWebhook == "" {
@@ -191,8 +191,25 @@ func main() {
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
 					tgCbMsg.Text = helpMsgText
-				case "start":
-					tgCbMsg.Text = startMsgText
+				case "subscribestart":
+					tgCbMsg.Text = "Выберите подписку"
+					buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData("Дайджест за сутки\nУтром - в 9:00", "subscribe9")
+					buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData("Дайджест за сутки\nВечером - в 20:00", "subscribe20")
+					buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData("Свежие новости\nСообщения будут приходить часто", "subscribelast")
+					var row []tgbotapi.InlineKeyboardButton
+					var row1 []tgbotapi.InlineKeyboardButton
+					var row2 []tgbotapi.InlineKeyboardButton
+					row = append(row, buttonSubscribe9)
+					row1 = append(row1, buttonSubscribe20)
+					row2 = append(row2, buttonSubscribeLast)
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
+					tgCbMsg.ReplyMarkup = keyboard
+				case "subscribe9":
+					tgCbMsg.Text = startMsgEndText
+				case "subscribe20":
+					tgCbMsg.Text = startMsgEndText
+				case "subscribelast":
+					tgCbMsg.Text = startMsgEndText
 				}
 				tgBot.Send(tgCbMsg)
 				fmt.Println(tgUpdate.CallbackQuery.Message.Date)
@@ -216,11 +233,13 @@ func main() {
 				tgMsg.Text = helpMsgText
 			case "start":
 				tgMsg.Text = startMsgText
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
+				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
+				tgMsg.ReplyMarkup = keyboard
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
 				//For inline keyboard
-				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Help", "help")
-				buttonStart := tgbotapi.NewInlineKeyboardButtonData("Start", "start")
 				// For keyboard
 				// buttonHelp := tgbotapi.NewKeyboardButton("/help")
 				// buttonStart := tgbotapi.NewKeyboardButton("/start")
@@ -232,11 +251,9 @@ func main() {
 				// keyboard := tgbotapi.NewReplyKeyboard(row)
 
 				// For inline keyboard
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonHelp, buttonStart))
 				// For keyboard
 				// keyboard := tgbotapi.NewReplyKeyboard(tgbotapi.NewKeyboardButtonRow(buttonHelp, buttonStart))
 				// keyboard.OneTimeKeyboard = true
-				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
 				tgMsg.Text = stubMsgText
 			case "top":
