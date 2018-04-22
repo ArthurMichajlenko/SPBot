@@ -218,6 +218,8 @@ func main() {
 				fmt.Println(tgUpdate.CallbackQuery.Message.Date)
 				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID)
 				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.FirstName)
+				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.LastName)
+				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.UserName)
 				continue
 			}
 			//Simple Message Handler
@@ -296,6 +298,8 @@ func main() {
 			fmt.Println(tgUpdate.Message.Date)
 			fmt.Println(tgUpdate.Message.Chat.ID)
 			fmt.Println(tgUpdate.Message.Chat.FirstName)
+			fmt.Println(tgUpdate.Message.Chat.LastName)
+			fmt.Println(tgUpdate.Message.Chat.UserName)
 		default:
 		}
 	}
