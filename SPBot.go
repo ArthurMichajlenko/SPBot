@@ -41,6 +41,21 @@ type Telegram struct {
 	TgPathCERT string `json:"tg_path_cert"`
 }
 
+//TgUser Telegram User
+type TgUser struct {
+	ChatID               int64 `storm:"id"`
+	FirstName            string
+	LastName             string
+	Username             string `storm:"unique"`
+	LastDate             int64
+	Notification9        string
+	Notification20       string
+	NotificationLast     string
+	NotificationCity     string
+	NotificationTop      string
+	NotificationHolidays string
+}
+
 // LoadConfigBots returns config reading from json file
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
@@ -76,6 +91,40 @@ func main() {
 	}
 	// TODO: Next 2 strings for development may remove in production
 	tgBot.Debug = true
+	// Telegram users from db Bucket tgUsers
+	// tgUsers := db.From("tgusers")
+	//test
+	testUser := TgUser{
+		ChatID:               123,
+		FirstName:            "First",
+		LastName:             "Test",
+		Username:             "testuser",
+		Notification9:        "disable",
+		Notification20:       "enable",
+		NotificationLast:     "enable",
+		NotificationCity:     "disable",
+		NotificationTop:      "disable",
+		NotificationHolidays: "disable",
+	}
+	// err = tgUsers.Save(&testUser)
+	err = db.Save(&testUser)
+	if err != nil {
+		log.Panic(err)
+	}
+	testUser.ChatID = 12789
+	testUser.Username = "testuser1"
+	err = db.Save(&testUser)
+	if err != nil {
+		log.Panic(err)
+	}
+	db.One("ChatID", 123, &testUser)
+	// db.DeleteStruct(&testUser)
+	testUser.LastDate = time.Now().Unix()
+	err = db.Update(&testUser)
+	if err != nil {
+		log.Panic(err)
+	}
+
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
