@@ -94,36 +94,36 @@ func main() {
 	// Telegram users from db Bucket tgUsers
 	// tgUsers := db.From("tgusers")
 	//test
-	testUser := TgUser{
-		ChatID:               123,
-		FirstName:            "First",
-		LastName:             "Test",
-		Username:             "testuser",
-		Notification9:        "disable",
-		Notification20:       "enable",
-		NotificationLast:     "enable",
-		NotificationCity:     "disable",
-		NotificationTop:      "disable",
-		NotificationHolidays: "disable",
-	}
-	// err = tgUsers.Save(&testUser)
-	err = db.Save(&testUser)
-	if err != nil {
-		log.Panic(err)
-	}
-	testUser.ChatID = 12789
-	testUser.Username = "testuser1"
-	err = db.Save(&testUser)
-	if err != nil {
-		log.Panic(err)
-	}
-	db.One("ChatID", 123, &testUser)
-	// db.DeleteStruct(&testUser)
-	testUser.LastDate = time.Now().Unix()
-	err = db.Update(&testUser)
-	if err != nil {
-		log.Panic(err)
-	}
+	// testUser := TgUser{
+	// 	ChatID:               123,
+	// 	FirstName:            "First",
+	// 	LastName:             "Test",
+	// 	Username:             "testuser",
+	// 	Notification9:        "disable",
+	// 	Notification20:       "enable",
+	// 	NotificationLast:     "enable",
+	// 	NotificationCity:     "disable",
+	// 	NotificationTop:      "disable",
+	// 	NotificationHolidays: "disable",
+	// }
+	// // err = tgUsers.Save(&testUser)
+	// err = db.Save(&testUser)
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+	// testUser.ChatID = 12789
+	// testUser.Username = "testuser1"
+	// err = db.Save(&testUser)
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+	// db.One("ChatID", 123, &testUser)
+	// // db.DeleteStruct(&testUser)
+	// testUser.LastDate = time.Now().Unix()
+	// err = db.Update(&testUser)
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
 
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
@@ -164,10 +164,10 @@ func main() {
 	}
 	// Cron for subscriptions
 	c := cron.New()
-	c.AddFunc("0 20 * * * *", func() {
-		tg20Msg := tgbotapi.NewMessage(474165300, startMsgText)
-		tg20Msg.ParseMode = "Markdown"
-		tgBot.Send(tg20Msg)
+	c.AddFunc("0 40 * * * *", func() {
+		tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
+		tg40Msg.ParseMode = "Markdown"
+		tgBot.Send(tg40Msg)
 	})
 	c.AddFunc("@hourly", func() {
 		tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
@@ -195,6 +195,9 @@ func main() {
 					tgCbMsg.Text = startMsgText
 				}
 				tgBot.Send(tgCbMsg)
+				fmt.Println(tgUpdate.CallbackQuery.Message.Date)
+				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID)
+				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.FirstName)
 				continue
 			}
 			//Simple Message Handler
@@ -259,6 +262,9 @@ func main() {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
 			tgBot.Send(tgMsg)
+			fmt.Println(tgUpdate.Message.Date)
+			fmt.Println(tgUpdate.Message.Chat.ID)
+			fmt.Println(tgUpdate.Message.Chat.FirstName)
 		default:
 		}
 	}
