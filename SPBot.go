@@ -238,7 +238,7 @@ func main() {
 				// keyboard.OneTimeKeyboard = true
 				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
-				tgMsg.Text = "[SP](http://esp.md/podrobnosti/2017/07/06/belchane-o-legalizacii-obektov-v-centre-goroda)"
+				tgMsg.Text = stubMsgText
 			case "top":
 				tgMsg.Text = stubMsgText
 			case "news":
@@ -250,9 +250,19 @@ func main() {
 			case "holidays":
 				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 			case "games":
-				tgMsg.Text = stubMsgText
+				tgMsg.Text = "[Помочь СП](http://esp.md/donate)"
 			case "donate":
-				tgMsg.Text = stubMsgText
+				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
+				buttonDonate := tgbotapi.NewInlineKeyboardButtonURL("Поддержать \"СП\" материально", "http://esp.md/donate")
+				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Вернуться в главное меню", "help")
+				var row []tgbotapi.InlineKeyboardButton
+				var row1 []tgbotapi.InlineKeyboardButton
+				row = append(row, buttonSubscribe)
+				row = append(row, buttonDonate)
+				row1 = append(row1, buttonHelp)
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1)
+				tgMsg.ReplyMarkup = keyboard
 			default:
 				toOriginal = true
 				tgMsg.Text = noCmdText
