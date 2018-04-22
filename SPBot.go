@@ -43,17 +43,17 @@ type Telegram struct {
 
 //TgUser Telegram User
 type TgUser struct {
-	ChatID               int64 `storm:"id"`
-	FirstName            string
-	LastName             string
-	Username             string `storm:"unique"`
-	LastDate             int64
-	Notification9        string
-	Notification20       string
-	NotificationLast     string
-	NotificationCity     string
-	NotificationTop      string
-	NotificationHolidays string
+	ChatID            int64 `storm:"id"`
+	FirstName         string
+	LastName          string
+	Username          string `storm:"unique"`
+	LastDate          int64
+	Subscribe9        string
+	Subscribe20       string
+	SubscribeLast     string
+	SubscribeCity     string
+	SubscribeTop      string
+	SubscribeHolidays string
 }
 
 // LoadConfigBots returns config reading from json file
