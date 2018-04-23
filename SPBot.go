@@ -327,7 +327,7 @@ func main() {
 			case "holidays":
 				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 			case "games":
-				tgMsg.Text = "[Помочь СП](http://esp.md/donate)"
+				tgMsg.Text = "[Помочь СП](http://esp.md/sobytiya/2018/04/23/belchanin-zavoeval-bronzu-chempionata-evropy-po-sambo)"
 			case "donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
