@@ -47,13 +47,13 @@ type TgUser struct {
 	FirstName         string
 	LastName          string
 	Username          string `storm:"unique"`
-	LastDate          int64
-	Subscribe9        string
-	Subscribe20       string
-	SubscribeLast     string
-	SubscribeCity     string
-	SubscribeTop      string
-	SubscribeHolidays string
+	LastDate          int
+	Subscribe9        bool
+	Subscribe20       bool
+	SubscribeLast     bool
+	SubscribeCity     bool
+	SubscribeTop      bool
+	SubscribeHolidays bool
 }
 
 // LoadConfigBots returns config reading from json file
@@ -83,6 +83,9 @@ func main() {
 		log.Panic(err)
 	}
 	defer db.Close()
+	// Telegram users from db Bucket tgUsers
+	var tgbUser TgUser
+	db.Init(&tgbUser)
 
 	// Connect to Telegram bot
 	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
@@ -91,40 +94,6 @@ func main() {
 	}
 	// TODO: Next 2 strings for development may remove in production
 	tgBot.Debug = true
-	// Telegram users from db Bucket tgUsers
-	// tgUsers := db.From("tgusers")
-	//test
-	// testUser := TgUser{
-	// 	ChatID:               123,
-	// 	FirstName:            "First",
-	// 	LastName:             "Test",
-	// 	Username:             "testuser",
-	// 	Notification9:        "disable",
-	// 	Notification20:       "enable",
-	// 	NotificationLast:     "enable",
-	// 	NotificationCity:     "disable",
-	// 	NotificationTop:      "disable",
-	// 	NotificationHolidays: "disable",
-	// }
-	// // err = tgUsers.Save(&testUser)
-	// err = db.Save(&testUser)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// testUser.ChatID = 12789
-	// testUser.Username = "testuser1"
-	// err = db.Save(&testUser)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// db.One("ChatID", 123, &testUser)
-	// // db.DeleteStruct(&testUser)
-	// testUser.LastDate = time.Now().Unix()
-	// err = db.Update(&testUser)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
@@ -214,12 +183,24 @@ func main() {
 				case "subscribelast":
 					tgCbMsg.Text = startMsgEndText
 				}
+				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+				if err == nil {
+					db.UpdateField(&tgbUser, "LastDate", tgUpdate.CallbackQuery.Message.Date)
+				} else {
+					tgbUser.LastDate = tgUpdate.CallbackQuery.Message.Date
+					tgbUser.ChatID = tgUpdate.CallbackQuery.Message.Chat.ID
+					tgbUser.Username = tgUpdate.CallbackQuery.Message.Chat.UserName
+					tgbUser.FirstName = tgUpdate.CallbackQuery.Message.Chat.FirstName
+					tgbUser.LastName = tgUpdate.CallbackQuery.Message.Chat.LastName
+					tgbUser.Subscribe9 = false
+					tgbUser.Subscribe20 = false
+					tgbUser.SubscribeLast = false
+					tgbUser.SubscribeTop = false
+					tgbUser.SubscribeCity = false
+					tgbUser.SubscribeHolidays = false
+					db.Save(&tgbUser)
+				}
 				tgBot.Send(tgCbMsg)
-				fmt.Println(tgUpdate.CallbackQuery.Message.Date)
-				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID)
-				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.FirstName)
-				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.LastName)
-				fmt.Println(tgUpdate.CallbackQuery.Message.Chat.UserName)
 				continue
 			}
 			//Simple Message Handler
@@ -294,12 +275,24 @@ func main() {
 			if toOriginal {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
+			err = db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
+			if err == nil {
+				db.UpdateField(&tgbUser, "LastDate", tgUpdate.Message.Date)
+			} else {
+				tgbUser.LastDate = tgUpdate.Message.Date
+				tgbUser.ChatID = tgUpdate.Message.Chat.ID
+				tgbUser.Username = tgUpdate.Message.Chat.UserName
+				tgbUser.FirstName = tgUpdate.Message.Chat.FirstName
+				tgbUser.LastName = tgUpdate.Message.Chat.LastName
+				tgbUser.Subscribe9 = false
+				tgbUser.Subscribe20 = false
+				tgbUser.SubscribeLast = false
+				tgbUser.SubscribeTop = false
+				tgbUser.SubscribeCity = false
+				tgbUser.SubscribeHolidays = false
+				db.Save(&tgbUser)
+			}
 			tgBot.Send(tgMsg)
-			fmt.Println(tgUpdate.Message.Date)
-			fmt.Println(tgUpdate.Message.Chat.ID)
-			fmt.Println(tgUpdate.Message.Chat.FirstName)
-			fmt.Println(tgUpdate.Message.Chat.LastName)
-			fmt.Println(tgUpdate.Message.Chat.UserName)
 			// Default may case high CPU load
 			// default:
 		}
