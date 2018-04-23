@@ -300,7 +300,8 @@ func main() {
 			fmt.Println(tgUpdate.Message.Chat.FirstName)
 			fmt.Println(tgUpdate.Message.Chat.LastName)
 			fmt.Println(tgUpdate.Message.Chat.UserName)
-		default:
+			// Default may case high CPU load
+			// default:
 		}
 	}
 }
