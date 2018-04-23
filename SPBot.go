@@ -177,10 +177,16 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 					tgCbMsg.ReplyMarkup = keyboard
 				case "subscribe9":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "Subscribe9", true)
 					tgCbMsg.Text = startMsgEndText
 				case "subscribe20":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "Subscribe20", true)
 					tgCbMsg.Text = startMsgEndText
 				case "subscribelast":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeLast", true)
 					tgCbMsg.Text = startMsgEndText
 				}
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
@@ -225,21 +231,6 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			case "subscriptions":
 				tgMsg.Text = stubMsgText
-				//For inline keyboard
-				// For keyboard
-				// buttonHelp := tgbotapi.NewKeyboardButton("/help")
-				// buttonStart := tgbotapi.NewKeyboardButton("/start")
-
-				// var row []tgbotapi.InlineKeyboardButton
-				// row = append(row, buttonHelp)
-				// row = append(row, buttonBeltsy)
-				// keyboard := tgbotapi.NewInlineKeyboardMarkup(row)
-				// keyboard := tgbotapi.NewReplyKeyboard(row)
-
-				// For inline keyboard
-				// For keyboard
-				// keyboard := tgbotapi.NewReplyKeyboard(tgbotapi.NewKeyboardButtonRow(buttonHelp, buttonStart))
-				// keyboard.OneTimeKeyboard = true
 			case "beltsy":
 				tgMsg.Text = stubMsgText
 			case "top":
