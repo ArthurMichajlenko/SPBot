@@ -188,6 +188,18 @@ func main() {
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					db.UpdateField(&tgbUser, "SubscribeLast", true)
 					tgCbMsg.Text = startMsgEndText
+				case "subscribetop":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeTop", true)
+					tgCbMsg.Text = startMsgEndText
+				case "subscribecity":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeCity", true)
+					tgCbMsg.Text = startMsgEndText
+				case "subscribeholidays":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeHolidays", true)
+					tgCbMsg.Text = startMsgEndText
 				}
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
@@ -230,7 +242,35 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
 			case "subscriptions":
-				tgMsg.Text = stubMsgText
+				tgMsg.Text = `Управление подписками:
+					*Утром* - получать дайджест за сутки утром - в 9:00
+					*Вечером* - получать дайджест за сутки вечером - в 20:00
+					*Последние новости* - получать новости сразу по мере их 
+					публикации _(сообщения будут приходить часто)_
+					*Самое популярное* - самые читаемые и комментируемые материалы за 7 дней
+					*Городские уведомления* - предупреждения городских служб, анонсы мероприятий в Бельцах и т.п.
+					*Календарь праздников* - молдавские, международные и религиозные праздники на ближайшую неделю
+					
+						Для изменения состояния подписки нажмите на 
+					соответствующую кнопку
+					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
+				buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData("Утром\u2705", "subscribe9")
+				buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData("Вечером", "subscribe20")
+				buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData("Последние новости", "subscribelast")
+				buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData("Самое популярное", "subscribetop")
+				buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData("Городские уведомления", "subscribecity")
+				buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData("Календарь праздников", "subscribeholidays")
+				var row []tgbotapi.InlineKeyboardButton
+				var row1 []tgbotapi.InlineKeyboardButton
+				var row2 []tgbotapi.InlineKeyboardButton
+				row = append(row, buttonSubscribe9)
+				row = append(row, buttonSubscribe20)
+				row1 = append(row1, buttonSubscribeLast)
+				row1 = append(row1, buttonSubscribeTop)
+				row2 = append(row2, buttonSubscribeCity)
+				row2 = append(row2, buttonSubscribeHolidays)
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
+				tgMsg.ReplyMarkup = keyboard
 			case "beltsy":
 				tgMsg.Text = stubMsgText
 			case "top":
@@ -242,7 +282,7 @@ func main() {
 			case "feedback":
 				tgMsg.Text = stubMsgText
 			case "holidays":
-				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
+				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 			case "games":
 				tgMsg.Text = "[Помочь СП](http://esp.md/donate)"
 			case "donate":
