@@ -209,6 +209,9 @@ func main() {
 				case "subscribelast":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubLast := !tgbUser.SubscribeLast
+					if !changeSubLast {
+						db.UpdateField(&tgbUser, "RssLastID", 0)
+					}
 					db.UpdateField(&tgbUser, "SubscribeLast", changeSubLast)
 					tgCbMsg.Text = startMsgEndText
 				case "subscribetop":
