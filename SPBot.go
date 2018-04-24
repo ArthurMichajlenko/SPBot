@@ -242,6 +242,7 @@ func main() {
 					tgbUser.SubscribeTop = false
 					tgbUser.SubscribeCity = false
 					tgbUser.SubscribeHolidays = false
+					tgbUser.RssLastID = 0
 					db.Save(&tgbUser)
 				}
 				tgBot.Send(tgCbMsg)
@@ -377,6 +378,7 @@ func main() {
 				tgbUser.SubscribeTop = false
 				tgbUser.SubscribeCity = false
 				tgbUser.SubscribeHolidays = false
+				tgbUser.RssLastID = 0
 				db.Save(&tgbUser)
 			}
 			tgBot.Send(tgMsg)
