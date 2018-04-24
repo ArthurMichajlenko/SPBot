@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/SlyMarbo/rss"
+
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/robfig/cron"
@@ -54,6 +56,7 @@ type TgUser struct {
 	SubscribeCity     bool
 	SubscribeTop      bool
 	SubscribeHolidays bool
+	RssLastID         int
 }
 
 // LoadConfigBots returns config reading from json file
@@ -131,13 +134,18 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	}
+	// Test RSS
+	feed, err := rss.Fetch("http://esp.md/feed/rss")
+	// fmt.Println(feed)
 	// Cron for subscriptions
 	c := cron.New()
-	c.AddFunc("0 40 * * * *", func() {
-		tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
-		tg40Msg.ParseMode = "Markdown"
-		tgBot.Send(tg40Msg)
-	})
+	// c.AddFunc("0 0/5 * * * *", func() {
+	// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
+	// tg40Msg.ParseMode = "Markdown"
+	// tgBot.Send(tg40Msg)
+	// feed.Update()
+	// fmt.Println(feed)
+	// })
 	c.AddFunc("@hourly", func() {
 		tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
 		tg1hMsg.ParseMode = "Markdown"
@@ -319,7 +327,12 @@ func main() {
 			case "top":
 				tgMsg.Text = stubMsgText
 			case "news":
-				tgMsg.Text = stubMsgText
+				feed.Update()
+				for _, newsItem := range feed.Items {
+					tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
+					tgBot.Send(tgMsg)
+				}
+				continue
 			case "search":
 				tgMsg.Text = stubMsgText
 			case "feedback":
@@ -327,7 +340,7 @@ func main() {
 			case "holidays":
 				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 			case "games":
-				tgMsg.Text = "[Помочь СП](http://esp.md/sobytiya/2018/04/23/belchanin-zavoeval-bronzu-chempionata-evropy-po-sambo)"
+				tgMsg.Text = stubMsgText
 			case "donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
