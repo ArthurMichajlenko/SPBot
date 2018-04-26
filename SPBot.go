@@ -228,7 +228,58 @@ func main() {
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubHolidays := !tgbUser.SubscribeHolidays
 					db.UpdateField(&tgbUser, "SubscribeHolidays", changeSubHolidays)
-					tgCbMsg.Text = startMsgEndText
+					// TODO: Test Edit keyboard replace if work
+					bt9 := "Утром"
+					bt20 := "Вечером"
+					btL := "Последние новости"
+					btT := "Самое популярное"
+					btC := "Городские уведомления"
+					btH := "Календарь праздников"
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					if tgbUser.Subscribe9 {
+						bt9 = "\u2705" + bt9
+					}
+					if tgbUser.Subscribe20 {
+						bt20 = "\u2705" + bt20
+					}
+					if tgbUser.SubscribeLast {
+						btL = "\u2705" + btL
+					}
+					if tgbUser.SubscribeTop {
+						btT = "\u2705" + btT
+					}
+					if tgbUser.SubscribeCity {
+						btC = "\u2705" + btC
+					}
+					if tgbUser.SubscribeHolidays {
+						btH = "\u2705" + btH
+					}
+					buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData(bt9, "subscribe9")
+					buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData(bt20, "subscribe20")
+					buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData(btL, "subscribelast")
+					buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData(btT, "subscribetop")
+					buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData(btC, "subscribecity")
+					buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData(btH, "subscribeholidays")
+					var row []tgbotapi.InlineKeyboardButton
+					var row1 []tgbotapi.InlineKeyboardButton
+					var row2 []tgbotapi.InlineKeyboardButton
+					row = append(row, buttonSubscribe9)
+					row = append(row, buttonSubscribe20)
+					row1 = append(row1, buttonSubscribeLast)
+					row1 = append(row1, buttonSubscribeTop)
+					row2 = append(row2, buttonSubscribeCity)
+					row2 = append(row2, buttonSubscribeHolidays)
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
+					fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID)
+					// newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
+					// newmessage.ReplyMarkup = tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard).ReplyMarkup
+					// newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
+					newmessage := tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard)
+					tgBot.Send(newmessage)
+
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
+					continue
+
 				}
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
