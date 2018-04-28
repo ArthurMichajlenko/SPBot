@@ -174,6 +174,7 @@ func main() {
 					btT := "Самое популярное"
 					btC := "Городские уведомления"
 					btH := "Календарь праздников"
+					btF := "Главное меню"
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					if tgbUser.Subscribe9 {
 						bt9 = "\u2705" + bt9
@@ -199,26 +200,29 @@ func main() {
 					buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData(btT, "subscribetop")
 					buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData(btC, "subscribecity")
 					buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData(btH, "subscribeholidays")
-					var row []tgbotapi.InlineKeyboardButton
+					buttonSubscribeFinish := tgbotapi.NewInlineKeyboardButtonData(btF, "subscribefinish")
+					var row0 []tgbotapi.InlineKeyboardButton
 					var row1 []tgbotapi.InlineKeyboardButton
 					var row2 []tgbotapi.InlineKeyboardButton
-					row = append(row, buttonSubscribe9)
-					row = append(row, buttonSubscribe20)
+					var row3 []tgbotapi.InlineKeyboardButton
+					row0 = append(row0, buttonSubscribe9)
+					row0 = append(row0, buttonSubscribe20)
 					row1 = append(row1, buttonSubscribeLast)
 					row1 = append(row1, buttonSubscribeTop)
 					row2 = append(row2, buttonSubscribeCity)
 					row2 = append(row2, buttonSubscribeHolidays)
-					keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
-					fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID)
+					row3 = append(row3, buttonSubscribeFinish)
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
+					// fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID)
 					// newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
 					// newmessage.ReplyMarkup = tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard).ReplyMarkup
-					// newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
+					//  newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
 					newmessage := tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard)
 					tgBot.Send(newmessage)
-
+					// continue
+				case "subscribefinish":
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
-					continue
-
+					// continue
 				}
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
@@ -268,6 +272,7 @@ func main() {
 				btT := "Самое популярное"
 				btC := "Городские уведомления"
 				btH := "Календарь праздников"
+				btF := "Главное меню"
 				db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
 				if tgbUser.Subscribe9 {
 					bt9 = "\u2705" + bt9
@@ -293,16 +298,19 @@ func main() {
 				buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData(btT, "subscribetop")
 				buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData(btC, "subscribecity")
 				buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData(btH, "subscribeholidays")
-				var row []tgbotapi.InlineKeyboardButton
+				buttonSubscribeFinish := tgbotapi.NewInlineKeyboardButtonData(btF, "subscribefinish")
+				var row0 []tgbotapi.InlineKeyboardButton
 				var row1 []tgbotapi.InlineKeyboardButton
 				var row2 []tgbotapi.InlineKeyboardButton
-				row = append(row, buttonSubscribe9)
-				row = append(row, buttonSubscribe20)
+				var row3 []tgbotapi.InlineKeyboardButton
+				row0 = append(row0, buttonSubscribe9)
+				row0 = append(row0, buttonSubscribe20)
 				row1 = append(row1, buttonSubscribeLast)
 				row1 = append(row1, buttonSubscribeTop)
 				row2 = append(row2, buttonSubscribeCity)
 				row2 = append(row2, buttonSubscribeHolidays)
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
+				row3 = append(row3, buttonSubscribeFinish)
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
 				tgMsg.ReplyMarkup = keyboard
 				tgMsg.Text = `Управление подписками:
 					*Утром* - получать дайджест за сутки утром - в 9:00
