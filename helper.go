@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+
+	"github.com/Syfaro/telegram-bot-api"
 )
 
 // Config bots configurations
@@ -63,4 +65,53 @@ func LoadConfigBots(file string) (Config, error) {
 		log.Panic(err)
 	}
 	return botsconfig, err
+}
+
+//SubButtons create keyboard for subscriptions
+func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReplyMarkupConfig {
+	bt9 := "Утром"
+	bt20 := "Вечером"
+	btL := "Последние новости"
+	btT := "Самое популярное"
+	btC := "Городские уведомления"
+	btH := "Календарь праздников"
+	btF := "Главное меню"
+	if user.Subscribe9 {
+		bt9 = "\u2705" + bt9
+	}
+	if user.Subscribe20 {
+		bt20 = "\u2705" + bt20
+	}
+	if user.SubscribeLast {
+		btL = "\u2705" + btL
+	}
+	if user.SubscribeTop {
+		btT = "\u2705" + btT
+	}
+	if user.SubscribeCity {
+		btC = "\u2705" + btC
+	}
+	if user.SubscribeHolidays {
+		btH = "\u2705" + btH
+	}
+	buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData(bt9, "subscribe9")
+	buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData(bt20, "subscribe20")
+	buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData(btL, "subscribelast")
+	buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData(btT, "subscribetop")
+	buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData(btC, "subscribecity")
+	buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData(btH, "subscribeholidays")
+	buttonSubscribeFinish := tgbotapi.NewInlineKeyboardButtonData(btF, "subscribefinish")
+	var row0 []tgbotapi.InlineKeyboardButton
+	var row1 []tgbotapi.InlineKeyboardButton
+	var row2 []tgbotapi.InlineKeyboardButton
+	var row3 []tgbotapi.InlineKeyboardButton
+	row0 = append(row0, buttonSubscribe9)
+	row0 = append(row0, buttonSubscribe20)
+	row1 = append(row1, buttonSubscribeLast)
+	row1 = append(row1, buttonSubscribeTop)
+	row2 = append(row2, buttonSubscribeCity)
+	row2 = append(row2, buttonSubscribeHolidays)
+	row3 = append(row3, buttonSubscribeFinish)
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
+	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
 }

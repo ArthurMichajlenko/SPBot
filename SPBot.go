@@ -139,12 +139,16 @@ func main() {
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSub9 := !tgbUser.Subscribe9
 					db.UpdateField(&tgbUser, "Subscribe9", changeSub9)
-					tgCbMsg.Text = startMsgEndText
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
+					tgBot.Send(newmessage)
 				case "subscribe20":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSub20 := !tgbUser.Subscribe20
 					db.UpdateField(&tgbUser, "Subscribe20", changeSub20)
-					tgCbMsg.Text = startMsgEndText
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
+					tgBot.Send(newmessage)
 				case "subscribelast":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubLast := !tgbUser.SubscribeLast
@@ -152,78 +156,35 @@ func main() {
 						db.UpdateField(&tgbUser, "RssLastID", 0)
 					}
 					db.UpdateField(&tgbUser, "SubscribeLast", changeSubLast)
-					tgCbMsg.Text = startMsgEndText
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
+					tgBot.Send(newmessage)
 				case "subscribetop":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubTop := !tgbUser.SubscribeTop
 					db.UpdateField(&tgbUser, "SubscribeTop", changeSubTop)
-					tgCbMsg.Text = startMsgEndText
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
+					tgBot.Send(newmessage)
 				case "subscribecity":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubCity := !tgbUser.SubscribeCity
 					db.UpdateField(&tgbUser, "SubscribeCity", changeSubCity)
-					tgCbMsg.Text = startMsgEndText
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
+					tgBot.Send(newmessage)
 				case "subscribeholidays":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					changeSubHolidays := !tgbUser.SubscribeHolidays
 					db.UpdateField(&tgbUser, "SubscribeHolidays", changeSubHolidays)
-					// TODO: Test Edit keyboard replace if work
-					bt9 := "Утром"
-					bt20 := "Вечером"
-					btL := "Последние новости"
-					btT := "Самое популярное"
-					btC := "Городские уведомления"
-					btH := "Календарь праздников"
-					btF := "Главное меню"
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
-					if tgbUser.Subscribe9 {
-						bt9 = "\u2705" + bt9
-					}
-					if tgbUser.Subscribe20 {
-						bt20 = "\u2705" + bt20
-					}
-					if tgbUser.SubscribeLast {
-						btL = "\u2705" + btL
-					}
-					if tgbUser.SubscribeTop {
-						btT = "\u2705" + btT
-					}
-					if tgbUser.SubscribeCity {
-						btC = "\u2705" + btC
-					}
-					if tgbUser.SubscribeHolidays {
-						btH = "\u2705" + btH
-					}
-					buttonSubscribe9 := tgbotapi.NewInlineKeyboardButtonData(bt9, "subscribe9")
-					buttonSubscribe20 := tgbotapi.NewInlineKeyboardButtonData(bt20, "subscribe20")
-					buttonSubscribeLast := tgbotapi.NewInlineKeyboardButtonData(btL, "subscribelast")
-					buttonSubscribeTop := tgbotapi.NewInlineKeyboardButtonData(btT, "subscribetop")
-					buttonSubscribeCity := tgbotapi.NewInlineKeyboardButtonData(btC, "subscribecity")
-					buttonSubscribeHolidays := tgbotapi.NewInlineKeyboardButtonData(btH, "subscribeholidays")
-					buttonSubscribeFinish := tgbotapi.NewInlineKeyboardButtonData(btF, "subscribefinish")
-					var row0 []tgbotapi.InlineKeyboardButton
-					var row1 []tgbotapi.InlineKeyboardButton
-					var row2 []tgbotapi.InlineKeyboardButton
-					var row3 []tgbotapi.InlineKeyboardButton
-					row0 = append(row0, buttonSubscribe9)
-					row0 = append(row0, buttonSubscribe20)
-					row1 = append(row1, buttonSubscribeLast)
-					row1 = append(row1, buttonSubscribeTop)
-					row2 = append(row2, buttonSubscribeCity)
-					row2 = append(row2, buttonSubscribeHolidays)
-					row3 = append(row3, buttonSubscribeFinish)
-					keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
-					// fmt.Println(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID)
-					// newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
-					// newmessage.ReplyMarkup = tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard).ReplyMarkup
-					//  newmessage := tgbotapi.NewEditMessageText(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, "Test")
-					newmessage := tgbotapi.NewEditMessageReplyMarkup(tgUpdate.CallbackQuery.Message.Chat.ID, tgUpdate.CallbackQuery.Message.MessageID, keyboard)
+					newmessage := SubButtons(&tgUpdate, &tgbUser)
 					tgBot.Send(newmessage)
-					// continue
 				case "subscribefinish":
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
-					// continue
+					tgCbMsg.Text = startMsgEndText
 				}
+				// Update visit time
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
 					db.UpdateField(&tgbUser, "LastDate", tgUpdate.CallbackQuery.Message.Date)
