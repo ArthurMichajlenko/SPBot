@@ -75,7 +75,7 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	btT := "Самое популярное"
 	btC := "Городские уведомления"
 	btH := "Календарь праздников"
-	btF := "Главное меню"
+	btF := "Продолжить..."
 	if user.Subscribe9 {
 		bt9 = "\u2705" + bt9
 	}

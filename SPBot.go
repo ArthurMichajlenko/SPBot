@@ -106,6 +106,7 @@ func main() {
 				tgCbMsg.ParseMode = "Markdown"
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = helpMsgText
 				case "subscribestart":
 					tgCbMsg.Text = `Выберите подписку:
@@ -123,17 +124,21 @@ func main() {
 					row2 = append(row2, buttonSubscribeLast)
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 					tgCbMsg.ReplyMarkup = keyboard
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 				case "subscribe9start":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					db.UpdateField(&tgbUser, "Subscribe9", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "subscribe20start":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					db.UpdateField(&tgbUser, "Subscribe20", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "subscribelaststart":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 					db.UpdateField(&tgbUser, "SubscribeLast", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "subscribe9":
 					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
