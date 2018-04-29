@@ -73,11 +73,10 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
 	}
-	// Test RSS
+	// RSS
 	feed, err := rss.Fetch("http://esp.md/feed/rss")
 	var countFeed int
 	countView := 5
-	// fmt.Println(feed)
 	// Cron for subscriptions
 	c := cron.New()
 	// c.AddFunc("0 0/5 * * * *", func() {
