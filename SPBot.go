@@ -76,6 +76,7 @@ func main() {
 	// Test RSS
 	feed, err := rss.Fetch("http://esp.md/feed/rss")
 	var countFeed int
+	countView := 5
 	// fmt.Println(feed)
 	// Cron for subscriptions
 	c := cron.New()
@@ -190,12 +191,14 @@ func main() {
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "next5":
-					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие 2...", "next5")
+					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
 					for count := countFeed + 1; count < len(feed.Items); count++ {
-						if count == countFeed+2 {
+						if count == countFeed+countView {
 							countFeed = count
-							tgCbMsg.ReplyMarkup = keyboard
+							if count != len(feed.Items)-1 {
+								tgCbMsg.ReplyMarkup = keyboard
+							}
 							tgCbMsg.Text = "[" + feed.Items[count].Title + "\n" + feed.Items[count].Date.Format("02-01-2006 15:04") + "]" + "(" + feed.Items[count].Link + ")"
 							tgBot.Send(tgCbMsg)
 							break
@@ -311,12 +314,12 @@ func main() {
 			case "top":
 				tgMsg.Text = stubMsgText
 			case "news":
-				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие 2...", "next5")
+				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
 				feed.Update()
 				countFeed = 0
 				for count, newsItem := range feed.Items {
-					if count == 1 {
+					if count == countView-1 {
 						countFeed = count
 						tgMsg.ReplyMarkup = keyboard
 						tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
