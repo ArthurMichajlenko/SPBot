@@ -79,17 +79,18 @@ func main() {
 	countView := 5
 	// Cron for subscriptions
 	c := cron.New()
-	// c.AddFunc("0 0/5 * * * *", func() {
-	// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
-	// tg40Msg.ParseMode = "Markdown"
-	// tgBot.Send(tg40Msg)
-	// feed.Update()
-	// fmt.Println(feed)
-	// })
+	c.AddFunc("0 0/15 * * * *", func() {
+		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
+		// tg40Msg.ParseMode = "Markdown"
+		// tgBot.Send(tg40Msg)
+		// feed.Update()
+		fmt.Println(time.Now(), "Tik-Tak")
+	})
 	c.AddFunc("@hourly", func() {
-		tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
-		tg1hMsg.ParseMode = "Markdown"
-		tgBot.Send(tg1hMsg)
+		// tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
+		// tg1hMsg.ParseMode = "Markdown"
+		// tgBot.Send(tg1hMsg)
+		fmt.Println(time.Now(), "Tik-Tak 1 Hour")
 	})
 	c.Start()
 
