@@ -11,6 +11,7 @@ import (
 
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
+	"github.com/fsnotify/fsnotify"
 	"github.com/robfig/cron"
 )
 
@@ -19,14 +20,24 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// load holidays if error message not released
+	// Load holidays if error send message not released
 	noWork := false
 	holidays, err := LoadHolidays(config.FileHolidays)
 	if err != nil {
 		log.Println(err)
 		noWork = true
 	}
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Println(err)
+	}
+	defer watcher.Close()
+	err = watcher.Add(config.FileHolidays)
+	if err != nil {
+		log.Println(err)
+	}
 	fmt.Println(holidays)
+
 	// Bolt
 	db, err := storm.Open("user.db")
 	if err != nil {
@@ -106,6 +117,21 @@ func main() {
 	for {
 
 		select {
+		// Watch holidays.txt and update Holidays
+		case event := <-watcher.Events:
+			log.Println("event:", event)
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				log.Println("modified file:", event.Name)
+			}
+			holidays, err = LoadHolidays(config.FileHolidays)
+			if err != nil {
+				log.Println(err)
+				noWork = true
+			} else {
+				noWork = false
+			}
+		case errEv := <-watcher.Errors:
+			log.Println("error:", errEv)
 		// Updates from Telegram
 		case tgUpdate := <-tgUpdates:
 			toOriginal := false
@@ -348,6 +374,7 @@ func main() {
 				} else {
 					tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
 				}
+				fmt.Println(holidays)
 			case "games":
 				tgMsg.Text = stubMsgText
 			case "donate":
