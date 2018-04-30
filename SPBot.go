@@ -36,8 +36,6 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(holidays)
-	fmt.Println(time.Now().AddDate(0, 0, 7))
 
 	// Bolt
 	db, err := storm.Open("user.db")
@@ -225,6 +223,11 @@ func main() {
 				case "subscribefinish":
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
+				case "subscribehd":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeHolidays", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
+					tgCbMsg.Text = startMsgEndText
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
@@ -373,12 +376,17 @@ func main() {
 				if noWork {
 					tgMsg.Text = stubMsgText
 				} else {
-					tgMsg.Text = ""
+					tgMsg.Text = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
 					for _, hd := range holidays {
 						if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
 							tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 						}
 					}
+					tgMsg.Text += "_Предлагаем Вам подписаться на рассылку праздников. Мы будем присылать Вам даты на неделю каждый понедельник в 10:00_"
+					buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribehd")
+					buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
+					tgMsg.ReplyMarkup = keyboard
 				}
 			case "games":
 				tgMsg.Text = stubMsgText
