@@ -1,16 +1,19 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
 
 // Config bots configurations
 type Config struct {
-	Bots Bots `json:"bots"`
+	Bots         Bots   `json:"bots"`
+	FileHolidays string `json:"file_holidays"`
 }
 
 // Bots configuration webhook,port,APIkey etc.
@@ -35,6 +38,13 @@ type Telegram struct {
 	TgPathCERT string `json:"tg_path_cert"`
 }
 
+//Holidays holidays
+type Holidays struct {
+	Day     string
+	Month   string
+	Holiday string
+}
+
 //TgUser Telegram User
 type TgUser struct {
 	ChatID            int64 `storm:"id"`
@@ -49,6 +59,54 @@ type TgUser struct {
 	SubscribeTop      bool
 	SubscribeHolidays bool
 	RssLastID         int
+}
+
+// LoadHolidays returns holidays reading from file
+func LoadHolidays(file string) ([]Holidays, error) {
+	var holidays []Holidays
+	var holiday Holidays
+	var row []string
+	holidaysFile, err := os.Open(file)
+	defer holidaysFile.Close()
+	if err != nil {
+		return holidays, err
+	}
+	scanner := bufio.NewScanner(holidaysFile)
+	for scanner.Scan() {
+		row = strings.Split(scanner.Text(), "|")
+		holiday.Day = row[0]
+		switch row[1] {
+		case "01":
+			holiday.Month = "Январь"
+		case "02":
+			holiday.Month = "Февраль"
+		case "03":
+			holiday.Month = "Март"
+		case "04":
+			holiday.Month = "Апрель"
+		case "05":
+			holiday.Month = "Май"
+		case "06":
+			holiday.Month = "Июнь"
+		case "07":
+			holiday.Month = "Июль"
+		case "08":
+			holiday.Month = "Август"
+		case "09":
+			holiday.Month = "Сентябрь"
+		case "10":
+			holiday.Month = "Октябрь"
+		case "11":
+			holiday.Month = "Ноябрь"
+		case "12":
+			holiday.Month = "Декабрь"
+		default:
+			holiday.Month = ""
+		}
+		holiday.Holiday = row[2]
+		holidays = append(holidays, holiday)
+	}
+	return holidays, err
 }
 
 // LoadConfigBots returns config reading from json file

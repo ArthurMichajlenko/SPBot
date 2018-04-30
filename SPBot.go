@@ -19,6 +19,14 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+	// load holidays if error message not released
+	noWork := false
+	holidays, err := LoadHolidays(config.FileHolidays)
+	if err != nil {
+		log.Println(err)
+		noWork = true
+	}
+	fmt.Println(holidays)
 	// Bolt
 	db, err := storm.Open("user.db")
 	if err != nil {
@@ -335,7 +343,11 @@ func main() {
 			case "feedback":
 				tgMsg.Text = stubMsgText
 			case "holidays":
-				tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
+				if noWork {
+					tgMsg.Text = stubMsgText
+				} else {
+					tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
+				}
 			case "games":
 				tgMsg.Text = stubMsgText
 			case "donate":

@@ -12,5 +12,6 @@
             "fb_port": 8443,
             "fb_path_cert": ""
         }
-    }
+    },
+    "file_holidays":"holidays.txt"
 }
