@@ -37,6 +37,7 @@ func main() {
 		log.Println(err)
 	}
 	fmt.Println(holidays)
+	fmt.Println(time.Now().AddDate(0, 0, 7))
 
 	// Bolt
 	db, err := storm.Open("user.db")
@@ -374,7 +375,9 @@ func main() {
 				} else {
 					tgMsg.Text = ""
 					for _, hd := range holidays {
-						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+						if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
+							tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+						}
 					}
 				}
 			case "games":

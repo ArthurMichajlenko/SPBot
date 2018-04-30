@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
@@ -41,10 +42,10 @@ type Telegram struct {
 
 //Holidays holidays
 type Holidays struct {
-	Day      string
-	Month    string
-	MonthNum int
-	Holiday  string
+	Day     string
+	Month   string
+	Holiday string
+	Date    time.Time
 }
 
 //TgUser Telegram User
@@ -77,7 +78,11 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	for scanner.Scan() {
 		row = strings.Split(scanner.Text(), "|")
 		holiday.Day = row[0]
-		holiday.MonthNum, _ = strconv.Atoi(row[1])
+		year, _, _ := time.Now().Date()
+		loc := time.Now().Location()
+		mon, _ := strconv.Atoi(row[1])
+		day, _ := strconv.Atoi(row[0])
+		holiday.Date = time.Date(year, time.Month(mon), day, 0, 0, 0, 0, loc)
 		switch row[1] {
 		case "01":
 			holiday.Month = "Январь"
