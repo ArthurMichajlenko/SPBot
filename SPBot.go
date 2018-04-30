@@ -372,9 +372,11 @@ func main() {
 				if noWork {
 					tgMsg.Text = stubMsgText
 				} else {
-					tgMsg.Text = strconv.Itoa(int(tgUpdate.Message.Chat.ID)) + "\u2714" + tgUpdate.Message.Chat.FirstName + time.Unix(int64(tgUpdate.Message.Date), 0).String()
+					tgMsg.Text = ""
+					for _, hd := range holidays {
+						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+					}
 				}
-				fmt.Println(holidays)
 			case "games":
 				tgMsg.Text = stubMsgText
 			case "donate":

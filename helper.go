@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/Syfaro/telegram-bot-api"
@@ -40,9 +41,10 @@ type Telegram struct {
 
 //Holidays holidays
 type Holidays struct {
-	Day     string
-	Month   string
-	Holiday string
+	Day      string
+	Month    string
+	MonthNum int
+	Holiday  string
 }
 
 //TgUser Telegram User
@@ -75,6 +77,7 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	for scanner.Scan() {
 		row = strings.Split(scanner.Text(), "|")
 		holiday.Day = row[0]
+		holiday.MonthNum, _ = strconv.Atoi(row[1])
 		switch row[1] {
 		case "01":
 			holiday.Month = "Январь"
