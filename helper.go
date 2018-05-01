@@ -63,6 +63,31 @@ type NodeNews struct {
 	NodePath  string            `json:"node_path"`
 }
 
+// Search from query esp.md
+type Search struct {
+	Nodes []NodeElementS `json:"nodes"`
+}
+
+// NodeElementS from search
+type NodeElementS struct {
+	Node NodeSearch `json:"node"`
+}
+
+// NodeSearch what is in node
+type NodeSearch struct {
+	NodeID    string    `json:"node_id"`
+	Title     string    `json:"title"`
+	NodeBody  string    `json:"node_body"`
+	NodeCover NodeCover `json:"node_cover"`
+	NodePath  string    `json:"node_path"`
+}
+
+// NodeCover cover search
+type NodeCover struct {
+	Src string `json:"src"`
+	Alt string `json:"alt"`
+}
+
 //Holidays holidays
 type Holidays struct {
 	Day     string
@@ -219,4 +244,20 @@ func NewsQuery(url string) (News, error) {
 	}
 	err = json.Unmarshal(r, &news)
 	return news, err
+}
+
+// SearchQuery get Nodes from esp.md
+func SearchQuery(url string) (Search, error) {
+	var search Search
+	res, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+	}
+	defer res.Body.Close()
+	r, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err)
+	}
+	err = json.Unmarshal(r, &search)
+	return search, err
 }

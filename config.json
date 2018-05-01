@@ -14,6 +14,6 @@
         }
     },
     "file_holidays":"holidays.txt",
-    "query_top":"http://dev.esp.md/top-news?page=1",
+    "query_top":"http://dev.esp.md/top-news?",
     "query_search":"http://dev.esp.md/search/bot?query="
 }

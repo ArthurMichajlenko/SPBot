@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
@@ -361,7 +362,9 @@ func main() {
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
 			case "beltsy":
 				var city News
-				city, err := NewsQuery(config.QueryTop)
+				numPage := 1
+				queryCity := config.QueryTop + "page=" + strconv.Itoa(numPage)
+				city, err := NewsQuery(queryCity)
 				if err != nil {
 					log.Println(err)
 				}
@@ -377,7 +380,9 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			case "top":
 				var top News
-				top, err := NewsQuery(config.QueryTop)
+				numPage := 1
+				queryTop := config.QueryTop + "page=" + strconv.Itoa(numPage)
+				top, err := NewsQuery(queryTop)
 				if err != nil {
 					log.Println(err)
 				}
@@ -408,7 +413,20 @@ func main() {
 				}
 				continue
 			case "search":
-				tgMsg.Text = stubMsgText
+				var search Search
+				numPage := 1
+				searchString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], "%20")
+				searchQuery := config.QuerySearch + searchString + "&page=" + strconv.Itoa(numPage)
+				log.Println(searchQuery)
+				search, err := SearchQuery(searchQuery)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, searchItem := range search.Nodes {
+					tgMsg.Text = "[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				continue
 			case "feedback":
 				tgMsg.Text = stubMsgText
 			case "holidays":
