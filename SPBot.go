@@ -417,7 +417,6 @@ func main() {
 				numPage := 1
 				searchString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], "%20")
 				searchQuery := config.QuerySearch + searchString + "&page=" + strconv.Itoa(numPage)
-				log.Println(searchQuery)
 				search, err := SearchQuery(searchQuery)
 				if err != nil {
 					log.Println(err)
