@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -16,6 +18,8 @@ import (
 type Config struct {
 	Bots         Bots   `json:"bots"`
 	FileHolidays string `json:"file_holidays"`
+	QueryTop     string `json:"query_top"`
+	QuerySearch  string `json:"query_search"`
 }
 
 // Bots configuration webhook,port,APIkey etc.
@@ -38,6 +42,25 @@ type Telegram struct {
 	TgWebhook  string `json:"tg_webhook"`
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
+}
+
+// News from query esp.md
+type News struct {
+	Nodes []NodeElement `json:"nodes"`
+}
+
+// NodeElement from news
+type NodeElement struct {
+	Node NodeNews `json:"node"`
+}
+
+// NodeNews what is in node
+type NodeNews struct {
+	NodeID    string            `json:"node_id"`
+	NodeTitle string            `json:"node_title"`
+	NodeBody  string            `json:"node_body"`
+	NodeCover map[string]string `json:"node_cover"`
+	NodePath  string            `json:"node_path"`
 }
 
 //Holidays holidays
@@ -180,4 +203,20 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	row3 = append(row3, buttonSubscribeFinish)
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
 	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
+}
+
+// NewsQuery get Nodes from esp.md
+func NewsQuery(url string) (News, error) {
+	var news News
+	res, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+	}
+	defer res.Body.Close()
+	r, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err)
+	}
+	err = json.Unmarshal(r, &news)
+	return news, err
 }

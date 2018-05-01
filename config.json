@@ -13,5 +13,7 @@
             "fb_path_cert": ""
         }
     },
-    "file_holidays":"holidays.txt"
+    "file_holidays":"holidays.txt",
+    "query_top":"http://dev.esp.md/top-news?page=1",
+    "query_search":"http://dev.esp.md/search/bot?query="
 }

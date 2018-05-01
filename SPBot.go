@@ -228,6 +228,16 @@ func main() {
 					db.UpdateField(&tgbUser, "SubscribeHolidays", true)
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
+				case "subscribetp":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeTop", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
+					tgCbMsg.Text = startMsgEndText
+				case "subscribec":
+					db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
+					db.UpdateField(&tgbUser, "SubscribeCity", true)
+					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
+					tgCbMsg.Text = startMsgEndText
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
@@ -348,9 +358,36 @@ func main() {
 					соответствующую кнопку
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
 			case "beltsy":
-				tgMsg.Text = stubMsgText
+				var city News
+				city, err := NewsQuery(config.QueryTop)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, cityItem := range city.Nodes {
+					// log.Println(topItem.Node.NodeTitle, topItem.Node.NodePath)
+					tgMsg.Text = "[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				tgMsg.Text = "_Оформив подиску на городские оповещения, Вы будете получать сюда предупреждения городских служб, анонсы мероприятий в Бельцах и т.д._"
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribec")
+				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
+				tgMsg.ReplyMarkup = keyboard
 			case "top":
-				tgMsg.Text = stubMsgText
+				var top News
+				top, err := NewsQuery(config.QueryTop)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, topItem := range top.Nodes {
+					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать Вам такие подборки каждое воскресенье в 18:00_"
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribetp")
+				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
+				tgMsg.ReplyMarkup = keyboard
 			case "news":
 				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
