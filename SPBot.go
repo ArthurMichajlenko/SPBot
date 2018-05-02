@@ -443,7 +443,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text = msgString
+				tgMsg.Text = `Ваше сообщение отправлено. Спасибо `
 			case "holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
