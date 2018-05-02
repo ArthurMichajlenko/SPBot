@@ -16,10 +16,11 @@ import (
 
 // Config bots configurations
 type Config struct {
-	Bots         Bots   `json:"bots"`
-	FileHolidays string `json:"file_holidays"`
-	QueryTop     string `json:"query_top"`
-	QuerySearch  string `json:"query_search"`
+	Bots         Bots     `json:"bots"`
+	Feedback     Feedback `json:"feedback"`
+	FileHolidays string   `json:"file_holidays"`
+	QueryTop     string   `json:"query_top"`
+	QuerySearch  string   `json:"query_search"`
 }
 
 // Bots configuration webhook,port,APIkey etc.
@@ -42,6 +43,19 @@ type Telegram struct {
 	TgWebhook  string `json:"tg_webhook"`
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
+}
+
+// Feedback config for feedback
+type Feedback struct {
+	Email Email `json:"email"`
+}
+
+// Email config email parameters
+type Email struct {
+	SMTPServer string `json:"smtp_server"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	EmailTo    string `json:"email_to"`
 }
 
 // News from query esp.md

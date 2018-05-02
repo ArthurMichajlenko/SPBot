@@ -86,6 +86,7 @@ func main() {
 	} else {
 		// Initialize webhook & channel for update from API
 		tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
+		tgBot.RemoveWebhook()
 		_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
 		if err != nil {
 			log.Fatal(err)
@@ -427,7 +428,8 @@ func main() {
 				}
 				continue
 			case "feedback":
-				tgMsg.Text = stubMsgText
+				msgString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], " ")
+				tgMsg.Text = msgString
 			case "holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText

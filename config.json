@@ -13,6 +13,14 @@
             "fb_path_cert": ""
         }
     },
+    "feedback":{
+        "email":{
+            "smtp_server":"smtp.gmail.com:993",
+            "username":"spbotbeltsy@gmail.com",
+            "password":"UfptnfCG",
+            "email_to":"michajlenko1967@outlook.com"
+        }
+    },
     "file_holidays":"holidays.txt",
     "query_top":"http://dev.esp.md/top-news?",
     "query_search":"http://dev.esp.md/search/bot?query="
