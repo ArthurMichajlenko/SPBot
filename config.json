@@ -15,9 +15,11 @@
     },
     "feedback":{
         "email":{
-            "smtp_server":"smtp.gmail.com:993",
+            "smtp_server":"smtp.gmail.com",
+            "smtp_port":"587",
             "username":"spbotbeltsy@gmail.com",
             "password":"UfptnfCG",
+            "email_from":"spbotbeltsy@gmail.com",
             "email_to":"michajlenko1967@outlook.com"
         }
     },

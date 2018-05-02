@@ -4,23 +4,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
-
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
+	"github.com/jordan-wright/email"
 	"github.com/robfig/cron"
 )
 
 func main() {
+	// Load config
 	config, err := LoadConfigBots("config.json")
 	if err != nil {
 		log.Panic(err)
 	}
+	// Create email auth
+	smtpAuth := smtp.PlainAuth("", config.Feedback.Email.Username, config.Feedback.Email.Password, config.Feedback.Email.SMTPServer)
 	// Load holidays if error send message not released
 	noWork := false
 	holidays, err := LoadHolidays(config.FileHolidays)
@@ -429,6 +433,16 @@ func main() {
 				continue
 			case "feedback":
 				msgString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], " ")
+				email := email.NewEmail()
+				email.From = config.Feedback.Email.EmailFrom
+				email.To = append(email.To, config.Feedback.Email.EmailTo)
+				email.Subject = "Сообщение от: ID:" + strconv.Itoa(tgUpdate.Message.From.ID) + " Username: " + tgUpdate.Message.From.UserName + "\n"
+				email.Subject += "Имя Фамилия: " + tgUpdate.Message.From.FirstName + " " + tgUpdate.Message.From.LastName
+				email.Text = []byte(msgString)
+				err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
+				if err != nil {
+					log.Println(err)
+				}
 				tgMsg.Text = msgString
 			case "holidays":
 				if noWork {

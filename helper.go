@@ -53,8 +53,10 @@ type Feedback struct {
 // Email config email parameters
 type Email struct {
 	SMTPServer string `json:"smtp_server"`
+	SMTPPort   string `json:"smtp_port"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
+	EmailFrom  string `json:"email_from"`
 	EmailTo    string `json:"email_to"`
 }
 
