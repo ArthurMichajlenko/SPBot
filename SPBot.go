@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -420,8 +421,8 @@ func main() {
 			case "search":
 				var search Search
 				numPage := 1
-				searchString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], "%20")
-				searchQuery := config.QuerySearch + searchString + "&page=" + strconv.Itoa(numPage)
+				searchString := tgUpdate.Message.CommandArguments()
+				searchQuery := config.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
 				search, err := SearchQuery(searchQuery)
 				if err != nil {
 					log.Println(err)
