@@ -58,7 +58,7 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Next 2 strings for development may remove in production
+	// todo Next 2 strings for development may remove in production
 	tgBot.Debug = true
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
@@ -503,7 +503,7 @@ func main() {
 				db.Save(&tgbUser)
 			}
 			tgBot.Send(tgMsg)
-			// Default may cause high CPU load
+			// ! Default may cause high CPU load
 			// default:
 		}
 	}
