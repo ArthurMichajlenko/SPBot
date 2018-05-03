@@ -26,8 +26,12 @@ func main() {
 	}
 	// Create email auth
 	smtpAuth := smtp.PlainAuth("", config.Feedback.Email.Username, config.Feedback.Email.Password, config.Feedback.Email.SMTPServer)
-	// Load holidays if error send message not released
-	noWork := false
+	var (
+		// Load holidays if error send message not released
+		noWork = false
+		// Message consist of few part e.g. feedback (maybe search)
+		// //multipart = false
+	)
 	holidays, err := LoadHolidays(config.FileHolidays)
 	if err != nil {
 		log.Println(err)
@@ -433,6 +437,7 @@ func main() {
 				}
 				continue
 			case "feedback":
+				//// multipart = true
 				msgString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], " ")
 				email := email.NewEmail()
 				email.From = config.Feedback.Email.EmailFrom
