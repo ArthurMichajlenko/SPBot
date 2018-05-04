@@ -7,7 +7,6 @@ import (
 	"net/smtp"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
@@ -29,8 +28,10 @@ func main() {
 	var (
 		// Load holidays if error send message not released
 		noWork = false
-		// Message consist of few part e.g. feedback (maybe search)
-		// //multipart = false
+		// Message consist of few parts e.g. feedback (maybe search)
+		multipart        = false
+		commandArguments string
+		messageOwner     TgMessageOwner
 	)
 	holidays, err := LoadHolidays(config.FileHolidays)
 	if err != nil {
@@ -62,7 +63,7 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// todo Next 2 strings for development may remove in production
+	// TODO: Next 2 strings for development must remove in production
 	tgBot.Debug = true
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
@@ -251,6 +252,23 @@ func main() {
 					db.UpdateField(&tgbUser, "SubscribeCity", true)
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
+				case "continue", "addattachment":
+					msgString := commandArguments
+					email := email.NewEmail()
+					email.From = config.Feedback.Email.EmailFrom
+					email.To = append(email.To, config.Feedback.Email.EmailTo)
+					email.Subject = "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
+					email.Subject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName
+					email.Text = []byte(msgString)
+					err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
+					if err != nil {
+						log.Println(err)
+					}
+					if tgUpdate.CallbackQuery.Data == "continue" {
+						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо ` + strconv.FormatBool(multipart)
+					} else {
+						tgCbMsg.Text = `Добавляем файл... ` + strconv.FormatBool(multipart)
+					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
@@ -379,7 +397,6 @@ func main() {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					// log.Println(topItem.Node.NodeTitle, topItem.Node.NodePath)
 					tgMsg.Text = "[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
@@ -437,19 +454,17 @@ func main() {
 				}
 				continue
 			case "feedback":
-				//// multipart = true
-				msgString := strings.Join(strings.Split(tgUpdate.Message.Text, " ")[1:], " ")
-				email := email.NewEmail()
-				email.From = config.Feedback.Email.EmailFrom
-				email.To = append(email.To, config.Feedback.Email.EmailTo)
-				email.Subject = "Сообщение от: ID:" + strconv.Itoa(tgUpdate.Message.From.ID) + " Username: " + tgUpdate.Message.From.UserName + "\n"
-				email.Subject += "Имя Фамилия: " + tgUpdate.Message.From.FirstName + " " + tgUpdate.Message.From.LastName
-				email.Text = []byte(msgString)
-				err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
-				if err != nil {
-					log.Println(err)
-				}
-				tgMsg.Text = `Ваше сообщение отправлено. Спасибо `
+				multipart = true
+				commandArguments = tgUpdate.Message.CommandArguments()
+				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
+				messageOwner.Username = tgUpdate.Message.Chat.UserName
+				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
+				messageOwner.LastName = tgUpdate.Message.Chat.LastName
+				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл...", "addattachment")
+				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить...", "continue")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
+				tgMsg.ReplyMarkup = keyboard
+				tgMsg.Text = "Press button..."
 			case "holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText

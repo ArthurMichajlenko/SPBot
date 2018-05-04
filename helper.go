@@ -128,6 +128,14 @@ type TgUser struct {
 	RssLastID         int
 }
 
+//TgMessageOwner info about who send message
+type TgMessageOwner struct {
+	ID        string
+	Username  string
+	FirstName string
+	LastName  string
+}
+
 // LoadHolidays returns holidays reading from file
 func LoadHolidays(file string) ([]Holidays, error) {
 	var holidays []Holidays
