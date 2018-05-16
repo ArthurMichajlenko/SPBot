@@ -6,8 +6,8 @@
  * @Email: michajlenko1967@gmail.com
  * @Create At: 2018-04-04 15:25:00
  * @Last Modified By: Arthur Michajlenko
- * @Last Modified At: 2018-05-16 14:42:02
- * @Description: This is description.
+ * @Last Modified At: 2018-05-16 14:49:42
+ * @Description: Bot for SP.
  */
 
 package main
