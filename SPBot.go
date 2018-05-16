@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2018 Arthur Michajlenko
+ *
+ * @Script: SPBot.go
+ * @Author: Arthur Michajlenko
+ * @Email: michajlenko1967@gmail.com
+ * @Create At: 2018-04-04 15:25:00Gп
+ * @Last Modified By: Arthur Michajlenko
+ * @Last Modified At: 2018-05-16 14:41:31
+ * @Description: This is description.
+ */
+
 package main
 
 import (
