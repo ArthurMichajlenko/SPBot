@@ -472,11 +472,15 @@ func main() {
 				messageOwner.Username = tgUpdate.Message.Chat.UserName
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
-				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл...", "addattachment")
-				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить...", "continue")
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
+				buttonAttach := tgbotapi.NewKeyboardButton("addattachment")
+				buttonContinue := tgbotapi.NewKeyboardButton("continue")
+				keyboard := tgbotapi.NewReplyKeyboard(tgbotapi.NewKeyboardButtonRow(buttonAttach, buttonContinue))
 				tgMsg.ReplyMarkup = keyboard
-				tgMsg.Text = "Press button..."
+				if commandArguments == "" {
+					tgMsg.Text = "Введите текст сообщения..."
+				} else {
+					tgMsg.Text = commandArguments
+				}
 			case "holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
