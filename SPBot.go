@@ -328,6 +328,7 @@ func main() {
 			if !tgUpdate.Message.IsCommand() {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
+				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 				tgBot.Send(tgMsg)
 				continue
 			}
@@ -472,12 +473,15 @@ func main() {
 				messageOwner.Username = tgUpdate.Message.Chat.UserName
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
-				buttonAttach := tgbotapi.NewKeyboardButton("addattachment")
-				buttonContinue := tgbotapi.NewKeyboardButton("continue")
-				keyboard := tgbotapi.NewReplyKeyboard(tgbotapi.NewKeyboardButtonRow(buttonAttach, buttonContinue))
+				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("addattachment", "addattachment")
+				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("continue", "continue")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
 				tgMsg.ReplyMarkup = keyboard
 				if commandArguments == "" {
 					tgMsg.Text = "Введите текст сообщения..."
+					tgMsg.ReplyMarkup = tgbotapi.ForceReply{
+						ForceReply: true,
+					}
 				} else {
 					tgMsg.Text = commandArguments
 				}
@@ -514,6 +518,7 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			default:
 				toOriginal = true
+				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 				tgMsg.Text = noCmdText
 			}
 
