@@ -41,9 +41,9 @@ func main() {
 		// Load holidays if error send message not released
 		noWork = false
 		// Message consist of few parts e.g. feedback (maybe search)
-		multipart        = false
-		commandArguments string
-		messageOwner     TgMessageOwner
+		multipartFeedback = false
+		commandArguments  string
+		messageOwner      TgMessageOwner
 	)
 	holidays, err := LoadHolidays(config.FileHolidays)
 	if err != nil {
@@ -277,9 +277,9 @@ func main() {
 						log.Println(err)
 					}
 					if tgUpdate.CallbackQuery.Data == "continue" {
-						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо ` + strconv.FormatBool(multipart)
+						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо ` + strconv.FormatBool(multipartFeedback)
 					} else {
-						tgCbMsg.Text = `Добавляем файл... ` + strconv.FormatBool(multipart)
+						tgCbMsg.Text = `Добавляем файл... ` + strconv.FormatBool(multipartFeedback)
 					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
@@ -467,7 +467,7 @@ func main() {
 				}
 				continue
 			case "feedback":
-				multipart = true
+				multipartFeedback = true
 				commandArguments = tgUpdate.Message.CommandArguments()
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
 				messageOwner.Username = tgUpdate.Message.Chat.UserName
