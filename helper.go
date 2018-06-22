@@ -14,7 +14,7 @@ import (
 	"github.com/Syfaro/telegram-bot-api"
 )
 
-// Config bots configurations
+// Config bots configurations.
 type Config struct {
 	Bots         Bots     `json:"bots"`
 	Feedback     Feedback `json:"feedback"`
@@ -29,7 +29,7 @@ type Bots struct {
 	Facebook Facebook `json:"facebook"`
 }
 
-// Facebook bot configuration
+// Facebook bot configuration.
 type Facebook struct {
 	FbApikey   string `json:"fb_apikey"`
 	FbWebhook  string `json:"fb_webhook"`
@@ -37,7 +37,7 @@ type Facebook struct {
 	FbPathCERT string `json:"fb_path_cert"`
 }
 
-// Telegram bot configuration
+// Telegram bot configuration.
 type Telegram struct {
 	TgApikey   string `json:"tg_apikey"`
 	TgWebhook  string `json:"tg_webhook"`
@@ -45,12 +45,12 @@ type Telegram struct {
 	TgPathCERT string `json:"tg_path_cert"`
 }
 
-// Feedback config for feedback
+// Feedback config for feedback.
 type Feedback struct {
 	Email Email `json:"email"`
 }
 
-// Email config email parameters
+// Email config email parameters.
 type Email struct {
 	SMTPServer string `json:"smtp_server"`
 	SMTPPort   string `json:"smtp_port"`
@@ -60,17 +60,17 @@ type Email struct {
 	EmailTo    string `json:"email_to"`
 }
 
-// News from query esp.md
+// News from query esp.md.
 type News struct {
 	Nodes []NodeElement `json:"nodes"`
 }
 
-// NodeElement from news
+// NodeElement from news.
 type NodeElement struct {
 	Node NodeNews `json:"node"`
 }
 
-// NodeNews what is in node
+// NodeNews what is in node.
 type NodeNews struct {
 	NodeID    string            `json:"node_id"`
 	NodeTitle string            `json:"node_title"`
@@ -79,17 +79,17 @@ type NodeNews struct {
 	NodePath  string            `json:"node_path"`
 }
 
-// Search from query esp.md
+// Search from query esp.md.
 type Search struct {
 	Nodes []NodeElementS `json:"nodes"`
 }
 
-// NodeElementS from search
+// NodeElementS from search.
 type NodeElementS struct {
 	Node NodeSearch `json:"node"`
 }
 
-// NodeSearch what is in node
+// NodeSearch what is in node.
 type NodeSearch struct {
 	NodeID    string    `json:"node_id"`
 	Title     string    `json:"title"`
@@ -98,13 +98,13 @@ type NodeSearch struct {
 	NodePath  string    `json:"node_path"`
 }
 
-// NodeCover cover search
+// NodeCover cover search.
 type NodeCover struct {
 	Src string `json:"src"`
 	Alt string `json:"alt"`
 }
 
-//Holidays holidays
+//Holidays holidays.
 type Holidays struct {
 	Day     string
 	Month   string
@@ -112,7 +112,7 @@ type Holidays struct {
 	Date    time.Time
 }
 
-//TgUser Telegram User
+//TgUser Telegram User.
 type TgUser struct {
 	ChatID            int64 `storm:"id"`
 	FirstName         string
@@ -128,7 +128,7 @@ type TgUser struct {
 	RssLastID         int
 }
 
-//TgMessageOwner info about who send message
+//TgMessageOwner info about who send message.
 type TgMessageOwner struct {
 	ID        string
 	Username  string
@@ -136,7 +136,7 @@ type TgMessageOwner struct {
 	LastName  string
 }
 
-// LoadHolidays returns holidays reading from file
+// LoadHolidays returns holidays reading from file.
 func LoadHolidays(file string) ([]Holidays, error) {
 	var holidays []Holidays
 	var holiday Holidays
@@ -189,7 +189,7 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	return holidays, err
 }
 
-// LoadConfigBots returns config reading from json file
+// LoadConfigBots returns config reading from json file.
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
 	configFile, err := os.Open(file)
@@ -205,7 +205,7 @@ func LoadConfigBots(file string) (Config, error) {
 	return botsconfig, err
 }
 
-//SubButtons create keyboard for subscriptions
+//SubButtons create keyboard for subscriptions.
 func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReplyMarkupConfig {
 	bt9 := "Утром"
 	bt20 := "Вечером"
@@ -254,7 +254,7 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
 }
 
-// NewsQuery get Nodes from esp.md
+// NewsQuery get Nodes from esp.md.
 func NewsQuery(url string) (News, error) {
 	var news News
 	res, err := http.Get(url)
@@ -270,7 +270,7 @@ func NewsQuery(url string) (News, error) {
 	return news, err
 }
 
-// SearchQuery get Nodes from esp.md
+// SearchQuery get Nodes from esp.md.
 func SearchQuery(url string) (Search, error) {
 	var search Search
 	res, err := http.Get(url)
