@@ -282,9 +282,9 @@ func main() {
 						log.Println(err)
 					}
 					if tgUpdate.CallbackQuery.Data == "continue" {
-						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо ` + strconv.FormatBool(multipartFeedback)
+						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 					} else {
-						tgCbMsg.Text = `Добавляем файл... ` + strconv.FormatBool(multipartFeedback)
+						tgCbMsg.Text = `Добавляем файл... `
 					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
