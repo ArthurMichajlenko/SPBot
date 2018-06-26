@@ -19,6 +19,7 @@ import (
 	"net/smtp"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
@@ -325,7 +326,7 @@ func main() {
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
-			if !tgUpdate.Message.IsCommand() {
+			if !tgUpdate.Message.IsCommand() && !multipartFeedback {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
 				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
@@ -333,16 +334,18 @@ func main() {
 				continue
 			}
 
-			switch tgUpdate.Message.Command() {
-			case "help":
+			msgSlice := strings.Split(tgUpdate.Message.Text, " ")
+			switch strings.ToLower(msgSlice[0]) {
+			// switch tgUpdate.Message.Command() {
+			case "/help":
 				tgMsg.Text = helpMsgText
-			case "start":
+			case "/start":
 				tgMsg.Text = startMsgText
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "subscriptions":
+			case "/subscriptions":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
@@ -401,7 +404,7 @@ func main() {
 						Для изменения состояния подписки нажмите на 
 					соответствующую кнопку
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
-			case "beltsy":
+			case "/beltsy":
 				var city News
 				numPage := 1
 				queryCity := config.QueryTop + "page=" + strconv.Itoa(numPage)
@@ -418,7 +421,7 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "top":
+			case "/top":
 				var top News
 				numPage := 1
 				queryTop := config.QueryTop + "page=" + strconv.Itoa(numPage)
@@ -435,7 +438,7 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "news":
+			case "/news":
 				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
 				feed.Update()
@@ -452,7 +455,7 @@ func main() {
 					tgBot.Send(tgMsg)
 				}
 				continue
-			case "search":
+			case "/search":
 				var search Search
 				numPage := 1
 				searchString := tgUpdate.Message.CommandArguments()
@@ -466,7 +469,7 @@ func main() {
 					tgBot.Send(tgMsg)
 				}
 				continue
-			case "feedback":
+			case "/feedback":
 				multipartFeedback = true
 				commandArguments = tgUpdate.Message.CommandArguments()
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
@@ -485,7 +488,7 @@ func main() {
 				} else {
 					tgMsg.Text = commandArguments
 				}
-			case "holidays":
+			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
 				} else {
@@ -501,9 +504,9 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "games":
+			case "/games":
 				tgMsg.Text = stubMsgText
-			case "donate":
+			case "/donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
 				buttonDonate := tgbotapi.NewInlineKeyboardButtonURL("Поддержать \"СП\" материально", "http://esp.md/donate")
@@ -517,14 +520,24 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 				tgMsg.ReplyMarkup = keyboard
 			default:
-				toOriginal = true
-				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
-				tgMsg.Text = noCmdText
+				if multipartFeedback {
+					commandArguments = tgUpdate.Message.Text
+					buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "continue")
+					buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
+					tgMsg.ReplyMarkup = keyboard
+					tgMsg.Text = "Вы уверенны?"
+				} else {
+					toOriginal = true
+					tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
+					tgMsg.Text = noCmdText
+				}
 			}
 
 			if toOriginal {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
+
 			err = db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
 			if err == nil {
 				db.UpdateField(&tgbUser, "LastDate", tgUpdate.Message.Date)
