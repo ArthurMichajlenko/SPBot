@@ -526,7 +526,7 @@ func main() {
 					buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
 					tgMsg.ReplyMarkup = keyboard
-					tgMsg.Text = "Вы уверенны?"
+					tgMsg.Text = "Отправить сообщение?"
 				} else {
 					toOriginal = true
 					tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
