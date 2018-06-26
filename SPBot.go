@@ -45,6 +45,7 @@ func main() {
 		multipartFeedback = false
 		commandArguments  string
 		messageOwner      TgMessageOwner
+		messageDate       time.Time
 	)
 	holidays, err := LoadHolidays(config.FileHolidays)
 	if err != nil {
@@ -168,6 +169,7 @@ func main() {
 				tgCbMsg.ParseMode = "Markdown"
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
+					multipartFeedback = false
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = helpMsgText
 				case "subscribestart":
@@ -271,9 +273,11 @@ func main() {
 					email.From = config.Feedback.Email.EmailFrom
 					email.To = append(email.To, config.Feedback.Email.EmailTo)
 					email.Subject = "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
-					email.Subject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName
+					email.Subject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
+					email.Subject += "Дата: " + messageDate.String()
 					email.Text = []byte(msgString)
 					err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
+					multipartFeedback = false
 					if err != nil {
 						log.Println(err)
 					}
@@ -476,6 +480,7 @@ func main() {
 				messageOwner.Username = tgUpdate.Message.Chat.UserName
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
+				messageDate = tgUpdate.Message.Time()
 				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("addattachment", "addattachment")
 				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("continue", "continue")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
