@@ -484,14 +484,14 @@ func main() {
 				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("addattachment", "addattachment")
 				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("continue", "continue")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
-				tgMsg.ReplyMarkup = keyboard
 				if commandArguments == "" {
 					tgMsg.Text = "Введите текст сообщения..."
-					tgMsg.ReplyMarkup = tgbotapi.ForceReply{
-						ForceReply: true,
-					}
+					// tgMsg.ReplyMarkup = tgbotapi.ForceReply{
+					// ForceReply: true,
+					// }
 				} else {
 					tgMsg.Text = commandArguments
+					tgMsg.ReplyMarkup = keyboard
 				}
 			case "/holidays":
 				if noWork {
