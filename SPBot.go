@@ -481,8 +481,8 @@ func main() {
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("addattachment", "addattachment")
-				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("continue", "continue")
+				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл...", "addattachment")
+				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить...", "continue")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
 				if commandArguments == "" {
 					tgMsg.Text = "Введите текст сообщения..."
