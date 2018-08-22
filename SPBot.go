@@ -43,6 +43,7 @@ func main() {
 		noWork = false
 		// Message consist of few parts e.g. feedback (maybe search)
 		multipartFeedback = false
+		mailAttach tgbotapi.File
 		commandArguments  string
 		messageOwner      TgMessageOwner
 		messageDate       time.Time
@@ -284,7 +285,11 @@ func main() {
 					if tgUpdate.CallbackQuery.Data == "continue" {
 						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 					} else {
-						tgCbMsg.Text = `Добавляем файл... `
+						getFile, _ := tgBot.GetFile(tgbotapi.FileConfig{FileID: mailAttach.FileID})
+						fmt.Println(getFile)
+						tgCbMsg.Text, _ = tgBot.GetFileDirectURL(mailAttach.FileID)
+						fmt.Println(tgCbMsg.Text)
+						// tgCbMsg.Text = `Добавляем файл... `
 					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
@@ -526,14 +531,15 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			default:
 				if multipartFeedback {
-					commandArguments = tgUpdate.Message.Text
 					if tgUpdate.Message.Document != nil {
-						commandArguments = "file"
+						mailAttach = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
+						commandArguments = "file:\n" + "ID: " + tgUpdate.Message.Document.FileID + " Name: " + tgUpdate.Message.Document.FileName + "\n" + "Mime: " + tgUpdate.Message.Document.MimeType + " Size: " + strconv.Itoa(tgUpdate.Message.Document.FileSize)
 						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "addattachment")
 						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
 						tgMsg.ReplyMarkup = keyboard
 					} else {
+						commandArguments = tgUpdate.Message.Text
 						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "continue")
 						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
