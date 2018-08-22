@@ -527,10 +527,18 @@ func main() {
 			default:
 				if multipartFeedback {
 					commandArguments = tgUpdate.Message.Text
-					buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "continue")
-					buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
-					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
-					tgMsg.ReplyMarkup = keyboard
+					if tgUpdate.Message.Document != nil {
+						commandArguments = "file"
+						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "addattachment")
+						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
+						tgMsg.ReplyMarkup = keyboard
+					} else {
+						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "continue")
+						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
+						tgMsg.ReplyMarkup = keyboard
+					}
 					tgMsg.Text = "Отправить сообщение?"
 				} else {
 					toOriginal = true
