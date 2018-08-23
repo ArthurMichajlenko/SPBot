@@ -287,9 +287,9 @@ func main() {
 					} else {
 						getFile, _ := tgBot.GetFile(tgbotapi.FileConfig{FileID: mailAttach.FileID})
 						fmt.Println(getFile)
-						tgCbMsg.Text, _ = tgBot.GetFileDirectURL(mailAttach.FileID)
+						// tgCbMsg.Text, _ = tgBot.GetFileDirectURL(mailAttach.FileID)
 						fmt.Println(tgCbMsg.Text)
-						// tgCbMsg.Text = `Добавляем файл... `
+						tgCbMsg.Text = `Добавляем файл... `
 					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
