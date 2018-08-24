@@ -112,6 +112,13 @@ type Holidays struct {
 	Date    time.Time
 }
 
+//AttachFile properties attached file
+type AttachFile struct {
+	FileName    string
+	ContentType string
+	BotFile     tgbotapi.File
+}
+
 //TgUser Telegram User.
 type TgUser struct {
 	ChatID            int64 `storm:"id"`

@@ -43,7 +43,7 @@ func main() {
 		noWork = false
 		// Message consist of few parts e.g. feedback (maybe search)
 		multipartFeedback = false
-		mailAttach tgbotapi.File
+		mailAttach        AttachFile
 		commandArguments  string
 		messageOwner      TgMessageOwner
 		messageDate       time.Time
@@ -277,19 +277,26 @@ func main() {
 					email.Subject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					email.Subject += "Дата: " + messageDate.String()
 					email.Text = []byte(msgString)
-					err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
 					multipartFeedback = false
-					if err != nil {
-						log.Println(err)
-					}
 					if tgUpdate.CallbackQuery.Data == "continue" {
 						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 					} else {
-						getFile, _ := tgBot.GetFile(tgbotapi.FileConfig{FileID: mailAttach.FileID})
-						fmt.Println(getFile)
-						// tgCbMsg.Text, _ = tgBot.GetFileDirectURL(mailAttach.FileID)
-						fmt.Println(tgCbMsg.Text)
+						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
+						fmt.Println(urlAttach)
+						res, err := http.Get(urlAttach)
+						if err != nil {
+							log.Println(err)
+						}
+						defer res.Body.Close()
+						_, err = email.Attach(res.Body, mailAttach.FileName, mailAttach.ContentType)
+						if err != nil {
+							log.Println(err)
+						}
 						tgCbMsg.Text = `Добавляем файл... `
+					}
+					err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
+					if err != nil {
+						log.Println(err)
 					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
@@ -532,7 +539,9 @@ func main() {
 			default:
 				if multipartFeedback {
 					if tgUpdate.Message.Document != nil {
-						mailAttach = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
+						mailAttach.BotFile = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
+						mailAttach.FileName = tgUpdate.Message.Document.FileName
+						mailAttach.ContentType = tgUpdate.Message.Document.MimeType
 						commandArguments = "file:\n" + "ID: " + tgUpdate.Message.Document.FileID + " Name: " + tgUpdate.Message.Document.FileName + "\n" + "Mime: " + tgUpdate.Message.Document.MimeType + " Size: " + strconv.Itoa(tgUpdate.Message.Document.FileSize)
 						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "addattachment")
 						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
