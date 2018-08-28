@@ -292,3 +292,8 @@ func SearchQuery(url string) (Search, error) {
 	err = json.Unmarshal(r, &search)
 	return search, err
 }
+
+// SendFeedback sends email feedback. Slice feedbackBody[0] mail text, feedbackBody[1...] direct URL attachments
+func SendFeedback(feedbackBody []string) error {
+	return
+}
