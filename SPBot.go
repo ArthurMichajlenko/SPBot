@@ -285,13 +285,10 @@ func main() {
 						attachmentURLs = append(attachmentURLs, urlAttach)
 						tgCbMsg.Text = `Добавляем файл... `
 					}
-					go func() {
-						err := SendFeedback(emailSubject, msgString, attachmentURLs)
-						if err != nil {
-							log.Println(err)
-							return
-						}
-					}()
+					err := SendFeedback(emailSubject, msgString, attachmentURLs)
+					if err != nil {
+						log.Println(err)
+					}
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
