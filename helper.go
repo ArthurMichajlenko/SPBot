@@ -318,10 +318,9 @@ func SendFeedback(subject string, text string, attachmentURLs []string) error {
 		if err != nil {
 			return err
 		}
-		err = email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 		if err != nil {
 			return err
 		}
 	}
-	return nil
+	return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 }
