@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/smtp"
 	"net/url"
 	"strconv"
 	"strings"
@@ -26,29 +25,33 @@ import (
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
-	"github.com/jordan-wright/email"
 	"github.com/robfig/cron"
 )
 
+var (
+	// botConfig configurations bot
+	botConfig  Config
+	mailAttach AttachFile
+)
+
 func main() {
-	// Load config
-	config, err := LoadConfigBots("config.json")
+	// Load botConfig
+	var err error
+	botConfig, err = LoadConfigBots("config.json")
 	if err != nil {
 		log.Panic(err)
 	}
-	// Create email auth
-	smtpAuth := smtp.PlainAuth("", config.Feedback.Email.Username, config.Feedback.Email.Password, config.Feedback.Email.SMTPServer)
 	var (
 		// Load holidays if error send message not released
 		noWork = false
 		// Message consist of few parts e.g. feedback (maybe search)
 		multipartFeedback = false
-		mailAttach        AttachFile
+		attachmentURLs    []string
 		commandArguments  string
 		messageOwner      TgMessageOwner
 		messageDate       time.Time
 	)
-	holidays, err := LoadHolidays(config.FileHolidays)
+	holidays, err := LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 		noWork = true
@@ -58,7 +61,7 @@ func main() {
 		log.Println(err)
 	}
 	defer watcher.Close()
-	err = watcher.Add(config.FileHolidays)
+	err = watcher.Add(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 	}
@@ -74,7 +77,7 @@ func main() {
 	db.Init(&tgbUser)
 
 	// Connect to Telegram bot
-	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
+	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -102,7 +105,7 @@ func main() {
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
-	if config.Bots.Telegram.TgWebhook == "" {
+	if botConfig.Bots.Telegram.TgWebhook == "" {
 		// Initialize polling
 		tgBot.RemoveWebhook()
 		u := tgbotapi.NewUpdate(0)
@@ -110,7 +113,7 @@ func main() {
 		tgUpdates, _ = tgBot.GetUpdatesChan(u)
 	} else {
 		// Initialize webhook & channel for update from API
-		tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
+		tgConURI := botConfig.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(botConfig.Bots.Telegram.TgPort) + "/"
 		tgBot.RemoveWebhook()
 		_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
 		if err != nil {
@@ -118,7 +121,7 @@ func main() {
 		}
 		// Listen Webhook
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
-		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
+		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
 	// RSS
 	feed, err := rss.Fetch("http://esp.md/feed/rss")
@@ -151,7 +154,7 @@ func main() {
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				log.Println("modified file:", event.Name)
 			}
-			holidays, err = LoadHolidays(config.FileHolidays)
+			holidays, err = LoadHolidays(botConfig.FileHolidays)
 			if err != nil {
 				log.Println(err)
 				noWork = true
@@ -270,34 +273,23 @@ func main() {
 					tgCbMsg.Text = startMsgEndText
 				case "continue", "addattachment":
 					msgString := commandArguments
-					email := email.NewEmail()
-					email.From = config.Feedback.Email.EmailFrom
-					email.To = append(email.To, config.Feedback.Email.EmailTo)
-					email.Subject = "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
-					email.Subject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
-					email.Subject += "Дата: " + messageDate.String()
-					email.Text = []byte(msgString)
-					multipartFeedback = false
+					emailSubject := "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
+					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
+					emailSubject += "Дата: " + messageDate.String()
 					if tgUpdate.CallbackQuery.Data == "continue" {
+						attachmentURLs = nil
+						multipartFeedback = false
 						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 					} else {
 						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
-						fmt.Println(urlAttach)
-						res, err := http.Get(urlAttach)
-						if err != nil {
-							log.Println(err)
-						}
-						defer res.Body.Close()
-						_, err = email.Attach(res.Body, mailAttach.FileName, mailAttach.ContentType)
-						if err != nil {
-							log.Println(err)
-						}
+						attachmentURLs = append(attachmentURLs, urlAttach)
 						tgCbMsg.Text = `Добавляем файл... `
 					}
 					go func() {
-						err := email.Send(config.Feedback.Email.SMTPServer+":"+config.Feedback.Email.SMTPPort, smtpAuth)
+						err := SendFeedback(emailSubject, msgString, attachmentURLs)
 						if err != nil {
 							log.Println(err)
+							return
 						}
 					}()
 				case "next5":
@@ -425,7 +417,7 @@ func main() {
 			case "/beltsy":
 				var city News
 				numPage := 1
-				queryCity := config.QueryTop + "page=" + strconv.Itoa(numPage)
+				queryCity := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
 				city, err := NewsQuery(queryCity)
 				if err != nil {
 					log.Println(err)
@@ -442,7 +434,7 @@ func main() {
 			case "/top":
 				var top News
 				numPage := 1
-				queryTop := config.QueryTop + "page=" + strconv.Itoa(numPage)
+				queryTop := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
 				top, err := NewsQuery(queryTop)
 				if err != nil {
 					log.Println(err)
@@ -477,7 +469,7 @@ func main() {
 				var search Search
 				numPage := 1
 				searchString := tgUpdate.Message.CommandArguments()
-				searchQuery := config.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
+				searchQuery := botConfig.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
 				search, err := SearchQuery(searchQuery)
 				if err != nil {
 					log.Println(err)

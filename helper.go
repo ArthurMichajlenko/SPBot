@@ -6,10 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jordan-wright/email"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
@@ -45,12 +48,12 @@ type Telegram struct {
 	TgPathCERT string `json:"tg_path_cert"`
 }
 
-// Feedback config for feedback.
+// Feedback botConfig for feedback.
 type Feedback struct {
 	Email Email `json:"email"`
 }
 
-// Email config email parameters.
+// Email botConfig email parameters.
 type Email struct {
 	SMTPServer string `json:"smtp_server"`
 	SMTPPort   string `json:"smtp_port"`
@@ -196,7 +199,7 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	return holidays, err
 }
 
-// LoadConfigBots returns config reading from json file.
+// LoadConfigBots returns botConfig reading from json file.
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
 	configFile, err := os.Open(file)
@@ -293,7 +296,32 @@ func SearchQuery(url string) (Search, error) {
 	return search, err
 }
 
-// SendFeedback sends email feedback. Slice feedbackBody[0] mail text, feedbackBody[1...] direct URL attachments
-func SendFeedback(feedbackBody []string) error {
-	return
+// SendFeedback sends email feedback.
+func SendFeedback(subject string, text string, attachmentURLs []string) error {
+	// Create email auth
+	smtpAuth := smtp.PlainAuth("", botConfig.Feedback.Email.Username, botConfig.Feedback.Email.Password, botConfig.Feedback.Email.SMTPServer)
+	email := email.NewEmail()
+	email.From = botConfig.Feedback.Email.EmailFrom
+	email.To = append(email.To, botConfig.Feedback.Email.EmailTo)
+	email.Subject = subject
+	email.Text = []byte(text)
+	if attachmentURLs == nil {
+		return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
+	}
+	for _, attachmentURL := range attachmentURLs {
+		res, err := http.Get(attachmentURL)
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+		_, err = email.Attach(res.Body, mailAttach.FileName, mailAttach.ContentType)
+		if err != nil {
+			return err
+		}
+		err = email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
