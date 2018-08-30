@@ -277,9 +277,9 @@ func main() {
 					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					emailSubject += "Дата: " + messageDate.String()
 					if tgUpdate.CallbackQuery.Data == "continue" {
+						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 						attachmentURLs = nil
 						multipartFeedback = false
-						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 					} else {
 						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
 						attachmentURLs = append(attachmentURLs, urlAttach)
