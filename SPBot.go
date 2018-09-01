@@ -273,7 +273,8 @@ func main() {
 					tgCbMsg.Text = startMsgEndText
 				case "continue", "addattachment":
 					msgString := commandArguments
-					emailSubject := "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
+					emailSubject := "Telegram\n"
+					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
 					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					emailSubject += "Дата: " + messageDate.String()
 					if tgUpdate.CallbackQuery.Data == "continue" {
@@ -283,6 +284,11 @@ func main() {
 					} else {
 						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
 						attachmentURLs = append(attachmentURLs, urlAttach)
+						msgString += "\nFiles " + strconv.Itoa(len(attachmentURLs)) + " from 5"
+ 						buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл Next", "addattachment")
+						buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить Next", "continue")
+						keyboard := tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue)
+						tgCbMsg.ReplyMarkup = keyboard
 						tgCbMsg.Text = `Добавляем файл... `
 					}
 					go func() {
