@@ -285,10 +285,6 @@ func main() {
 						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
 						attachmentURLs = append(attachmentURLs, urlAttach)
 						msgString += "\nFiles " + strconv.Itoa(len(attachmentURLs)) + " from 5"
- 						buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл Next", "addattachment")
-						buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить Next", "continue")
-						keyboard := tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue)
-						tgCbMsg.ReplyMarkup = keyboard
 						tgCbMsg.Text = `Добавляем файл... `
 					}
 					go func() {
