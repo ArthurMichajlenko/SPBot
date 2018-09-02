@@ -271,13 +271,13 @@ func main() {
 					db.UpdateField(&tgbUser, "SubscribeCity", true)
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
-				case "continue", "addattachment":
+				case "sendfeedback", "addattachment":
 					msgString := commandArguments
 					emailSubject := "Telegram\n"
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
 					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					emailSubject += "Дата: " + messageDate.String()
-					if tgUpdate.CallbackQuery.Data == "continue" {
+					if tgUpdate.CallbackQuery.Data == "sendfeedback" {
 						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 						attachmentURLs = nil
 						multipartFeedback = false
@@ -489,8 +489,8 @@ func main() {
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
 				buttonAttach := tgbotapi.NewInlineKeyboardButtonData("Добавить файл ...", "addattachment")
-				buttonContinue := tgbotapi.NewInlineKeyboardButtonData("Продолжить ...", "continue")
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonContinue))
+				buttonSendfeedback := tgbotapi.NewInlineKeyboardButtonData("Продолжить ...", "sendfeedback")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonAttach, buttonSendfeedback))
 				if commandArguments == "" {
 					tgMsg.Text = "Введите текст сообщения..."
 					// tgMsg.ReplyMarkup = tgbotapi.ForceReply{
@@ -544,7 +544,7 @@ func main() {
 						tgMsg.ReplyMarkup = keyboard
 					} else {
 						commandArguments = tgUpdate.Message.Text
-						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "continue")
+						buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "sendfeedback")
 						buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
 						tgMsg.ReplyMarkup = keyboard
