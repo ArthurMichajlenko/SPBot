@@ -278,6 +278,12 @@ func main() {
 					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					emailSubject += "Дата: " + messageDate.String()
 					if tgUpdate.CallbackQuery.Data == "sendfeedback" {
+						go func() {
+							err := SendFeedback(emailSubject, msgString, attachmentURLs)
+							if err != nil {
+								log.Println(err)
+							}
+						}()
 						tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 						attachmentURLs = nil
 						multipartFeedback = false
@@ -287,12 +293,6 @@ func main() {
 						msgString += "\nFiles " + strconv.Itoa(len(attachmentURLs)) + " from 5"
 						tgCbMsg.Text = `Добавляем файл... `
 					}
-					go func() {
-						err := SendFeedback(emailSubject, msgString, attachmentURLs)
-						if err != nil {
-							log.Println(err)
-						}
-					}()
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
