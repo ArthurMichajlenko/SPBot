@@ -1,2 +1,3 @@
 # SPBot
+
 Bot GazetaSP

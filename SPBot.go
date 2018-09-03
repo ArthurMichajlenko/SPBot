@@ -1,28 +1,58 @@
+/*
+ * Copyright (c) 2018 Arthur Michajlenko
+ *
+ * @Script: SPBot.go
+ * @Author: Arthur Michajlenko
+ * @Email: michajlenko1967@gmail.com
+ * @Create At: 2018-04-04 15:25:00
+ * @Last Modified By: Arthur Michajlenko
+ * @Last Modified At: 2018-05-16 14:49:42
+ * @Description: Bot for SP.
+ */
+
 package main
 
 import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/SlyMarbo/rss"
-
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
 	"github.com/robfig/cron"
 )
 
+var (
+	// botConfig configurations bot
+	botConfig  Config
+	mailAttach AttachFile
+)
+
 func main() {
-	config, err := LoadConfigBots("config.json")
+	// Load botConfig
+	var err error
+	botConfig, err = LoadConfigBots("config.json")
 	if err != nil {
 		log.Panic(err)
 	}
-	// Load holidays if error send message not released
-	noWork := false
-	holidays, err := LoadHolidays(config.FileHolidays)
+	var (
+		// Load holidays if error send message not released
+		noWork = false
+		// Message consist of few parts e.g. feedback (maybe search)
+		multipartFeedback = false
+		attachmentURLs    []string
+		msgString         string
+		commandArguments  string
+		messageOwner      TgMessageOwner
+		messageDate       time.Time
+	)
+	holidays, err := LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 		noWork = true
@@ -32,7 +62,7 @@ func main() {
 		log.Println(err)
 	}
 	defer watcher.Close()
-	err = watcher.Add(config.FileHolidays)
+	err = watcher.Add(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 	}
@@ -48,11 +78,11 @@ func main() {
 	db.Init(&tgbUser)
 
 	// Connect to Telegram bot
-	tgBot, err := tgbotapi.NewBotAPI(config.Bots.Telegram.TgApikey)
+	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Next 2 strings for development may remove in production
+	// TODO: Next 2 strings for development must remove in production
 	tgBot.Debug = true
 	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
@@ -69,14 +99,14 @@ func main() {
 	/search - поиск по сайту "СП".
 	_после /search через пробел введите ключевое слово/фразу_
 	/feedback - задать вопрос/сообщить новость.
-	_после /feedback введите текст сообщения, если надо прикрепите файл_
+	_после /feedback через пробел введите текст сообщения, если надо прикрепите файл_
 	/holidays - календарь праздников.
 	/games - поиграть в игру.
 	/donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
-	if config.Bots.Telegram.TgWebhook == "" {
+	if botConfig.Bots.Telegram.TgWebhook == "" {
 		// Initialize polling
 		tgBot.RemoveWebhook()
 		u := tgbotapi.NewUpdate(0)
@@ -84,14 +114,15 @@ func main() {
 		tgUpdates, _ = tgBot.GetUpdatesChan(u)
 	} else {
 		// Initialize webhook & channel for update from API
-		tgConURI := config.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(config.Bots.Telegram.TgPort) + "/"
+		tgConURI := botConfig.Bots.Telegram.TgWebhook + ":" + strconv.Itoa(botConfig.Bots.Telegram.TgPort) + "/"
+		tgBot.RemoveWebhook()
 		_, err = tgBot.SetWebhook(tgbotapi.NewWebhook(tgConURI + tgBot.Token))
 		if err != nil {
 			log.Fatal(err)
 		}
 		// Listen Webhook
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
-		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(config.Bots.Telegram.TgPort), nil)
+		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
 	// RSS
 	feed, err := rss.Fetch("http://esp.md/feed/rss")
@@ -124,7 +155,7 @@ func main() {
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				log.Println("modified file:", event.Name)
 			}
-			holidays, err = LoadHolidays(config.FileHolidays)
+			holidays, err = LoadHolidays(botConfig.FileHolidays)
 			if err != nil {
 				log.Println(err)
 				noWork = true
@@ -143,6 +174,10 @@ func main() {
 				tgCbMsg.ParseMode = "Markdown"
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
+					multipartFeedback = false
+					attachmentURLs = nil
+					mailAttach.FileName = nil
+					mailAttach.ContentType = nil
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = helpMsgText
 				case "subscribestart":
@@ -240,6 +275,22 @@ func main() {
 					db.UpdateField(&tgbUser, "SubscribeCity", true)
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
+				case "sendfeedback":
+					emailSubject := "Telegram\n"
+					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
+					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
+					emailSubject += "Дата: " + messageDate.String()
+					go func(emailSubject string, msgString string, attachmentURLs []string, fileName []string, contentType []string) {
+						err := SendFeedback(emailSubject, msgString, attachmentURLs, fileName, contentType)
+						if err != nil {
+							log.Printf("Send Feedback err: %#+v\n", err)
+						}
+					}(emailSubject, msgString, attachmentURLs, mailAttach.FileName, mailAttach.ContentType)
+					attachmentURLs = nil
+					mailAttach.FileName = nil
+					mailAttach.ContentType = nil
+					multipartFeedback = false
+					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
@@ -284,23 +335,26 @@ func main() {
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
-			if !tgUpdate.Message.IsCommand() {
+			if !tgUpdate.Message.IsCommand() && !multipartFeedback {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
+				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 				tgBot.Send(tgMsg)
 				continue
 			}
 
-			switch tgUpdate.Message.Command() {
-			case "help":
+			msgSlice := strings.Split(tgUpdate.Message.Text, " ")
+			switch strings.ToLower(msgSlice[0]) {
+			// switch tgUpdate.Message.Command() {
+			case "/help":
 				tgMsg.Text = helpMsgText
-			case "start":
+			case "/start":
 				tgMsg.Text = startMsgText
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "subscriptions":
+			case "/subscriptions":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
@@ -359,14 +413,15 @@ func main() {
 						Для изменения состояния подписки нажмите на 
 					соответствующую кнопку
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
-			case "beltsy":
+			case "/beltsy":
 				var city News
-				city, err := NewsQuery(config.QueryTop)
+				numPage := 1
+				queryCity := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
+				city, err := NewsQuery(queryCity)
 				if err != nil {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					// log.Println(topItem.Node.NodeTitle, topItem.Node.NodePath)
 					tgMsg.Text = "[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
@@ -375,9 +430,11 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "top":
+			case "/top":
 				var top News
-				top, err := NewsQuery(config.QueryTop)
+				numPage := 1
+				queryTop := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
+				top, err := NewsQuery(queryTop)
 				if err != nil {
 					log.Println(err)
 				}
@@ -390,7 +447,7 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "news":
+			case "/news":
 				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
 				feed.Update()
@@ -407,11 +464,30 @@ func main() {
 					tgBot.Send(tgMsg)
 				}
 				continue
-			case "search":
-				tgMsg.Text = stubMsgText
-			case "feedback":
-				tgMsg.Text = stubMsgText
-			case "holidays":
+			case "/search":
+				var search Search
+				numPage := 1
+				commandArguments = tgUpdate.Message.CommandArguments()
+				searchString := commandArguments
+				searchQuery := botConfig.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
+				search, err := SearchQuery(searchQuery)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, searchItem := range search.Nodes {
+					tgMsg.Text = "[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				continue
+			case "/feedback":
+				multipartFeedback = true
+				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
+				messageOwner.Username = tgUpdate.Message.Chat.UserName
+				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
+				messageOwner.LastName = tgUpdate.Message.Chat.LastName
+				messageDate = tgUpdate.Message.Time()
+				tgMsg.Text = "Введите текст сообщения..."
+			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
 				} else {
@@ -427,9 +503,9 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "games":
+			case "/games":
 				tgMsg.Text = stubMsgText
-			case "donate":
+			case "/donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
 				buttonDonate := tgbotapi.NewInlineKeyboardButtonURL("Поддержать \"СП\" материально", "http://esp.md/donate")
@@ -443,13 +519,42 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 				tgMsg.ReplyMarkup = keyboard
 			default:
-				toOriginal = true
-				tgMsg.Text = noCmdText
+				if multipartFeedback {
+					if tgUpdate.Message.Document != nil {
+						if len(attachmentURLs) != 5 {
+							mailAttach.BotFile = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
+							mailAttach.FileName = append(mailAttach.FileName, tgUpdate.Message.Document.FileName)
+							mailAttach.ContentType = append(mailAttach.ContentType, tgUpdate.Message.Document.MimeType)
+							urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
+							attachmentURLs = append(attachmentURLs, urlAttach)
+							tgMsg.Text = "Вы можете приложить еще *" + strconv.Itoa(5-len(attachmentURLs)) + "* файл(а)\n*ВНИМАНИЕ* _Все вложения должны отправляться как файлы. Размер файла не должен превышать 20 MB_"
+							tgBot.Send(tgMsg)
+						} else {
+							tgMsg.Text = "_Вы исчерпали количество вложений_"
+							tgBot.Send(tgMsg)
+						}
+					} else {
+						tgMsg.Text = `Вы можете приложить до 5 файлов к своему сообщению.
+						*ВНИМАНИЕ* _Все вложения должны отправляться как файлы. Размер файла не должен превышать 20 MB_`
+						tgBot.Send(tgMsg)
+						msgString = tgUpdate.Message.Text
+					}
+					buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "sendfeedback")
+					buttonNo := tgbotapi.NewInlineKeyboardButtonData("Нет", "help")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
+					tgMsg.ReplyMarkup = keyboard
+					tgMsg.Text = "Отправить сообщение?"
+				} else {
+					toOriginal = true
+					tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
+					tgMsg.Text = noCmdText
+				}
 			}
 
 			if toOriginal {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
+
 			err = db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
 			if err == nil {
 				db.UpdateField(&tgbUser, "LastDate", tgUpdate.Message.Date)
@@ -469,7 +574,7 @@ func main() {
 				db.Save(&tgbUser)
 			}
 			tgBot.Send(tgMsg)
-			// Default may cause high CPU load
+			// ! Default may cause high CPU load
 			// default:
 		}
 	}
