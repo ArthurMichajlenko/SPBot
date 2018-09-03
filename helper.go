@@ -117,8 +117,8 @@ type Holidays struct {
 
 //AttachFile properties attached file
 type AttachFile struct {
-	FileName    string
-	ContentType string
+	FileName    []string
+	ContentType []string
 	BotFile     tgbotapi.File
 }
 
@@ -308,13 +308,13 @@ func SendFeedback(subject string, text string, attachmentURLs []string) error {
 	if attachmentURLs == nil {
 		return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 	}
-	for _, attachmentURL := range attachmentURLs {
+	for i, attachmentURL := range attachmentURLs {
 		res, err := http.Get(attachmentURL)
 		if err != nil {
 			return err
 		}
 		defer res.Body.Close()
-		_, err = email.Attach(res.Body, mailAttach.FileName, mailAttach.ContentType)
+		_, err = email.Attach(res.Body, mailAttach.FileName[i], mailAttach.ContentType[i])
 		if err != nil {
 			return err
 		}
