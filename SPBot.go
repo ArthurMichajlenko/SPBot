@@ -176,6 +176,8 @@ func main() {
 				case "help":
 					multipartFeedback = false
 					attachmentURLs = nil
+					mailAttach.FileName = nil
+					mailAttach.ContentType = nil
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = helpMsgText
 				case "subscribestart":
@@ -278,13 +280,17 @@ func main() {
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
 					emailSubject += "Имя Фамилия: " + messageOwner.FirstName + " " + messageOwner.LastName + "\n"
 					emailSubject += "Дата: " + messageDate.String()
-					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
-					err := SendFeedback(emailSubject, msgString, attachmentURLs)
-					if err != nil {
-						log.Println(err)
-					}
+					go func(emailSubject string, msgString string, attachmentURLs []string, fileName []string, contentType []string) {
+						err := SendFeedback(emailSubject, msgString, attachmentURLs, fileName, contentType)
+						if err != nil {
+							log.Printf("Send Feedback err: %#+v\n", err)
+						}
+					}(emailSubject, msgString, attachmentURLs, mailAttach.FileName, mailAttach.ContentType)
 					attachmentURLs = nil
+					mailAttach.FileName = nil
+					mailAttach.ContentType = nil
 					multipartFeedback = false
+					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
 				case "next5":
 					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
@@ -461,7 +467,8 @@ func main() {
 			case "/search":
 				var search Search
 				numPage := 1
-				searchString := tgUpdate.Message.CommandArguments()
+				commandArguments = tgUpdate.Message.CommandArguments()
+				searchString := commandArguments
 				searchQuery := botConfig.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
 				search, err := SearchQuery(searchQuery)
 				if err != nil {
@@ -474,21 +481,12 @@ func main() {
 				continue
 			case "/feedback":
 				multipartFeedback = true
-				commandArguments = tgUpdate.Message.CommandArguments()
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
 				messageOwner.Username = tgUpdate.Message.Chat.UserName
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				if commandArguments == "" {
-					tgMsg.Text = "Введите текст сообщения..."
-					// tgMsg.ReplyMarkup = tgbotapi.ForceReply{
-					// ForceReply: true,
-					// }
-				} else {
-					tgMsg.Text = commandArguments
-					// tgMsg.ReplyMarkup = keyboard
-				}
+				tgMsg.Text = "Введите текст сообщения..."
 			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
@@ -523,12 +521,22 @@ func main() {
 			default:
 				if multipartFeedback {
 					if tgUpdate.Message.Document != nil {
-						mailAttach.BotFile = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
-						mailAttach.FileName = append(mailAttach.FileName, tgUpdate.Message.Document.FileName)
-						mailAttach.ContentType = append(mailAttach.ContentType, tgUpdate.Message.Document.MimeType)
-						urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
-						attachmentURLs = append(attachmentURLs, urlAttach)
+						if len(attachmentURLs) != 5 {
+							mailAttach.BotFile = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
+							mailAttach.FileName = append(mailAttach.FileName, tgUpdate.Message.Document.FileName)
+							mailAttach.ContentType = append(mailAttach.ContentType, tgUpdate.Message.Document.MimeType)
+							urlAttach, _ := tgBot.GetFileDirectURL(mailAttach.BotFile.FileID)
+							attachmentURLs = append(attachmentURLs, urlAttach)
+							tgMsg.Text = "Вы можете приложить еще *" + strconv.Itoa(5-len(attachmentURLs)) + "* файл(а)\n*ВНИМАНИЕ* _Все вложения должны отправляться как файлы. Размер файла не должен превышать 20 MB_"
+							tgBot.Send(tgMsg)
+						} else {
+							tgMsg.Text = "_Вы исчерпали количество вложений_"
+							tgBot.Send(tgMsg)
+						}
 					} else {
+						tgMsg.Text = `Вы можете приложить до 5 файлов к своему сообщению.
+						*ВНИМАНИЕ* _Все вложения должны отправляться как файлы. Размер файла не должен превышать 20 MB_`
+						tgBot.Send(tgMsg)
 						msgString = tgUpdate.Message.Text
 					}
 					buttonYes := tgbotapi.NewInlineKeyboardButtonData("Да", "sendfeedback")

@@ -297,8 +297,12 @@ func SearchQuery(url string) (Search, error) {
 }
 
 // SendFeedback sends email feedback.
-func SendFeedback(subject string, text string, attachmentURLs []string) error {
+func SendFeedback(subject string, text string, attachmentURLs []string, fileName []string, contentType []string) error {
 	// Create email auth
+	botConfig, err := LoadConfigBots("config.json")
+	if err != nil {
+		log.Panic(err)
+	}
 	smtpAuth := smtp.PlainAuth("", botConfig.Feedback.Email.Username, botConfig.Feedback.Email.Password, botConfig.Feedback.Email.SMTPServer)
 	email := email.NewEmail()
 	email.From = botConfig.Feedback.Email.EmailFrom
@@ -309,18 +313,18 @@ func SendFeedback(subject string, text string, attachmentURLs []string) error {
 		return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 	}
 	for i, attachmentURL := range attachmentURLs {
-		res, err := http.Get(attachmentURL)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-		_, err = email.Attach(res.Body, mailAttach.FileName[i], mailAttach.ContentType[i])
-		if err != nil {
-			return err
-		}
-		if err != nil {
-			return err
-		}
+			res, err := http.Get(attachmentURL)
+			if err != nil {
+				return err
+			}
+			defer res.Body.Close()
+			_, err = email.Attach(res.Body, fileName[i], contentType[i])
+			if err != nil {
+				return err
+			}
+			if err != nil {
+				return err
+			}
 	}
 	return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 }
