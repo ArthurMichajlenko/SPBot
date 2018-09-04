@@ -25,5 +25,5 @@
     },
     "file_holidays":"holidays.txt",
     "query_top":"http://dev.esp.md/top-news?",
-    "query_search":"http://dev.esp.md/search/bot?query="
+    "query_search":"http://esp.md/bot/search?query="
 }

@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -45,6 +44,7 @@ func main() {
 		// Load holidays if error send message not released
 		noWork = false
 		// Message consist of few parts e.g. feedback, search
+		numPageSearch     int
 		multipartFeedback = false
 		multipartSearch   = false
 		attachmentURLs    []string
@@ -279,17 +279,22 @@ func main() {
 					tgCbMsg.Text = startMsgEndText
 				case "search":
 					var search Search
-					numPage := 1
-					searchQuery := botConfig.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
-					search, err := SearchQuery(searchQuery)
+					numPageSearch = 1
+					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
 					}
-					for _, searchItem := range search.Nodes {
-						tgCbMsg.Text = "[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+					if len(search.Nodes) == 0 {
+						tgCbMsg.Text = "По Вашему запросу ничего не найдено"
 						tgBot.Send(tgCbMsg)
+					} else {
+						for _, searchItem := range search.Nodes {
+							tgCbMsg.Text = searchItem.Node.NodeDate+ "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+							tgBot.Send(tgCbMsg)
+						}
 					}
 					multipartSearch = false
+					continue
 				case "sendfeedback":
 					emailSubject := "Telegram\n"
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
