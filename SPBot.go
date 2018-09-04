@@ -279,7 +279,6 @@ func main() {
 					tgCbMsg.Text = startMsgEndText
 				case "search":
 					var search Search
-					numPageSearch = 1
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
@@ -289,7 +288,7 @@ func main() {
 						tgBot.Send(tgCbMsg)
 					} else {
 						for _, searchItem := range search.Nodes {
-							tgCbMsg.Text = searchItem.Node.NodeDate+ "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
 							tgBot.Send(tgCbMsg)
 						}
 					}
@@ -486,6 +485,7 @@ func main() {
 				continue
 			case "/search":
 				multipartSearch = true
+				numPageSearch = 0
 				tgMsg.Text = "Введите что искать"
 			case "/feedback":
 				multipartFeedback = true
