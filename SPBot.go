@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -44,11 +43,13 @@ func main() {
 	var (
 		// Load holidays if error send message not released
 		noWork = false
-		// Message consist of few parts e.g. feedback (maybe search)
+		// Message consist of few parts e.g. feedback, search
+		numPageSearch     int
 		multipartFeedback = false
+		multipartSearch   = false
 		attachmentURLs    []string
 		msgString         string
-		commandArguments  string
+		searchString      string
 		messageOwner      TgMessageOwner
 		messageDate       time.Time
 	)
@@ -97,9 +98,9 @@ func main() {
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
 	/search - поиск по сайту "СП".
-	_после /search через пробел введите ключевое слово/фразу_
 	/feedback - задать вопрос/сообщить новость.
-	_после /feedback через пробел введите текст сообщения, если надо прикрепите файл_
+	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
+	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
 	/games - поиграть в игру.
 	/donate - поддержать "СП".`
@@ -175,6 +176,7 @@ func main() {
 				switch tgUpdate.CallbackQuery.Data {
 				case "help":
 					multipartFeedback = false
+					multipartSearch = false
 					attachmentURLs = nil
 					mailAttach.FileName = nil
 					mailAttach.ContentType = nil
@@ -275,6 +277,74 @@ func main() {
 					db.UpdateField(&tgbUser, "SubscribeCity", true)
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
+				case "search":
+					var search Search
+					search, err := SearchQuery(searchString, numPageSearch)
+					if err != nil {
+						log.Println(err)
+					}
+					if len(search.Nodes) == 0 {
+						tgCbMsg.Text = "По Вашему запросу ничего не найдено"
+						// tgBot.Send(tgCbMsg)
+						multipartSearch = false
+						break
+					} else {
+						for _, searchItem := range search.Nodes {
+							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+							tgBot.Send(tgCbMsg)
+						}
+					}
+					multipartSearch = false
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchNext))
+					tgCbMsg.ReplyMarkup = keyboard
+					tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+				case "searchnext":
+					numPageSearch++
+					var search Search
+					search, err := SearchQuery(searchString, numPageSearch)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, searchItem := range search.Nodes {
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					multipartSearch = false
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					buttonSearchPrev := tgbotapi.NewInlineKeyboardButtonData("Назад", "searchprev")
+					if len(search.Nodes) != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev, buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Вы в конце поиска"
+					}
+				case "searchprev":
+					numPageSearch--
+					var search Search
+					search, err := SearchQuery(searchString, numPageSearch)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, searchItem := range search.Nodes {
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					multipartSearch = false
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					buttonSearchPrev := tgbotapi.NewInlineKeyboardButtonData("Назад", "searchprev")
+					if numPageSearch != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev, buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Вы в начале поиска"
+					}
 				case "sendfeedback":
 					emailSubject := "Telegram\n"
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
@@ -335,7 +405,7 @@ func main() {
 			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
-			if !tgUpdate.Message.IsCommand() && !multipartFeedback {
+			if !tgUpdate.Message.IsCommand() && !multipartFeedback && !multipartSearch {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 				tgMsg.Text = noCmdText
 				tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
@@ -465,20 +535,9 @@ func main() {
 				}
 				continue
 			case "/search":
-				var search Search
-				numPage := 1
-				commandArguments = tgUpdate.Message.CommandArguments()
-				searchString := commandArguments
-				searchQuery := botConfig.QuerySearch + url.QueryEscape(searchString) + "&page=" + strconv.Itoa(numPage)
-				search, err := SearchQuery(searchQuery)
-				if err != nil {
-					log.Println(err)
-				}
-				for _, searchItem := range search.Nodes {
-					tgMsg.Text = "[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
-					tgBot.Send(tgMsg)
-				}
-				continue
+				multipartSearch = true
+				numPageSearch = 0
+				tgMsg.Text = "Введите что искать"
 			case "/feedback":
 				multipartFeedback = true
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
@@ -519,7 +578,8 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(row, row1, row2)
 				tgMsg.ReplyMarkup = keyboard
 			default:
-				if multipartFeedback {
+				switch {
+				case multipartFeedback:
 					if tgUpdate.Message.Document != nil {
 						if len(attachmentURLs) != 5 {
 							mailAttach.BotFile = tgbotapi.File{FileID: tgUpdate.Message.Document.FileID, FileSize: tgUpdate.Message.Document.FileSize}
@@ -544,7 +604,15 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonYes, buttonNo))
 					tgMsg.ReplyMarkup = keyboard
 					tgMsg.Text = "Отправить сообщение?"
-				} else {
+				case multipartSearch:
+					searchString = tgUpdate.Message.Text
+					buttonSearch := tgbotapi.NewInlineKeyboardButtonData("Искать", "search")
+					buttonEscape := tgbotapi.NewInlineKeyboardButtonData("Отменить", "help")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearch, buttonEscape))
+					tgMsg.ReplyMarkup = keyboard
+					tgMsg.Text = "Начинаем поиск ..."
+					// tgBot.Send(tgMsg)
+				default:
 					toOriginal = true
 					tgMsg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 					tgMsg.Text = noCmdText

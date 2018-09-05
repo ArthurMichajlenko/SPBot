@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -99,6 +100,7 @@ type NodeSearch struct {
 	NodeBody  string    `json:"node_body"`
 	NodeCover NodeCover `json:"node_cover"`
 	NodePath  string    `json:"node_path"`
+	NodeDate  string    `json:"node_date"`
 }
 
 // NodeCover cover search.
@@ -281,9 +283,10 @@ func NewsQuery(url string) (News, error) {
 }
 
 // SearchQuery get Nodes from esp.md.
-func SearchQuery(url string) (Search, error) {
+func SearchQuery(query string, numPage int) (Search, error) {
 	var search Search
-	res, err := http.Get(url)
+	queryURL := botConfig.QuerySearch + url.QueryEscape(query) + "&page=" + strconv.Itoa(numPage)
+	res, err := http.Get(queryURL)
 	if err != nil {
 		log.Println(err)
 	}
@@ -313,18 +316,18 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 		return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 	}
 	for i, attachmentURL := range attachmentURLs {
-			res, err := http.Get(attachmentURL)
-			if err != nil {
-				return err
-			}
-			defer res.Body.Close()
-			_, err = email.Attach(res.Body, fileName[i], contentType[i])
-			if err != nil {
-				return err
-			}
-			if err != nil {
-				return err
-			}
+		res, err := http.Get(attachmentURL)
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+		_, err = email.Attach(res.Body, fileName[i], contentType[i])
+		if err != nil {
+			return err
+		}
+		if err != nil {
+			return err
+		}
 	}
 	return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
 }
