@@ -278,7 +278,7 @@ func main() {
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "search":
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
@@ -290,7 +290,7 @@ func main() {
 						break
 					} else {
 						for _, searchItem := range search.Nodes {
-							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 							tgBot.Send(tgCbMsg)
 						}
 					}
@@ -301,13 +301,13 @@ func main() {
 					tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
 				case "searchnext":
 					numPageSearch++
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
 					}
 					for _, searchItem := range search.Nodes {
-						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
 					multipartSearch = false
@@ -324,13 +324,13 @@ func main() {
 					}
 				case "searchprev":
 					numPageSearch--
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
 					}
 					for _, searchItem := range search.Nodes {
-						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
 					multipartSearch = false

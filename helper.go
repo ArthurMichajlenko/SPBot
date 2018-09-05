@@ -81,33 +81,9 @@ type NodeNews struct {
 	NodeBody  string            `json:"node_body"`
 	NodeCover map[string]string `json:"node_cover"`
 	NodePath  string            `json:"node_path"`
+	NodeDate  string            `json:"node_date"`
 }
 
-// Search from query esp.md.
-type Search struct {
-	Nodes []NodeElementS `json:"nodes"`
-}
-
-// NodeElementS from search.
-type NodeElementS struct {
-	Node NodeSearch `json:"node"`
-}
-
-// NodeSearch what is in node.
-type NodeSearch struct {
-	NodeID    string    `json:"node_id"`
-	Title     string    `json:"title"`
-	NodeBody  string    `json:"node_body"`
-	NodeCover NodeCover `json:"node_cover"`
-	NodePath  string    `json:"node_path"`
-	NodeDate  string    `json:"node_date"`
-}
-
-// NodeCover cover search.
-type NodeCover struct {
-	Src string `json:"src"`
-	Alt string `json:"alt"`
-}
 
 //Holidays holidays.
 type Holidays struct {
@@ -283,8 +259,8 @@ func NewsQuery(url string) (News, error) {
 }
 
 // SearchQuery get Nodes from esp.md.
-func SearchQuery(query string, numPage int) (Search, error) {
-	var search Search
+func SearchQuery(query string, numPage int) (News, error) {
+	var search News
 	queryURL := botConfig.QuerySearch + url.QueryEscape(query) + "&page=" + strconv.Itoa(numPage)
 	res, err := http.Get(queryURL)
 	if err != nil {
