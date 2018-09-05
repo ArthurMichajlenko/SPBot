@@ -285,7 +285,9 @@ func main() {
 					}
 					if len(search.Nodes) == 0 {
 						tgCbMsg.Text = "По Вашему запросу ничего не найдено"
-						tgBot.Send(tgCbMsg)
+						// tgBot.Send(tgCbMsg)
+						multipartSearch = false
+						break
 					} else {
 						for _, searchItem := range search.Nodes {
 							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
@@ -293,7 +295,56 @@ func main() {
 						}
 					}
 					multipartSearch = false
-					continue
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchNext))
+					tgCbMsg.ReplyMarkup = keyboard
+					tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+				case "searchnext":
+					numPageSearch++
+					var search Search
+					search, err := SearchQuery(searchString, numPageSearch)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, searchItem := range search.Nodes {
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					multipartSearch = false
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					buttonSearchPrev := tgbotapi.NewInlineKeyboardButtonData("Назад", "searchprev")
+					if len(search.Nodes) != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev, buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Вы в конце поиска"
+					}
+				case "searchprev":
+					numPageSearch--
+					var search Search
+					search, err := SearchQuery(searchString, numPageSearch)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, searchItem := range search.Nodes {
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					multipartSearch = false
+					buttonSearchNext := tgbotapi.NewInlineKeyboardButtonData("Вперед", "searchnext")
+					buttonSearchPrev := tgbotapi.NewInlineKeyboardButtonData("Назад", "searchprev")
+					if numPageSearch != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchPrev, buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Вы в начале поиска"
+					}
 				case "sendfeedback":
 					emailSubject := "Telegram\n"
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
