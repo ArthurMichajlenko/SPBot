@@ -20,11 +20,17 @@ import (
 
 // Config bots configurations.
 type Config struct {
-	Bots         Bots     `json:"bots"`
-	Feedback     Feedback `json:"feedback"`
-	FileHolidays string   `json:"file_holidays"`
-	QueryTop     string   `json:"query_top"`
-	QuerySearch  string   `json:"query_search"`
+	Bots             Bots     `json:"bots"`
+	Feedback         Feedback `json:"feedback"`
+	FileHolidays     string   `json:"file_holidays"`
+	QueryTopViews    string   `json:"query_top_views"`
+	QueryTopComments string   `json:"query_top_comments"`
+	QuerySearch      string   `json:"query_search"`
+	QueryNews1H      string   `json:"query_news_1h"`
+	QueryNews24H     string   `json:"query_news_24h"`
+    QueryCityDisp    string   `json:"query_city_disp"`   
+    QueryCityAfisha  string   `json:"query_city_afisha"` 
+    QueryGames       string   `json:"query_games"`       
 }
 
 // Bots configuration webhook,port,APIkey etc.
@@ -77,36 +83,11 @@ type NodeElement struct {
 // NodeNews what is in node.
 type NodeNews struct {
 	NodeID    string            `json:"node_id"`
-	NodeTitle string            `json:"node_title"`
+	NodeTitle string            `json:"title"`
 	NodeBody  string            `json:"node_body"`
 	NodeCover map[string]string `json:"node_cover"`
 	NodePath  string            `json:"node_path"`
-}
-
-// Search from query esp.md.
-type Search struct {
-	Nodes []NodeElementS `json:"nodes"`
-}
-
-// NodeElementS from search.
-type NodeElementS struct {
-	Node NodeSearch `json:"node"`
-}
-
-// NodeSearch what is in node.
-type NodeSearch struct {
-	NodeID    string    `json:"node_id"`
-	Title     string    `json:"title"`
-	NodeBody  string    `json:"node_body"`
-	NodeCover NodeCover `json:"node_cover"`
-	NodePath  string    `json:"node_path"`
-	NodeDate  string    `json:"node_date"`
-}
-
-// NodeCover cover search.
-type NodeCover struct {
-	Src string `json:"src"`
-	Alt string `json:"alt"`
+	NodeDate  string            `json:"node_date"`
 }
 
 //Holidays holidays.
@@ -266,9 +247,12 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
 }
 
-// NewsQuery get Nodes from esp.md.
-func NewsQuery(url string) (News, error) {
+// NewsQuery get Nodes from esp.md. -1 without page
+func NewsQuery(url string, numPage int) (News, error) {
 	var news News
+	if numPage != -1 {
+		url += strconv.Itoa(numPage)
+	}
 	res, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
@@ -283,8 +267,8 @@ func NewsQuery(url string) (News, error) {
 }
 
 // SearchQuery get Nodes from esp.md.
-func SearchQuery(query string, numPage int) (Search, error) {
-	var search Search
+func SearchQuery(query string, numPage int) (News, error) {
+	var search News
 	queryURL := botConfig.QuerySearch + url.QueryEscape(query) + "&page=" + strconv.Itoa(numPage)
 	res, err := http.Get(queryURL)
 	if err != nil {

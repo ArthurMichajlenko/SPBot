@@ -13,6 +13,7 @@
 package main
 
 import (
+	"math/rand"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SlyMarbo/rss"
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
@@ -45,6 +45,7 @@ func main() {
 		noWork = false
 		// Message consist of few parts e.g. feedback, search
 		numPageSearch     int
+		numPageNews       int
 		multipartFeedback = false
 		multipartSearch   = false
 		attachmentURLs    []string
@@ -102,7 +103,7 @@ func main() {
 	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
 	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
-	/games - поиграть в игру.
+	/game - поиграть в игру.
 	/donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
@@ -125,17 +126,12 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
-	// RSS
-	feed, err := rss.Fetch("http://esp.md/feed/rss")
-	var countFeed int
-	countView := 5
 	// Cron for subscriptions
 	c := cron.New()
 	c.AddFunc("0 0/15 * * * *", func() {
 		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
 		// tg40Msg.ParseMode = "Markdown"
 		// tgBot.Send(tg40Msg)
-		// feed.Update()
 		fmt.Println(time.Now(), "Tik-Tak")
 	})
 	c.AddFunc("@hourly", func() {
@@ -278,7 +274,7 @@ func main() {
 					tgBot.DeleteMessage(tgbotapi.DeleteMessageConfig{ChatID: tgUpdate.CallbackQuery.Message.Chat.ID, MessageID: tgUpdate.CallbackQuery.Message.MessageID})
 					tgCbMsg.Text = startMsgEndText
 				case "search":
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
@@ -290,7 +286,7 @@ func main() {
 						break
 					} else {
 						for _, searchItem := range search.Nodes {
-							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+							tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 							tgBot.Send(tgCbMsg)
 						}
 					}
@@ -301,13 +297,13 @@ func main() {
 					tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageSearch+1)
 				case "searchnext":
 					numPageSearch++
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
 					}
 					for _, searchItem := range search.Nodes {
-						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
 					multipartSearch = false
@@ -324,13 +320,13 @@ func main() {
 					}
 				case "searchprev":
 					numPageSearch--
-					var search Search
+					var search News
 					search, err := SearchQuery(searchString, numPageSearch)
 					if err != nil {
 						log.Println(err)
 					}
 					for _, searchItem := range search.Nodes {
-						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.Title + "]" + "(" + searchItem.Node.NodePath + ")"
+						tgCbMsg.Text = searchItem.Node.NodeDate + "\n[" + searchItem.Node.NodeTitle + "]" + "(" + searchItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
 					multipartSearch = false
@@ -344,6 +340,50 @@ func main() {
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSearchNext))
 						tgCbMsg.ReplyMarkup = keyboard
 						tgCbMsg.Text = "Вы в начале поиска"
+					}
+				case "newsnext":
+					numPageNews++
+					urlNews := botConfig.QueryNews24H
+					news, err := NewsQuery(urlNews, numPageNews)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, newsItem := range news.Nodes {
+						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+					if len(news.Nodes) != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageNews+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Больше новостей нет"
+					}
+				case "newsprev":
+					numPageNews--
+					urlNews := botConfig.QueryNews24H
+					news, err := NewsQuery(urlNews, numPageNews)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, newsItem := range news.Nodes {
+						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+					if numPageNews != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageNews+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Последние новости"
 					}
 				case "sendfeedback":
 					emailSubject := "Telegram\n"
@@ -361,24 +401,33 @@ func main() {
 					mailAttach.ContentType = nil
 					multipartFeedback = false
 					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
-				case "next5":
-					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
-					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
-					for count := countFeed + 1; count < len(feed.Items); count++ {
-						if count == countFeed+countView {
-							countFeed = count
-							if count != len(feed.Items)-1 {
-								tgCbMsg.ReplyMarkup = keyboard
-							}
-							tgCbMsg.Text = "[" + feed.Items[count].Title + "\n" + feed.Items[count].Date.Format("02-01-2006 15:04") + "]" + "(" + feed.Items[count].Link + ")"
-							tgBot.Send(tgCbMsg)
-							break
-						}
-						tgCbMsg.Text = "[" + feed.Items[count].Title + "\n" + feed.Items[count].Date.Format("02-01-2006 15:04") + "]" + "(" + feed.Items[count].Link + ")"
+				case "games10":
+					var games News
+					numPage := 0
+					urlGames := botConfig.QueryGames
+					games, err := NewsQuery(urlGames, numPage)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, gamesItem := range games.Nodes {
+						tgCbMsg.Text = gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
 					continue
+				case "games1rand":
+					var games News
+					numPage := 0
+					urlGames := botConfig.QueryGames
+					games, err := NewsQuery(urlGames, numPage)
+					if err != nil {
+						log.Println(err)
+					}
+					rand.Seed(time.Now().UTC().UnixNano())
+					choice:=rand.Intn(10)
+					gamesItem:=games.Nodes[choice]
+					tgCbMsg.Text=gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 				}
+
 				// Update visit time
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
@@ -485,14 +534,23 @@ func main() {
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
 			case "/beltsy":
 				var city News
-				numPage := 1
-				queryCity := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
-				city, err := NewsQuery(queryCity)
+				numPage := 0
+				urlCity := botConfig.QueryCityDisp
+				city, err := NewsQuery(urlCity, numPage)
 				if err != nil {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = "[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				urlCity = botConfig.QueryCityAfisha
+				city, err = NewsQuery(urlCity, numPage)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, cityItem := range city.Nodes {
+					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Оформив подиску на городские оповещения, Вы будете получать сюда предупреждения городских служб, анонсы мероприятий в Бельцах и т.д._"
@@ -502,14 +560,26 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			case "/top":
 				var top News
-				numPage := 1
-				queryTop := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
-				top, err := NewsQuery(queryTop)
+				urlTop := botConfig.QueryTopViews
+				top, err := NewsQuery(urlTop, -1)
 				if err != nil {
 					log.Println(err)
 				}
+				tgMsg.Text = "*Самые читаемые*"
+				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
-					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				urlTop = botConfig.QueryTopComments
+				top, err = NewsQuery(urlTop, -1)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text = "*Самые комментируемые*"
+				tgBot.Send(tgMsg)
+				for _, topItem := range top.Nodes {
+					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать Вам такие подборки каждое воскресенье в 18:00_"
@@ -518,22 +588,19 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
 			case "/news":
-				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
-				feed.Update()
-				countFeed = 0
-				for count, newsItem := range feed.Items {
-					if count == countView-1 {
-						countFeed = count
-						tgMsg.ReplyMarkup = keyboard
-						tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
-						tgBot.Send(tgMsg)
-						break
-					}
-					tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
+				numPageNews = 0
+				urlNews := botConfig.QueryNews24H
+				news, err := NewsQuery(urlNews, numPageNews)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, newsItem := range news.Nodes {
+					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				continue
+				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+				tgMsg.ReplyMarkup = keyboard
 			case "/search":
 				multipartSearch = true
 				numPageSearch = 0
@@ -562,8 +629,12 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "/games":
-				tgMsg.Text = stubMsgText
+			case "/game":
+				buttonGames10 := tgbotapi.NewInlineKeyboardButtonData("Последние 10", "games10")
+				buttonGames1Rand := tgbotapi.NewInlineKeyboardButtonData("Случайная", "games1rand")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonGames10, buttonGames1Rand))
+				tgMsg.ReplyMarkup = keyboard
+				tgMsg.Text = "Выберите игру"
 			case "/donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
