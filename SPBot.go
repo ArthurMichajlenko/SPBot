@@ -13,6 +13,7 @@
 package main
 
 import (
+	"math/rand"
 	"fmt"
 	"log"
 	"net/http"
@@ -102,7 +103,7 @@ func main() {
 	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
 	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
-	/games - поиграть в игру.
+	/game - поиграть в игру.
 	/donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
@@ -400,6 +401,31 @@ func main() {
 					mailAttach.ContentType = nil
 					multipartFeedback = false
 					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
+				case "games10":
+					var games News
+					numPage := 0
+					urlGames := botConfig.QueryGames
+					games, err := NewsQuery(urlGames, numPage)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, gamesItem := range games.Nodes {
+						tgCbMsg.Text = gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					continue
+				case "games1rand":
+					var games News
+					numPage := 0
+					urlGames := botConfig.QueryGames
+					games, err := NewsQuery(urlGames, numPage)
+					if err != nil {
+						log.Println(err)
+					}
+					rand.Seed(time.Now().UTC().UnixNano())
+					choice:=rand.Intn(10)
+					gamesItem:=games.Nodes[choice]
+					tgCbMsg.Text=gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 				}
 
 				// Update visit time
@@ -539,7 +565,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text="*Самые читаемые*"
+				tgMsg.Text = "*Самые читаемые*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -550,7 +576,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text="*Самые комментируемые*"
+				tgMsg.Text = "*Самые комментируемые*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -603,8 +629,12 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "/games":
-				tgMsg.Text = stubMsgText
+			case "/game":
+				buttonGames10 := tgbotapi.NewInlineKeyboardButtonData("Последние 10", "games10")
+				buttonGames1Rand := tgbotapi.NewInlineKeyboardButtonData("Случайная", "games1rand")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonGames10, buttonGames1Rand))
+				tgMsg.ReplyMarkup = keyboard
+				tgMsg.Text = "Выберите игру"
 			case "/donate":
 				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
