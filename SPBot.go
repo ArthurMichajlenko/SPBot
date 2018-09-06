@@ -20,7 +20,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SlyMarbo/rss"
 	"github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
@@ -126,17 +125,12 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
-	// RSS
-	feed, err := rss.Fetch("http://esp.md/feed/rss")
-	var countFeed int
-	countView := 5
 	// Cron for subscriptions
 	c := cron.New()
 	c.AddFunc("0 0/15 * * * *", func() {
 		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
 		// tg40Msg.ParseMode = "Markdown"
 		// tgBot.Send(tg40Msg)
-		// feed.Update()
 		fmt.Println(time.Now(), "Tik-Tak")
 	})
 	c.AddFunc("@hourly", func() {
