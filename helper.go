@@ -244,7 +244,7 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
 }
 
-// NewsQuery get Nodes from esp.md.
+// NewsQuery get Nodes from esp.md. -1 without page
 func NewsQuery(url string, numPage int) (News, error) {
 	var news News
 	if numPage != -1 {
