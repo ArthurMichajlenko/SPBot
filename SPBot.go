@@ -400,24 +400,8 @@ func main() {
 					mailAttach.ContentType = nil
 					multipartFeedback = false
 					tgCbMsg.Text = `Ваше сообщение отправлено. Спасибо `
-				case "next5":
-					buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
-					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
-					for count := countFeed + 1; count < len(feed.Items); count++ {
-						if count == countFeed+countView {
-							countFeed = count
-							if count != len(feed.Items)-1 {
-								tgCbMsg.ReplyMarkup = keyboard
-							}
-							tgCbMsg.Text = "[" + feed.Items[count].Title + "\n" + feed.Items[count].Date.Format("02-01-2006 15:04") + "]" + "(" + feed.Items[count].Link + ")"
-							tgBot.Send(tgCbMsg)
-							break
-						}
-						tgCbMsg.Text = "[" + feed.Items[count].Title + "\n" + feed.Items[count].Date.Format("02-01-2006 15:04") + "]" + "(" + feed.Items[count].Link + ")"
-						tgBot.Send(tgCbMsg)
-					}
-					continue
 				}
+
 				// Update visit time
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
