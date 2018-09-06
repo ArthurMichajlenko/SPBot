@@ -346,6 +346,50 @@ func main() {
 						tgCbMsg.ReplyMarkup = keyboard
 						tgCbMsg.Text = "Вы в начале поиска"
 					}
+				case "newsnext":
+					numPageNews++
+					urlNews := botConfig.QueryNews24H
+					news, err := NewsQuery(urlNews, numPageNews)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, newsItem := range news.Nodes {
+						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+					if len(news.Nodes) != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageNews+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Больше новостей нет"
+					}
+				case "newsprev":
+					numPageNews--
+					urlNews := botConfig.QueryNews24H
+					news, err := NewsQuery(urlNews, numPageNews)
+					if err != nil {
+						log.Println(err)
+					}
+					for _, newsItem := range news.Nodes {
+						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
+						tgBot.Send(tgCbMsg)
+					}
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+					if numPageNews != 0 {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Страница: " + strconv.Itoa(numPageNews+1)
+					} else {
+						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+						tgCbMsg.ReplyMarkup = keyboard
+						tgCbMsg.Text = "Последние новости"
+					}
 				case "sendfeedback":
 					emailSubject := "Telegram\n"
 					emailSubject += "Сообщение от: ID:" + messageOwner.ID + " Username: " + messageOwner.Username + "\n"
@@ -529,7 +573,9 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				continue
+				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+				tgMsg.ReplyMarkup = keyboard
 			case "/search":
 				multipartSearch = true
 				numPageSearch = 0
