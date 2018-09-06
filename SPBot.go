@@ -45,6 +45,7 @@ func main() {
 		noWork = false
 		// Message consist of few parts e.g. feedback, search
 		numPageSearch     int
+		numPageNews       int
 		multipartFeedback = false
 		multipartSearch   = false
 		attachmentURLs    []string
@@ -487,7 +488,7 @@ func main() {
 				var city News
 				numPage := 1
 				queryCity := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
-				city, err := NewsQuery(queryCity)
+				city, err := NewsQuery(queryCity, 0)
 				if err != nil {
 					log.Println(err)
 				}
@@ -504,7 +505,7 @@ func main() {
 				var top News
 				numPage := 1
 				queryTop := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
-				top, err := NewsQuery(queryTop)
+				top, err := NewsQuery(queryTop, 0)
 				if err != nil {
 					log.Println(err)
 				}
@@ -518,19 +519,14 @@ func main() {
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
 			case "/news":
-				buttonNext5 := tgbotapi.NewInlineKeyboardButtonData("Следующие "+strconv.Itoa(countView)+" новостей", "next5")
-				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNext5))
-				feed.Update()
-				countFeed = 0
-				for count, newsItem := range feed.Items {
-					if count == countView-1 {
-						countFeed = count
-						tgMsg.ReplyMarkup = keyboard
-						tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
-						tgBot.Send(tgMsg)
-						break
-					}
-					tgMsg.Text = "[" + newsItem.Title + "\n" + newsItem.Date.Format("02-01-2006 15:04") + "]" + "(" + newsItem.Link + ")"
+				numPageNews = 0
+				urlNews := botConfig.QueryNews24H
+				news, err := NewsQuery(urlNews, numPageNews)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, newsItem := range news.Nodes {
+					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				continue

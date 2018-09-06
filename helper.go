@@ -25,6 +25,8 @@ type Config struct {
 	FileHolidays string   `json:"file_holidays"`
 	QueryTop     string   `json:"query_top"`
 	QuerySearch  string   `json:"query_search"`
+	QueryNews1H  string   `json:"query_news_1h"`
+	QueryNews24H string   `json:"query_news_24h"`
 }
 
 // Bots configuration webhook,port,APIkey etc.
@@ -77,13 +79,12 @@ type NodeElement struct {
 // NodeNews what is in node.
 type NodeNews struct {
 	NodeID    string            `json:"node_id"`
-	NodeTitle string            `json:"node_title"`
+	NodeTitle string            `json:"title"`
 	NodeBody  string            `json:"node_body"`
 	NodeCover map[string]string `json:"node_cover"`
 	NodePath  string            `json:"node_path"`
 	NodeDate  string            `json:"node_date"`
 }
-
 
 //Holidays holidays.
 type Holidays struct {
@@ -243,8 +244,9 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 }
 
 // NewsQuery get Nodes from esp.md.
-func NewsQuery(url string) (News, error) {
+func NewsQuery(url string, numPage int) (News, error) {
 	var news News
+	url += strconv.Itoa(numPage)
 	res, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
