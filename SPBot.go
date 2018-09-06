@@ -508,14 +508,23 @@ func main() {
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
 			case "/beltsy":
 				var city News
-				numPage := 1
-				queryCity := botConfig.QueryTopViews + "page=" + strconv.Itoa(numPage)
-				city, err := NewsQuery(queryCity, 0)
+				numPage := 0
+				urlCity := botConfig.QueryCityDisp
+				city, err := NewsQuery(urlCity, numPage)
 				if err != nil {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = "[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				urlCity = botConfig.QueryCityAfisha
+				city, err = NewsQuery(urlCity, numPage)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, cityItem := range city.Nodes {
+					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Оформив подиску на городские оповещения, Вы будете получать сюда предупреждения городских служб, анонсы мероприятий в Бельцах и т.д._"
@@ -533,7 +542,7 @@ func main() {
 				tgMsg.Text="*Самые читаемые*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
-					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				urlTop = botConfig.QueryTopComments
@@ -544,7 +553,7 @@ func main() {
 				tgMsg.Text="*Самые комментируемые*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
-					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать Вам такие подборки каждое воскресенье в 18:00_"

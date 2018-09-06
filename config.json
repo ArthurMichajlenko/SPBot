@@ -28,5 +28,7 @@
     "query_top_comments":"http://esp.md/bot-news/top3/comments",
     "query_search":"http://esp.md/bot/search?query=",
     "query_news_1h":"http://esp.md/bot-news/lasthour?page=",
-    "query_news_24h":"http://esp.md/bot-news/last24?page="
+    "query_news_24h":"http://esp.md/bot-news/last24?page=",
+    "query_city_disp": "http: //esp.md/bot-news/lasthour/dispetcherskaya",
+    "query_city_afisha": "http://esp.md/bot-news/lasthour/afisha"
 }

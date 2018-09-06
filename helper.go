@@ -28,6 +28,8 @@ type Config struct {
 	QuerySearch      string   `json:"query_search"`
 	QueryNews1H      string   `json:"query_news_1h"`
 	QueryNews24H     string   `json:"query_news_24h"`
+    QueryCityDisp    string   `json:"query_city_disp"`   
+    QueryCityAfisha  string   `json:"query_city_afisha"` 
 }
 
 // Bots configuration webhook,port,APIkey etc.
