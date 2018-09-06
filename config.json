@@ -24,7 +24,8 @@
         }
     },
     "file_holidays":"holidays.txt",
-    "query_top":"http://dev.esp.md/top-news?",
+    "query_top_views":"http://esp.md/bot-news/top3/views",
+    "query_top_comments":"http://esp.md/bot-news/top3/comments",
     "query_search":"http://esp.md/bot/search?query=",
     "query_news_1h":"http://esp.md/bot-news/lasthour?page=",
     "query_news_24h":"http://esp.md/bot-news/last24?page="

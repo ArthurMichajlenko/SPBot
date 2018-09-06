@@ -509,7 +509,7 @@ func main() {
 			case "/beltsy":
 				var city News
 				numPage := 1
-				queryCity := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
+				queryCity := botConfig.QueryTopViews + "page=" + strconv.Itoa(numPage)
 				city, err := NewsQuery(queryCity, 0)
 				if err != nil {
 					log.Println(err)
@@ -525,12 +525,24 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 			case "/top":
 				var top News
-				numPage := 1
-				queryTop := botConfig.QueryTop + "page=" + strconv.Itoa(numPage)
-				top, err := NewsQuery(queryTop, 0)
+				urlTop := botConfig.QueryTopViews
+				top, err := NewsQuery(urlTop, -1)
 				if err != nil {
 					log.Println(err)
 				}
+				tgMsg.Text="*Самые читаемые*"
+				tgBot.Send(tgMsg)
+				for _, topItem := range top.Nodes {
+					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+					tgBot.Send(tgMsg)
+				}
+				urlTop = botConfig.QueryTopComments
+				top, err = NewsQuery(urlTop, -1)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text="*Самые комментируемые*"
+				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = "[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
