@@ -13,9 +13,9 @@
 package main
 
 import (
-	"math/rand"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -423,9 +423,9 @@ func main() {
 						log.Println(err)
 					}
 					rand.Seed(time.Now().UTC().UnixNano())
-					choice:=rand.Intn(10)
-					gamesItem:=games.Nodes[choice]
-					tgCbMsg.Text=gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
+					choice := rand.Intn(10)
+					gamesItem := games.Nodes[choice]
+					tgCbMsg.Text = gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 				}
 
 				// Update visit time
