@@ -68,7 +68,6 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-
 	// Bolt
 	db, err := storm.Open("user.db")
 	if err != nil {
@@ -78,7 +77,6 @@ func main() {
 	// Telegram users from db Bucket tgUsers
 	var tgbUser TgUser
 	db.Init(&tgbUser)
-
 	// Connect to Telegram bot
 	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
 	if err != nil {
@@ -141,7 +139,6 @@ func main() {
 		fmt.Println(time.Now(), "Tik-Tak 1 Hour")
 	})
 	c.Start()
-
 	// Get updates from channels
 	for {
 		select {
