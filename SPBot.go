@@ -144,7 +144,6 @@ func main() {
 
 	// Get updates from channels
 	for {
-
 		select {
 		// Watch holidays.txt and update Holidays
 		case event := <-watcher.Events:
@@ -427,7 +426,6 @@ func main() {
 					gamesItem := games.Nodes[choice]
 					tgCbMsg.Text = gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 				}
-
 				// Update visit time
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
@@ -461,10 +459,8 @@ func main() {
 				tgBot.Send(tgMsg)
 				continue
 			}
-
 			msgSlice := strings.Split(tgUpdate.Message.Text, " ")
 			switch strings.ToLower(msgSlice[0]) {
-			// switch tgUpdate.Message.Command() {
 			case "/help":
 				tgMsg.Text = helpMsgText
 			case "/start":
@@ -689,11 +685,9 @@ func main() {
 					tgMsg.Text = noCmdText
 				}
 			}
-
 			if toOriginal {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
-
 			err = db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
 			if err == nil {
 				db.UpdateField(&tgbUser, "LastDate", tgUpdate.Message.Date)
