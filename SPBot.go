@@ -69,7 +69,7 @@ func main() {
 		log.Println(err)
 	}
 	// Bolt
-	db, err := storm.Open("user.db")
+	db, err := storm.Open("tguser.db")
 	if err != nil {
 		log.Panic(err)
 	}
