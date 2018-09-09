@@ -92,7 +92,7 @@ func main() {
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscriptions - управление Вашими подписками.
+	/subscribes - управление Вашими подписками.
 	/beltsy - городские новости и уведомления.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -103,7 +103,7 @@ func main() {
 	/holidays - календарь праздников.
 	/game - поиграть в игру.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscribes`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if botConfig.Bots.Telegram.TgWebhook == "" {
@@ -124,14 +124,14 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
-	// Cron for subscriptions
+	// Cron for subscribes
 	c := cron.New()
-	c.AddFunc("0 0/10 * * * *", func() {
+	c.AddFunc("0 0/5 * * * *", func() {
 		var tgUser []TgUser
 		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
 		// tg40Msg.ParseMode = "Markdown"
 		// tgBot.Send(tg40Msg)
-		db.Find("SubscribeTop", false, tgUser)
+		db.Find("SubscribeTop", false, &tgUser)
 		fmt.Println(time.Now(), "Tik-Tak", tgUser)
 	})
 	c.AddFunc("@hourly", func() {
@@ -468,7 +468,7 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "/subscriptions":
+			case "/subscribes":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
