@@ -216,6 +216,59 @@ func main() {
 			}
 		}
 	})
+	//City subscribe
+	c.AddFunc("0 01 * * * *", func() {
+		var tgUser []TgUser
+		var citya News
+		var cityd News
+		urlCityA := botConfig.QueryCityAfisha
+		urlCityD := botConfig.QueryCityDisp
+		citya, err := NewsQuery(urlCityA, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		cityd, err = NewsQuery(urlCityD, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeCity", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range citya.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+			for _, topItem := range cityd.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	//Holiday subscribe
+	c.AddFunc("0 02 10 * * 1", func() {
+		var tgUser []TgUser
+		db.Find("SubscribeHolidays", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			msgHead := "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+			if noWork {
+				tgMsg.Text = ""
+			} else {
+				tgMsg.Text = msgHead
+				for _, hd := range holidays {
+					if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
+						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+					}
+				}
+			}
+			if tgMsg.Text == msgHead {
+				tgMsg.Text = ""
+			}
+			tgBot.Send(tgMsg)
+		}
+	})
 	c.Start()
 	// Get updates from channels
 	for {
@@ -683,7 +736,7 @@ func main() {
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				tgMsg.Text = "Введите текст сообщения..."
+				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
 			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
