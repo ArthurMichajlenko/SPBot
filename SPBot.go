@@ -126,13 +126,38 @@ func main() {
 	}
 	// Cron for subscribes
 	c := cron.New()
-	c.AddFunc("0 0/5 * * * *", func() {
+	// Top Subscribe
+	c.AddFunc("0 55 17 * * 0", func() {
 		var tgUser []TgUser
-		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
-		// tg40Msg.ParseMode = "Markdown"
-		// tgBot.Send(tg40Msg)
-		db.Find("SubscribeTop", false, &tgUser)
-		fmt.Println(time.Now(), "Tik-Tak", tgUser)
+		var topv News
+		var topc News
+		urlTopV := botConfig.QueryTopViews
+		urlTopC := botConfig.QueryTopComments
+		topv, err := NewsQuery(urlTopV, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		topc, err = NewsQuery(urlTopC, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeTop", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "*Самые читаемые*"
+			tgBot.Send(tgMsg)
+			for _, topItem := range topc.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+			tgMsg.Text = "*Самые комментируемые*"
+			tgBot.Send(tgMsg)
+			for _, topItem := range topv.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
 	})
 	c.AddFunc("@hourly", func() {
 		// tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
