@@ -13,9 +13,9 @@
 package main
 
 import (
-	"math/rand"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -68,9 +68,8 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-
 	// Bolt
-	db, err := storm.Open("user.db")
+	db, err := storm.Open("tguser.db")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -78,7 +77,6 @@ func main() {
 	// Telegram users from db Bucket tgUsers
 	var tgbUser TgUser
 	db.Init(&tgbUser)
-
 	// Connect to Telegram bot
 	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
 	if err != nil {
@@ -94,7 +92,7 @@ func main() {
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscriptions - управление Вашими подписками.
+	/subscribes - управление Вашими подписками.
 	/beltsy - городские новости и уведомления.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -105,7 +103,7 @@ func main() {
 	/holidays - календарь праздников.
 	/game - поиграть в игру.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscribes`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if botConfig.Bots.Telegram.TgWebhook == "" {
@@ -126,25 +124,154 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
-	// Cron for subscriptions
+	// Cron for subscribes
 	c := cron.New()
-	c.AddFunc("0 0/15 * * * *", func() {
-		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
-		// tg40Msg.ParseMode = "Markdown"
-		// tgBot.Send(tg40Msg)
-		fmt.Println(time.Now(), "Tik-Tak")
+	// Top Subscribe
+	c.AddFunc("0 55 17 * * 0", func() {
+		var tgUser []TgUser
+		var topv News
+		var topc News
+		urlTopV := botConfig.QueryTopViews
+		urlTopC := botConfig.QueryTopComments
+		topv, err := NewsQuery(urlTopV, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		topc, err = NewsQuery(urlTopC, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeTop", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "*Самые читаемые*"
+			tgBot.Send(tgMsg)
+			for _, topItem := range topc.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+			tgMsg.Text = "*Самые комментируемые*"
+			tgBot.Send(tgMsg)
+			for _, topItem := range topv.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
 	})
+	// News subscribe
 	c.AddFunc("@hourly", func() {
-		// tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
-		// tg1hMsg.ParseMode = "Markdown"
-		// tgBot.Send(tg1hMsg)
-		fmt.Println(time.Now(), "Tik-Tak 1 Hour")
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews1H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeLast", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	// 9:00 subscribe
+	c.AddFunc("0 02 09 * * *", func() {
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews24H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("Subscribe9", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	// 20:00 subscribe
+	c.AddFunc("0 02 20 * * *", func() {
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews24H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("Subscribe20", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	//City subscribe
+	c.AddFunc("0 01 * * * *", func() {
+		var tgUser []TgUser
+		var citya News
+		var cityd News
+		urlCityA := botConfig.QueryCityAfisha
+		urlCityD := botConfig.QueryCityDisp
+		citya, err := NewsQuery(urlCityA, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		cityd, err = NewsQuery(urlCityD, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeCity", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range citya.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+			for _, topItem := range cityd.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	//Holiday subscribe
+	c.AddFunc("0 02 10 * * 1", func() {
+		var tgUser []TgUser
+		db.Find("SubscribeHolidays", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			msgHead := "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+			if noWork {
+				tgMsg.Text = ""
+			} else {
+				tgMsg.Text = msgHead
+				for _, hd := range holidays {
+					if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
+						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+					}
+				}
+			}
+			if tgMsg.Text == msgHead {
+				tgMsg.Text = ""
+			}
+			tgBot.Send(tgMsg)
+		}
 	})
 	c.Start()
-
 	// Get updates from channels
 	for {
-
 		select {
 		// Watch holidays.txt and update Holidays
 		case event := <-watcher.Events:
@@ -423,11 +550,10 @@ func main() {
 						log.Println(err)
 					}
 					rand.Seed(time.Now().UTC().UnixNano())
-					choice:=rand.Intn(10)
-					gamesItem:=games.Nodes[choice]
-					tgCbMsg.Text=gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
+					choice := rand.Intn(10)
+					gamesItem := games.Nodes[choice]
+					tgCbMsg.Text = gamesItem.Node.NodeDate + "\n[" + gamesItem.Node.NodeTitle + "]" + "(" + gamesItem.Node.NodePath + ")"
 				}
-
 				// Update visit time
 				err = db.One("ChatID", tgUpdate.CallbackQuery.Message.Chat.ID, &tgbUser)
 				if err == nil {
@@ -461,10 +587,8 @@ func main() {
 				tgBot.Send(tgMsg)
 				continue
 			}
-
 			msgSlice := strings.Split(tgUpdate.Message.Text, " ")
 			switch strings.ToLower(msgSlice[0]) {
-			// switch tgUpdate.Message.Command() {
 			case "/help":
 				tgMsg.Text = helpMsgText
 			case "/start":
@@ -473,7 +597,7 @@ func main() {
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "/subscriptions":
+			case "/subscribes":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
@@ -612,7 +736,7 @@ func main() {
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				tgMsg.Text = "Введите текст сообщения..."
+				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
 			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
@@ -689,11 +813,9 @@ func main() {
 					tgMsg.Text = noCmdText
 				}
 			}
-
 			if toOriginal {
 				tgMsg.ReplyToMessageID = tgUpdate.Message.MessageID
 			}
-
 			err = db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
 			if err == nil {
 				db.UpdateField(&tgbUser, "LastDate", tgUpdate.Message.Date)
