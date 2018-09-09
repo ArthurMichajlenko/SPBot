@@ -159,11 +159,62 @@ func main() {
 			}
 		}
 	})
+	// News subscribe
 	c.AddFunc("@hourly", func() {
-		// tg1hMsg := tgbotapi.NewMessage(474165300, "Ku-Ku")
-		// tg1hMsg.ParseMode = "Markdown"
-		// tgBot.Send(tg1hMsg)
-		fmt.Println(time.Now(), "Tik-Tak 1 Hour")
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews1H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("SubscribeLast", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	// 9:00 subscribe
+	c.AddFunc("0 02 09 * * *", func() {
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews24H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("Subscribe9", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
+	})
+	// 20:00 subscribe
+	c.AddFunc("0 02 20 * * *", func() {
+		var tgUser []TgUser
+		var news News
+		urlNews := botConfig.QueryNews24H
+		news, err := NewsQuery(urlNews, 0)
+		if err != nil {
+			log.Println(err)
+		}
+		db.Find("Subscribe20", true, &tgUser)
+		for _, subUser := range tgUser {
+			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
+			tgMsg.ParseMode = "Markdown"
+			for _, topItem := range news.Nodes {
+				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				tgBot.Send(tgMsg)
+			}
+		}
 	})
 	c.Start()
 	// Get updates from channels
