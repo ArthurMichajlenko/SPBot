@@ -126,12 +126,12 @@ func main() {
 	}
 	// Cron for subscriptions
 	c := cron.New()
-	c.AddFunc("0 0/15 * * * *", func() {
+	c.AddFunc("0 0/10 * * * *", func() {
 		var tgUser []TgUser
 		// tg40Msg := tgbotapi.NewMessage(474165300, startMsgText)
 		// tg40Msg.ParseMode = "Markdown"
 		// tgBot.Send(tg40Msg)
-		db.Find("SubscribeTop", false, &tgUser)
+		db.Find("SubscribeTop", false, tgUser)
 		fmt.Println(time.Now(), "Tik-Tak", tgUser)
 	})
 	c.AddFunc("@hourly", func() {
