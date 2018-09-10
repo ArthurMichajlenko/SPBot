@@ -82,9 +82,11 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Next 2 strings for development must remove in production
-	tgBot.Debug = true
-	fmt.Println("Hello, I am", tgBot.Self.UserName)
+	// TODO: Next 2 strings for debug
+	if botConfig.Debug {
+		tgBot.Debug = true
+		fmt.Println("Hello, I am", tgBot.Self.UserName)
+	}
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
@@ -92,7 +94,7 @@ func main() {
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscribes - управление Вашими подписками.
+	/subscriptions - управление Вашими подписками.
 	/beltsy - городские новости и уведомления.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -101,9 +103,9 @@ func main() {
 	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
 	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
-	/game - поиграть в игру.
+	/games - поиграть в игру.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscribes`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if botConfig.Bots.Telegram.TgWebhook == "" {
@@ -124,7 +126,7 @@ func main() {
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
 		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
 	}
-	// Cron for subscribes
+	// Cron for subscriptions
 	c := cron.New()
 	// Top Subscribe
 	c.AddFunc("0 55 17 * * 0", func() {
@@ -593,11 +595,11 @@ func main() {
 				tgMsg.Text = helpMsgText
 			case "/start":
 				tgMsg.Text = startMsgText
-				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscriptionstart")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "/subscribes":
+			case "/subscriptions":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
@@ -753,7 +755,7 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "/game":
+			case "/games":
 				buttonGames10 := tgbotapi.NewInlineKeyboardButtonData("Последние 10", "games10")
 				buttonGames1Rand := tgbotapi.NewInlineKeyboardButtonData("Случайная", "games1rand")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonGames10, buttonGames1Rand))
