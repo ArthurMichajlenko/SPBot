@@ -16,3 +16,6 @@
 *.temp
 temp.*
 debug
+user.db
+tguser.db
+SPBot
