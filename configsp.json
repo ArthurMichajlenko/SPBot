@@ -13,7 +13,23 @@
             "fb_path_cert": ""
         }
     },
-    "file_holidays":"holidays.txt",
-    "query_top":"http://dev.esp.md/top-news?page=1",
-    "query_search":"http://dev.esp.md/search/bot?query="
+    "feedback": {
+        "email": {
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": "587",
+            "username": "spbotbeltsy@gmail.com",
+            "password": "UfptnfCG",
+            "email_from": "spbotbeltsy@gmail.com",
+            "email_to": "michajlenko1967@outlook.com"
+        }
+    },
+    "file_holidays": "holidays.txt",
+    "query_top_views": "http://esp.md/bot-news/top3/views",
+    "query_top_comments": "http://esp.md/bot-news/top3/comments",
+    "query_search": "http://esp.md/bot/search?query=",
+    "query_news_1h": "http://esp.md/bot-news/lasthour?page=",
+    "query_news_24h": "http://esp.md/bot-news/last24?page=",
+    "query_city_disp": "http://esp.md/bot-news/lasthour/dispetcherskaya?page=",
+    "query_city_afisha": "http://esp.md/bot-news/lasthour/afisha?page=",
+    "query_games": "http://esp.md/bot-news/games?page="
 }
