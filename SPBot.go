@@ -13,6 +13,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -82,8 +83,8 @@ func main() {
 		log.Panic(err)
 	}
 	// TODO: Next 2 strings for development must remove in production
-	// tgBot.Debug = true
-	// fmt.Println("Hello, I am", tgBot.Self.UserName)
+	tgBot.Debug = true
+	fmt.Println("Hello, I am", tgBot.Self.UserName)
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
