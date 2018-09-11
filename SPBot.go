@@ -82,7 +82,6 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Next 2 strings for debug
 	if botConfig.Debug {
 		tgBot.Debug = true
 		fmt.Println("Hello, I am", tgBot.Self.UserName)
@@ -124,7 +123,7 @@ func main() {
 		}
 		// Listen Webhook
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
-		go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), "/etc/letsencrypt/live/dev.infinitloop.md/fullchain.pem","/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem" ,nil)
+		go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), botConfig.Bots.Telegram.TgPathCERT, botConfig.Bots.Telegram.TgPathKey, nil)
 	}
 	// Cron for subscriptions
 	c := cron.New()
@@ -724,6 +723,7 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
+				tgMsg.Text = ""
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard

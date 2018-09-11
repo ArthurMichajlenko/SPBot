@@ -4,13 +4,15 @@
             "tg_apikey": "579669561:AAFMhNNt7L4HnDNEgPEU3rqrYmHZ3lWpJAo",
             "tg_webhook": "https://dev.infinitloop.md",
             "tg_port": 8443,
-            "tg_path_cert": ""
+            "tg_path_cert": "/etc/letsencrypt/live/dev.infinitloop.md/fullchain.pem",
+            "tg_path_key": "/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem"
         },
         "facebook": {
             "fb_apikey": "321",
             "fb_webhook": "https://dev.infinitloop.md",
             "fb_port": 8443,
-            "fb_path_cert": ""
+            "fb_path_cert": "",
+            "fb_path_key": ""
         }
     },
     "feedback": {

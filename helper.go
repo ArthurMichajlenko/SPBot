@@ -46,6 +46,7 @@ type Facebook struct {
 	FbWebhook  string `json:"fb_webhook"`
 	FbPort     int    `json:"fb_port"`
 	FbPathCERT string `json:"fb_path_cert"`
+	FbPathKey  string `json:"fb_path_key"`
 }
 
 // Telegram bot configuration.
@@ -54,6 +55,7 @@ type Telegram struct {
 	TgWebhook  string `json:"tg_webhook"`
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
+	TgPathKey  string `json:"tg_path_key"`
 }
 
 // Feedback botConfig for feedback.
