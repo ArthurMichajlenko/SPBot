@@ -13,6 +13,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -81,9 +82,10 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Next 2 strings for development must remove in production
-	// tgBot.Debug = true
-	// fmt.Println("Hello, I am", tgBot.Self.UserName)
+	if botConfig.Debug {
+		tgBot.Debug = true
+		fmt.Println("Hello, I am", tgBot.Self.UserName)
+	}
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
@@ -91,7 +93,7 @@ func main() {
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscribes - управление Вашими подписками.
+	/subscriptions - управление Вашими подписками.
 	/beltsy - городские новости и уведомления.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -100,9 +102,9 @@ func main() {
 	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
 	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
-	/game - поиграть в игру.
+	/games - поиграть в игру.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscribes`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if botConfig.Bots.Telegram.TgWebhook == "" {
@@ -121,9 +123,9 @@ func main() {
 		}
 		// Listen Webhook
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
-		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
+		go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), botConfig.Bots.Telegram.TgPathCERT, botConfig.Bots.Telegram.TgPathKey, nil)
 	}
-	// Cron for subscribes
+	// Cron for subscriptions
 	c := cron.New()
 	// Top Subscribe
 	c.AddFunc("0 55 17 * * 0", func() {
@@ -144,13 +146,13 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			tgMsg.Text = "*Самые читаемые*"
+			tgMsg.Text = "*Самые читаемые за последние семь дней*"
 			tgBot.Send(tgMsg)
 			for _, topItem := range topc.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
-			tgMsg.Text = "*Самые комментируемые*"
+			tgMsg.Text = "*Самые комментируемые за последние семь дней*"
 			tgBot.Send(tgMsg)
 			for _, topItem := range topv.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -171,6 +173,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Последнии новости"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -190,6 +194,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Материалы за последнии сутки"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -209,6 +215,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Материалы за последнии сутки"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -234,6 +242,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Городские новости"
+			tgBot.Send(tgMsg)
 			for _, topItem := range citya.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -592,11 +602,11 @@ func main() {
 				tgMsg.Text = helpMsgText
 			case "/start":
 				tgMsg.Text = startMsgText
-				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscriptionstart")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
-			case "/subscribes":
+			case "/subscriptions":
 				bt9 := "Утром"
 				bt20 := "Вечером"
 				btL := "Последние новости"
@@ -721,6 +731,7 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
+				tgMsg.Text = "Вы можете подписаться на новости выполнив комманду /subscriptions"
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard
@@ -752,7 +763,7 @@ func main() {
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 					tgMsg.ReplyMarkup = keyboard
 				}
-			case "/game":
+			case "/games":
 				buttonGames10 := tgbotapi.NewInlineKeyboardButtonData("Последние 10", "games10")
 				buttonGames1Rand := tgbotapi.NewInlineKeyboardButtonData("Случайная", "games1rand")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonGames10, buttonGames1Rand))

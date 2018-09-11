@@ -28,33 +28,41 @@ type Config struct {
 	QuerySearch      string   `json:"query_search"`
 	QueryNews1H      string   `json:"query_news_1h"`
 	QueryNews24H     string   `json:"query_news_24h"`
-    QueryCityDisp    string   `json:"query_city_disp"`   
-    QueryCityAfisha  string   `json:"query_city_afisha"` 
-    QueryGames       string   `json:"query_games"`       
+	QueryCityDisp    string   `json:"query_city_disp"`
+	QueryCityAfisha  string   `json:"query_city_afisha"`
+	QueryGames       string   `json:"query_games"`
+	Debug            bool     `json:"debug"`
 }
+
 // Bots configuration webhook,port,APIkey etc.
 type Bots struct {
 	Telegram Telegram `json:"telegram"`
 	Facebook Facebook `json:"facebook"`
 }
+
 // Facebook bot configuration.
 type Facebook struct {
 	FbApikey   string `json:"fb_apikey"`
 	FbWebhook  string `json:"fb_webhook"`
 	FbPort     int    `json:"fb_port"`
 	FbPathCERT string `json:"fb_path_cert"`
+	FbPathKey  string `json:"fb_path_key"`
 }
+
 // Telegram bot configuration.
 type Telegram struct {
 	TgApikey   string `json:"tg_apikey"`
 	TgWebhook  string `json:"tg_webhook"`
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
+	TgPathKey  string `json:"tg_path_key"`
 }
+
 // Feedback botConfig for feedback.
 type Feedback struct {
 	Email Email `json:"email"`
 }
+
 // Email botConfig email parameters.
 type Email struct {
 	SMTPServer string `json:"smtp_server"`
@@ -64,14 +72,17 @@ type Email struct {
 	EmailFrom  string `json:"email_from"`
 	EmailTo    string `json:"email_to"`
 }
+
 // News from query esp.md.
 type News struct {
 	Nodes []NodeElement `json:"nodes"`
 }
+
 // NodeElement from news.
 type NodeElement struct {
 	Node NodeNews `json:"node"`
 }
+
 // NodeNews what is in node.
 type NodeNews struct {
 	NodeID    string            `json:"node_id"`
@@ -81,6 +92,7 @@ type NodeNews struct {
 	NodePath  string            `json:"node_path"`
 	NodeDate  string            `json:"node_date"`
 }
+
 //Holidays holidays.
 type Holidays struct {
 	Day     string
@@ -88,12 +100,14 @@ type Holidays struct {
 	Holiday string
 	Date    time.Time
 }
+
 //AttachFile properties attached file
 type AttachFile struct {
 	FileName    []string
 	ContentType []string
 	BotFile     tgbotapi.File
 }
+
 //TgUser Telegram User. BoltDb
 type TgUser struct {
 	ChatID            int64 `storm:"id"`
@@ -109,6 +123,7 @@ type TgUser struct {
 	SubscribeHolidays bool
 	RssLastID         int
 }
+
 //TgMessageOwner info about who send message.
 type TgMessageOwner struct {
 	ID        string
@@ -116,6 +131,7 @@ type TgMessageOwner struct {
 	FirstName string
 	LastName  string
 }
+
 // LoadHolidays returns holidays reading from file.
 func LoadHolidays(file string) ([]Holidays, error) {
 	var holidays []Holidays
@@ -168,6 +184,7 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	}
 	return holidays, err
 }
+
 // LoadConfigBots returns botConfig reading from json file.
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
@@ -183,6 +200,7 @@ func LoadConfigBots(file string) (Config, error) {
 	}
 	return botsconfig, err
 }
+
 //SubButtons create keyboard for subscriptions.
 func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReplyMarkupConfig {
 	bt9 := "Утром"
@@ -231,6 +249,7 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(row0, row1, row2, row3)
 	return tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, keyboard)
 }
+
 // NewsQuery get Nodes from esp.md. -1 without page
 func NewsQuery(url string, numPage int) (News, error) {
 	var news News
@@ -249,6 +268,7 @@ func NewsQuery(url string, numPage int) (News, error) {
 	err = json.Unmarshal(r, &news)
 	return news, err
 }
+
 // SearchQuery get Nodes from esp.md.
 func SearchQuery(query string, numPage int) (News, error) {
 	var search News
@@ -265,6 +285,7 @@ func SearchQuery(query string, numPage int) (News, error) {
 	err = json.Unmarshal(r, &search)
 	return search, err
 }
+
 // SendFeedback sends email feedback.
 func SendFeedback(subject string, text string, attachmentURLs []string, fileName []string, contentType []string) error {
 	// Create email auth
