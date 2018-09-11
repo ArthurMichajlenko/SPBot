@@ -124,7 +124,7 @@ func main() {
 		}
 		// Listen Webhook
 		tgUpdates = tgBot.ListenForWebhook("/" + tgBot.Token)
-		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), nil)
+		go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Telegram.TgPort), "/etc/letsencrypt/live/dev.infinitloop.md/fullchain.pem","/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem" ,nil)
 	}
 	// Cron for subscriptions
 	c := cron.New()
