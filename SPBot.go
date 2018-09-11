@@ -146,13 +146,13 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			tgMsg.Text = "*Самые читаемые*"
+			tgMsg.Text = "*Самые читаемые за последние семь дней*"
 			tgBot.Send(tgMsg)
 			for _, topItem := range topc.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
-			tgMsg.Text = "*Самые комментируемые*"
+			tgMsg.Text = "*Самые комментируемые за последние семь дней*"
 			tgBot.Send(tgMsg)
 			for _, topItem := range topv.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -173,6 +173,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Последнии новости"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -192,6 +194,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Материалы за последнии сутки"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -211,6 +215,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Материалы за последнии сутки"
+			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
@@ -236,6 +242,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
+			tgMsg.Text = "Городские новости"
+			tgBot.Send(tgMsg)
 			for _, topItem := range citya.Nodes {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
