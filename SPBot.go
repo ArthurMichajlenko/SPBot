@@ -723,7 +723,7 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = ""
+				tgMsg.Text = "Вы можете подписаться на новости выполнив комманду /subscriptions"
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard
