@@ -15,6 +15,7 @@
 *.tmp
 *.temp
 temp.*
+*.log
 debug
 user.db
 tguser.db

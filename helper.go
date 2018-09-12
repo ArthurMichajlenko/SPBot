@@ -56,6 +56,7 @@ type Telegram struct {
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
 	TgPathKey  string `json:"tg_path_key"`
+    LogFile    string `json:"log_file"`    
 }
 
 // Feedback botConfig for feedback.

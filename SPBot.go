@@ -13,10 +13,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -84,7 +84,15 @@ func main() {
 	}
 	if botConfig.Debug {
 		tgBot.Debug = true
-		fmt.Println("Hello, I am", tgBot.Self.UserName)
+		log.Println("Hello, I am", tgBot.Self.UserName)
+	} else {
+		logfile, err := os.OpenFile(botConfig.Bots.Telegram.LogFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			log.Println(err)
+		}
+		defer logfile.Close()
+		log.SetOutput(logfile)
+		log.Println("Hello, I am", tgBot.Self.UserName)
 	}
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
@@ -173,8 +181,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if len(news.Nodes)==0 {
-				tgMsg.Text=""
+			if len(news.Nodes) == 0 {
+				tgMsg.Text = ""
 			} else {
 				tgMsg.Text = "Последнии новости"
 			}
@@ -198,8 +206,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if len(news.Nodes)==0 {
-				tgMsg.Text=""
+			if len(news.Nodes) == 0 {
+				tgMsg.Text = ""
 			} else {
 				tgMsg.Text = "Материалы за последнии сутки"
 			}
@@ -223,8 +231,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if len(news.Nodes)==0 {
-				tgMsg.Text=""
+			if len(news.Nodes) == 0 {
+				tgMsg.Text = ""
 			} else {
 				tgMsg.Text = "Материалы за последнии сутки"
 			}
@@ -254,8 +262,8 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if (len(citya.Nodes)==0) && (len(cityd.Nodes)==0) {
-				tgMsg.Text=""
+			if (len(citya.Nodes) == 0) && (len(cityd.Nodes) == 0) {
+				tgMsg.Text = ""
 			} else {
 				tgMsg.Text = "Городские новости"
 			}
