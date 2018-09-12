@@ -5,7 +5,8 @@
             "tg_webhook": "https://dev.infinitloop.md",
             "tg_port": 8443,
             "tg_path_cert": "/etc/letsencrypt/live/dev.infinitloop.md/fullchain.pem",
-            "tg_path_key": "/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem"
+            "tg_path_key": "/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem",
+            "log_file": "tgbot.log"
         },
         "facebook": {
             "fb_apikey": "321",
