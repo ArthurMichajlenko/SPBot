@@ -54,6 +54,23 @@ func main() {
 		messageOwner      TgMessageOwner
 		messageDate       time.Time
 	)
+	// Connect to Telegram bot
+	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
+	if err != nil {
+		log.Panic(err)
+	}
+	if botConfig.Debug {
+		tgBot.Debug = true
+		log.Println("Hello, I am", tgBot.Self.UserName)
+	} else {
+		logfile, err := os.OpenFile(botConfig.Bots.Telegram.LogFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			log.Println(err)
+		}
+		defer logfile.Close()
+		log.SetOutput(logfile)
+		log.Println("Hello, I am", tgBot.Self.UserName)
+	}
 	holidays, err := LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
@@ -77,23 +94,6 @@ func main() {
 	// Telegram users from db Bucket tgUsers
 	var tgbUser TgUser
 	db.Init(&tgbUser)
-	// Connect to Telegram bot
-	tgBot, err := tgbotapi.NewBotAPI(botConfig.Bots.Telegram.TgApikey)
-	if err != nil {
-		log.Panic(err)
-	}
-	if botConfig.Debug {
-		tgBot.Debug = true
-		log.Println("Hello, I am", tgBot.Self.UserName)
-	} else {
-		logfile, err := os.OpenFile(botConfig.Bots.Telegram.LogFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			log.Println(err)
-		}
-		defer logfile.Close()
-		log.SetOutput(logfile)
-		log.Println("Hello, I am", tgBot.Self.UserName)
-	}
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
