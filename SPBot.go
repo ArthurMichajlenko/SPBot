@@ -626,7 +626,7 @@ func main() {
 				tgMsg.Text = helpMsgText
 			case "/start":
 				tgMsg.Text = startMsgText
-				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscriptionstart")
+				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribestart")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
 				tgMsg.ReplyMarkup = keyboard
