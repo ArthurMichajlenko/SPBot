@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Go Run",
+            "label": "Go Run TG",
             "type": "shell",
             "command": "go run *.go",
             "problemMatcher": [
@@ -12,9 +12,29 @@
             ]
         },
         {
-            "label": "Go Build",
+            "label": "Go Run VB",
+            "type": "shell",
+            "command": "cd VbBot && go run *.go",
+            "problemMatcher": [
+                "$go"
+            ]
+        },
+        {
+            "label": "Go Build TG",
             "type": "shell",
             "command": "go build",
+            "problemMatcher": [
+                "$go"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Go Build VB",
+            "type": "shell",
+            "command": "cd VbBot && go build",
             "problemMatcher": [
                 "$go"
             ],
