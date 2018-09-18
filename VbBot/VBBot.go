@@ -17,5 +17,5 @@ import (
 )
 
 func main() {
-	log.Println("Begin")
+	log.Println("Begin VB")
 }
