@@ -38,6 +38,7 @@ type Config struct {
 type Bots struct {
 	Telegram Telegram `json:"telegram"`
 	Facebook Facebook `json:"facebook"`
+	Viber    Viber    `json:"viber"`
 }
 
 // Facebook bot configuration.
@@ -47,6 +48,7 @@ type Facebook struct {
 	FbPort     int    `json:"fb_port"`
 	FbPathCERT string `json:"fb_path_cert"`
 	FbPathKey  string `json:"fb_path_key"`
+	LogFile    string `json:"log_file"`
 }
 
 // Telegram bot configuration.
@@ -56,7 +58,17 @@ type Telegram struct {
 	TgPort     int    `json:"tg_port"`
 	TgPathCERT string `json:"tg_path_cert"`
 	TgPathKey  string `json:"tg_path_key"`
-    LogFile    string `json:"log_file"`    
+	LogFile    string `json:"log_file"`
+}
+
+// Viber bot configuration.
+type Viber struct {
+	VBApikey   string `json:"vb_apikey"`
+	VBWebhook  string `json:"vb_webhook"`
+	VBPort     int    `json:"vb_port"`
+	VBPathCERT string `json:"vb_path_cert"`
+	VBPathKey  string `json:"vb_path_key"`
+	LogFile    string `json:"log_file"`
 }
 
 // Feedback botConfig for feedback.

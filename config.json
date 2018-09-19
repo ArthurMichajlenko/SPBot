@@ -13,7 +13,16 @@
             "fb_webhook": "https://dev.infinitloop.md",
             "fb_port": 8443,
             "fb_path_cert": "",
-            "fb_path_key": ""
+            "fb_path_key": "",
+            "log_file": "fbbot.log"
+        },
+        "viber": {
+            "vb_apikey": "48799744e527d2c8-d447e6da2f634a31-8a717c2c7cd69d51",
+            "vb_webhook": "https://dev.infinitloop.md",
+            "vb_port": 8444,
+            "vb_path_cert": "",
+            "vb_path_key": "",
+            "log_file": "vbbot.log"
         }
     },
     "feedback": {

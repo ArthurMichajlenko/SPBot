@@ -15,21 +15,31 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/mileusna/viber"
 )
 
+var botConfig Config
+
 func main() {
-	log.Println("Begin VB")
-	v := viber.New("48799744e527d2c8-d447e6da2f634a31-8a717c2c7cd69d51", "IumasLink", "")
+	// Load botConfig
+	var err error
+	botConfig, err = LoadConfigBots("config.json")
+	if err != nil {
+		log.Panic(err)
+	}
+	// Start webhook
+	v := viber.New(botConfig.Bots.Viber.VBApikey, "IumasLink", "")
 	vAccount, err := v.AccountInfo()
 	if err != nil {
 		log.Println(err)
 	}
 	v.Sender.Avatar = vAccount.Icon
 	http.Handle("/", v)
-	go http.ListenAndServe("0.0.0.0:8444", nil)
-	webHookResp, err := v.SetWebhook("https://dev.infinitloop.md:8444/", nil)
+	log.Println("Hello, I am ", vAccount.Name)
+	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
+	webHookResp, err := v.SetWebhook(botConfig.Bots.Viber.VBWebhook+":"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
 	if err != nil {
 		log.Println("WebHook error=> ", err)
 	} else {
