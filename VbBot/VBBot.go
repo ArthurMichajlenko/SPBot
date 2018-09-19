@@ -46,7 +46,7 @@ func main() {
 		log.Println("WebHook resp=> ", webHookResp)
 	}
 
-	userID := "bnzFlKadhfEx/nOKdHXrCw==" // fake user ID, use the real one
+	userID := "bnzFlKadhfEx/nOKdHXrCw==" // My User ID
 	// send text message
 	token, err := v.SendTextMessage(userID, "Hello, World!\nПривет Мир")
 	if err != nil {
