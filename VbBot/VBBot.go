@@ -30,16 +30,16 @@ func main() {
 		log.Panic(err)
 	}
 	// Start webhook
-	v := viber.New(botConfig.Bots.Viber.VBApikey, "IumasLink", "")
-	vAccount, err := v.AccountInfo()
+	vb := viber.New(botConfig.Bots.Viber.VBApikey, "IumasLink", "")
+	vAccount, err := vb.AccountInfo()
 	if err != nil {
 		log.Println(err)
 	}
-	v.Sender.Avatar = vAccount.Icon
-	http.Handle("/", v)
+	vb.Sender.Avatar = vAccount.Icon
+	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)
 	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
-	webHookResp, err := v.SetWebhook(botConfig.Bots.Viber.VBWebhook+":"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
+	webHookResp, err := vb.SetWebhook(botConfig.Bots.Viber.VBWebhook+":"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
 	if err != nil {
 		log.Println("WebHook error=> ", err)
 	} else {
@@ -48,12 +48,12 @@ func main() {
 
 	userID := "bnzFlKadhfEx/nOKdHXrCw==" // My User ID
 	// send text message
-	token, err := v.SendTextMessage(userID, "Hello, World!\nПривет Мир")
+	token, err := vb.SendTextMessage(userID, "Hello, World!\nПривет Мир")
 	if err != nil {
 		log.Println("Viber error:", err)
 	} else {
 		log.Println("Message sent, message token:", token)
 	}
-	log.Println(v)
+	log.Println(vb)
 	log.Println(vAccount)
 }
