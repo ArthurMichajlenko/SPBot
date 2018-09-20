@@ -102,17 +102,16 @@ func main() {
 	/help - выводит это сообщение.
 	/start - подключение к боту.
 	/subscriptions - управление Вашими подписками.
-	/beltsy - городские новости и уведомления.
+	/alerts - городские оповещения.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
 	/search - поиск по сайту "СП".
 	/feedback - задать вопрос/сообщить новость.
-	_Вы можете прикрепите не более 5 файлов размером не более 20 MB каждый_
-	*ВНИМАНИЕ* Все вложения должны отправляться как файл.
 	/holidays - календарь праздников.
-	/games - поиграть в игру.
+	/games - игры.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
+	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
 	if botConfig.Bots.Telegram.TgWebhook == "" {
@@ -184,7 +183,7 @@ func main() {
 			if len(news.Nodes) == 0 {
 				tgMsg.Text = ""
 			} else {
-				tgMsg.Text = "Последнии новости"
+				tgMsg.Text = "Последние новости"
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
@@ -209,7 +208,7 @@ func main() {
 			if len(news.Nodes) == 0 {
 				tgMsg.Text = ""
 			} else {
-				tgMsg.Text = "Материалы за последнии сутки"
+				tgMsg.Text = "Материалы за последние сутки"
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
@@ -234,7 +233,7 @@ func main() {
 			if len(news.Nodes) == 0 {
 				tgMsg.Text = ""
 			} else {
-				tgMsg.Text = "Материалы за последнии сутки"
+				tgMsg.Text = "Материалы за последние сутки"
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
@@ -512,7 +511,7 @@ func main() {
 						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
-					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предыдущие 10 новостей", "newsprev")
 					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 					if len(news.Nodes) != 0 {
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
@@ -534,7 +533,7 @@ func main() {
 						tgCbMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 						tgBot.Send(tgCbMsg)
 					}
-					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предидущие 10 новостей", "newsprev")
+					buttonNewsPrev := tgbotapi.NewInlineKeyboardButtonData("Предыдущие 10 новостей", "newsprev")
 					buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 					if numPageNews != 0 {
 						keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsPrev, buttonNewsNext))
@@ -755,7 +754,7 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = "Вы можете подписаться на новости выполнив комманду /subscriptions"
+				tgMsg.Text = "Вы можете подписаться на новости, выполнив комманду /subscriptions"
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard
