@@ -688,7 +688,7 @@ func main() {
 						Для изменения состояния подписки нажмите на 
 					соответствующую кнопку
 					_Символ ✔ стоит около рассылок к которым Вы подписаны_`
-			case "/beltsy":
+			case "/alerts":
 				var city News
 				numPage := 0
 				urlCity := botConfig.QueryCityDisp
