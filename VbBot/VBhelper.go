@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mileusna/viber"
+
 	"github.com/jordan-wright/email"
 
 	"github.com/Syfaro/telegram-bot-api"
@@ -330,4 +332,19 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 		}
 	}
 	return email.Send(botConfig.Feedback.Email.SMTPServer+":"+botConfig.Feedback.Email.SMTPPort, smtpAuth)
+}
+
+// msgReceived will be called everttime when user send a message
+func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
+	switch m.(type) {
+	case *viber.TextMessage:
+		v.SendTextMessage(u.ID, "Thank you for you message")
+		txt := m.(*viber.TextMessage).Text
+		v.SendTextMessage(u.ID, "You send me this message:"+txt)
+	case *viber.URLMessage:
+		url := m.(*viber.URLMessage).Media
+		v.SendTextMessage(u.ID, "You send me this URL:"+url)
+	case *viber.PictureMessage:
+		v.SendTextMessage(u.ID, "Nice pic")
+	}
 }

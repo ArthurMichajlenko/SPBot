@@ -13,6 +13,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,6 +36,7 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
+	vb.Message = msgReceived
 	vb.Sender.Avatar = vAccount.Icon
 	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)
@@ -56,4 +58,5 @@ func main() {
 	}
 	log.Println(vb)
 	log.Println(vAccount)
+	fmt.Scanln()
 }
