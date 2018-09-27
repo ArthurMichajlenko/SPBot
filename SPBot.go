@@ -868,7 +868,7 @@ func main() {
 				db.Save(&tgbUser)
 			}
 			tgBot.Send(tgMsg)
-			//NOTE Default may cause high CPU load
+			//NOTE: Default may cause high CPU load
 			// default:
 		}
 	}
