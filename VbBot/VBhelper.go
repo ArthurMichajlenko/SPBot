@@ -13,11 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mileusna/viber"
-
-	"github.com/jordan-wright/email"
-
 	"github.com/Syfaro/telegram-bot-api"
+	"github.com/jordan-wright/email"
+	"github.com/mileusna/viber"
 )
 
 // Config bots configurations.
@@ -340,7 +338,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	case *viber.TextMessage:
 		v.SendTextMessage(u.ID, "Thank you for you message")
 		txt := m.(*viber.TextMessage).Text
-		v.SendTextMessage(u.ID, "You send me this message:"+txt)
+		if strings.HasPrefix(txt, "/") {
+			v.SendTextMessage(u.ID, "You send me this command:"+txt)
+		} else {
+			v.SendTextMessage(u.ID, "You send me this message:"+txt)
+		}
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
