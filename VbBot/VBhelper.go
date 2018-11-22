@@ -334,14 +334,56 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 
 // msgReceived will be called everttime when user send a message
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
+	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
+	stubMsgText := `_Извините, пока не реализовано_`
+	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
+	helpMsgText := `Что я умею:
+	/help - выводит это сообщение.
+	/start - подключение к боту.
+	/subscriptions - управление Вашими подписками.
+	/alerts - городские оповещения.
+	/top - самое популярное в "СП".
+	/news - последние материалы на сайте "СП".
+	/search - поиск по сайту "СП".
+	/feedback - задать вопрос/сообщить новость.
+	/holidays - календарь праздников.
+	/games - игры.
+	/donate - поддержать "СП".`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
+	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
+
 	switch m.(type) {
 	case *viber.TextMessage:
-		v.SendTextMessage(u.ID, "Thank you for you message")
 		txt := m.(*viber.TextMessage).Text
 		if strings.HasPrefix(txt, "/") {
-			v.SendTextMessage(u.ID, "You send me this command:"+txt)
+			switch txt {
+			case strings.ToLower("/help"):
+				v.SendTextMessage(u.ID, helpMsgText)
+			case strings.ToLower("/start"):
+				v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
+			case strings.ToLower("/subscriptions"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/alerts"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/top"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/news"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/search"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/feedback"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/holidays"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/games"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			case strings.ToLower("/donate"):
+				v.SendTextMessage(u.ID, stubMsgText)
+			default:
+				v.SendTextMessage(u.ID, helpMsgText)
+			}
 		} else {
-			v.SendTextMessage(u.ID, "You send me this message:"+txt)
+			v.SendTextMessage(u.ID, noCmdText)
 		}
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
