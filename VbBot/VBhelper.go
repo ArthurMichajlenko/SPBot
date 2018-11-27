@@ -351,7 +351,10 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	/donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
-
+	kb := v.NewKeyboard("", true)
+	bt := v.NewTextButton(6, 1, "reply", "/help", `<font color="#ffffff">help</font>`)
+	bt.SetBgColor("#752f35")
+	kb.AddButton(bt)
 	switch m.(type) {
 	case *viber.TextMessage:
 		txt := m.(*viber.TextMessage).Text
@@ -380,7 +383,10 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			case strings.ToLower("/donate"):
 				v.SendTextMessage(u.ID, stubMsgText)
 			default:
-				v.SendTextMessage(u.ID, helpMsgText)
+				msg:=v.NewTextMessage("Посмотрите что я могу")
+				msg.SetKeyboard(kb)
+				v.SendMessage(u.ID, msg)
+				// v.SendTextMessage(u.ID, helpMsgText)
 			}
 		} else {
 			v.SendTextMessage(u.ID, noCmdText)
