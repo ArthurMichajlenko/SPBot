@@ -14,7 +14,7 @@
         {
             "label": "Go Run VB",
             "type": "shell",
-            "command": "cd VbBot && go run *.go",
+            "command": "cd VbBot; go run *.go",
             "problemMatcher": [
                 "$go"
             ]
@@ -52,7 +52,7 @@
         {
             "label": "Go Build VB",
             "type": "shell",
-            "command": "cd VbBot && go build",
+            "command": "cd VbBot; go build",
             "problemMatcher": [
                 "$go"
             ],
@@ -64,7 +64,7 @@
         {
             "label": "Go Build VB Linux",
             "type": "shell",
-            "command": "cd VbBot && go build",
+            "command": "cd VbBot; go build",
             "options": {
                 "env": {
                     "GOOS": "linux",
