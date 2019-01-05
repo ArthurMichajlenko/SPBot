@@ -334,54 +334,53 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 
 // msgReceived will be called everttime when user send a message
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
-	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
+	// noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
 	stubMsgText := `_Извините, пока не реализовано_`
 	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:
-	/help - выводит это сообщение.
-	/start - подключение к боту.
-	/subscriptions - управление Вашими подписками.
-	/alerts - городские оповещения.
-	/top - самое популярное в "СП".
-	/news - последние материалы на сайте "СП".
-	/search - поиск по сайту "СП".
-	/feedback - задать вопрос/сообщить новость.
-	/holidays - календарь праздников.
-	/games - игры.
-	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
+	help - выводит это сообщение.
+	start - подключение к боту.
+	subscriptions - управление Вашими подписками.
+	alerts - городские оповещения.
+	top - самое популярное в "СП".
+	news - последние материалы на сайте "СП".
+	search - поиск по сайту "СП".
+	feedback - задать вопрос/сообщить новость.
+	holidays - календарь праздников.
+	games - игры.
+	donate - поддержать "СП".`
+	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kb := v.NewKeyboard("", true)
 	kb.DefaultHeight = false
-	bt := v.NewTextButton(6, 1, "reply", "/help", `<font color="#ffffff">help</font>`)
+	bt := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">help</font>`)
 	bt.SetBgColor("#752f35")
 	kb.AddButton(bt)
 	switch m.(type) {
 	case *viber.TextMessage:
 		txt := m.(*viber.TextMessage).Text
-		if strings.HasPrefix(txt, "/") {
 			switch txt {
-			case strings.ToLower("/help"):
+			case strings.ToLower("help"):
 				v.SendTextMessage(u.ID, helpMsgText)
-			case strings.ToLower("/start"):
+			case strings.ToLower("start"):
 				v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
-			case strings.ToLower("/subscriptions"):
+			case strings.ToLower("subscriptions"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/alerts"):
+			case strings.ToLower("alerts"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/top"):
+			case strings.ToLower("top"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/news"):
+			case strings.ToLower("news"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/search"):
+			case strings.ToLower("search"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/feedback"):
+			case strings.ToLower("feedback"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/holidays"):
+			case strings.ToLower("holidays"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/games"):
+			case strings.ToLower("games"):
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("/donate"):
+			case strings.ToLower("donate"):
 				v.SendTextMessage(u.ID, stubMsgText)
 			default:
 				msg := v.NewTextMessage("Посмотрите что я могу")
@@ -389,9 +388,6 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 				// v.SendTextMessage(u.ID, helpMsgText)
 			}
-		} else {
-			v.SendTextMessage(u.ID, noCmdText)
-		}
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
