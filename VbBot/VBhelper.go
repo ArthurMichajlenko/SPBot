@@ -358,29 +358,29 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	kb.AddButton(bt)
 	switch m.(type) {
 	case *viber.TextMessage:
-		txt := m.(*viber.TextMessage).Text
+		txt := strings.ToLower(m.(*viber.TextMessage).Text)
 			switch txt {
-			case strings.ToLower("help"):
+			case "help":
 				v.SendTextMessage(u.ID, helpMsgText)
-			case strings.ToLower("start"):
+			case "start":
 				v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
-			case strings.ToLower("subscriptions"):
+			case "subscriptions":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("alerts"):
+			case "alerts":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("top"):
+			case "top":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("news"):
+			case "news":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("search"):
+			case "search":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("feedback"):
+			case "feedback":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("holidays"):
+			case "holidays":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("games"):
+			case "games":
 				v.SendTextMessage(u.ID, stubMsgText)
-			case strings.ToLower("donate"):
+			case "donate":
 				v.SendTextMessage(u.ID, stubMsgText)
 			default:
 				msg := v.NewTextMessage("Посмотрите что я могу")
