@@ -353,9 +353,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kb := v.NewKeyboard("", true)
 	kb.DefaultHeight = false
-	bt := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">help</font>`)
-	bt.SetBgColor("#752f35")
-	kb.AddButton(bt)
+	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">help</font>`)
+	btHelp.SetBgColor("#752f35")
+	kb.AddButton(btHelp)
 	switch m.(type) {
 	case *viber.TextMessage:
 		txt := strings.ToLower(m.(*viber.TextMessage).Text)
