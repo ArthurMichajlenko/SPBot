@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/jordan-wright/email"
 	"github.com/mileusna/viber"
 )
@@ -335,7 +335,7 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 // msgReceived will be called everttime when user send a message
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
 	// noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
-	stubMsgText := `_Извините, пока не реализовано_`
+	stubMsgText := ` Извините, пока не реализовано`
 	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:
 	help - выводит это сообщение.
@@ -353,41 +353,68 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kb := v.NewKeyboard("", true)
 	kb.DefaultHeight = false
-	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">help</font>`)
+	btHelp := v.NewTextButton(3, 1, "reply", "help", `<font color="#ffffff">Help</font>`)
 	btHelp.SetBgColor("#752f35")
+	btDonate := v.NewTextButton(3, 1, "reply", "donate", `<font color="#ffffff">Donate</font>`)
+	btDonate.SetBgColor("#752f35")
+	btSearch := v.NewTextButton(3, 1, "reply", "search", `<font color="#ffffff">Search</font>`)
+	btSearch.SetBgColor("#752f35")
+	btFeedback := v.NewTextButton(3, 1, "reply", "feedback", `<font color="#ffffff">Feedback</font>`)
+	btFeedback.SetBgColor("#752f35")
+	btGames := v.NewTextButton(3, 1, "reply", "games", `<font color="#ffffff">Games</font>`)
+	btGames.SetBgColor("#752f35")
+	btHolidays := v.NewTextButton(3, 1, "reply", "holidays", `<font color="#ffffff">Holidays</font>`)
+	btHolidays.SetBgColor("#752f35")
+	btAlerts := v.NewTextButton(3, 1, "reply", "alerts", `<font color="#ffffff">Alerts</font>`)
+	btAlerts.SetBgColor("#752f35")
+	btNews := v.NewTextButton(3, 1, "reply", "news", `<font color="#ffffff">News</font>`)
+	btNews.SetBgColor("#752f35")
+	btTop := v.NewTextButton(3, 1, "reply", "top", `<font color="#ffffff">Top</font>`)
+	btTop.SetBgColor("#752f35")
+	btSubscriptions := v.NewTextButton(3, 1, "reply", "subscriptions", `<font color="#ffffff">Subscriptions</font>`)
+	btSubscriptions.SetBgColor("#752f35")
 	kb.AddButton(btHelp)
+	kb.AddButton(btDonate)
+	kb.AddButton(btSearch)
+	kb.AddButton(btFeedback)
+	kb.AddButton(btGames)
+	kb.AddButton(btHolidays)
+	kb.AddButton(btAlerts)
+	kb.AddButton(btNews)
+	kb.AddButton(btTop)
+	kb.AddButton(btSubscriptions)
 	switch m.(type) {
 	case *viber.TextMessage:
 		txt := strings.ToLower(m.(*viber.TextMessage).Text)
-			switch txt {
-			case "help":
-				v.SendTextMessage(u.ID, helpMsgText)
-			case "start":
-				v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
-			case "subscriptions":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "alerts":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "top":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "news":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "search":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "feedback":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "holidays":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "games":
-				v.SendTextMessage(u.ID, stubMsgText)
-			case "donate":
-				v.SendTextMessage(u.ID, stubMsgText)
-			default:
-				msg := v.NewTextMessage("Посмотрите что я могу")
-				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID, msg)
-				// v.SendTextMessage(u.ID, helpMsgText)
-			}
+		switch txt {
+		case "help":
+			v.SendTextMessage(u.ID, helpMsgText)
+		case "start":
+			v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
+		case "subscriptions":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "alerts":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "top":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "news":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "search":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "feedback":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "holidays":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "games":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		case "donate":
+			v.SendTextMessage(u.ID, txt+stubMsgText)
+		default:
+			msg := v.NewTextMessage("Посмотрите что я могу")
+			msg.SetKeyboard(kb)
+			v.SendMessage(u.ID, msg)
+			// v.SendTextMessage(u.ID, helpMsgText)
+		}
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
