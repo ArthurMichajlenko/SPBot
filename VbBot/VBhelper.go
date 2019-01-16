@@ -334,7 +334,7 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 
 // msgReceived will be called everttime when user send a message
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
-	// noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
+	noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
 	stubMsgText := ` Извините, пока не реализовано`
 	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:
@@ -385,36 +385,36 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	kb.AddButton(btHelp)
 	switch m.(type) {
 	case *viber.TextMessage:
+		msg := v.NewTextMessage("")
 		txt := strings.ToLower(m.(*viber.TextMessage).Text)
 		switch txt {
 		case "help":
-			v.SendTextMessage(u.ID, helpMsgText)
+			msg = v.NewTextMessage(helpMsgText)
 		case "start":
-			v.SendTextMessage(u.ID, startMsgText+"\n"+startMsgEndText)
+			msg = v.NewTextMessage(startMsgText + "\n" + startMsgEndText)
 		case "subscriptions":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "alerts":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "top":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "news":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "search":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "feedback":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "holidays":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "games":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		case "donate":
-			v.SendTextMessage(u.ID, txt+stubMsgText)
+			msg = v.NewTextMessage(txt+stubMsgText)
 		default:
-			msg := v.NewTextMessage("Посмотрите что я могу")
-			msg.SetKeyboard(kb)
-			v.SendMessage(u.ID, msg)
-			// v.SendTextMessage(u.ID, helpMsgText)
+			msg = v.NewTextMessage(noCmdText)
 		}
+		msg.SetKeyboard(kb)
+		v.SendMessage(u.ID, msg)
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
