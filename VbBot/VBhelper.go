@@ -393,23 +393,23 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "start":
 			msg = v.NewTextMessage(startMsgText + "\n" + startMsgEndText)
 		case "subscriptions":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "alerts":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "top":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "news":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "search":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "feedback":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "holidays":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "games":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		case "donate":
-			msg = v.NewTextMessage(txt+stubMsgText)
+			msg = v.NewTextMessage(txt + stubMsgText)
 		default:
 			msg = v.NewTextMessage(noCmdText)
 		}
