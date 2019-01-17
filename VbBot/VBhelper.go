@@ -372,7 +372,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	btTop := v.NewTextButton(2, 1, "reply", "top", `<font color="#ffffff">Top</font>`)
 	btTop.SetBgColor("#752f35")
 	btSubscriptions := v.NewTextButton(2, 1, "reply", "subscriptions", `<font color="#ffffff">Subscriptions</font>`)
-	btSubscriptions.SetBgColor("#752f35")
+	btSubscriptions.SetBgColor("#752f35").TextSizeSmall()
 	kb.AddButton(btNews)
 	kb.AddButton(btAlerts)
 	kb.AddButton(btTop)
