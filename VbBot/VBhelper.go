@@ -398,6 +398,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "top":
 			msg = v.NewTextMessage(txt + stubMsgText)
+			msgURL := v.NewURLMessage("test", "http://esp.md/sobytiya/2019/01/19/v-avarii-u-zavoda-reut-v-belcah-pogib-chelovek")
+			v.SendMessage(u.ID, msgURL)
 		case "news":
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "search":
