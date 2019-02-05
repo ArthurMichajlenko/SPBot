@@ -399,7 +399,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "top":
 			msg = v.NewTextMessage(txt + stubMsgText)
 			msgURL := v.NewURLMessage("test", "http://esp.md/sobytiya/2019/01/19/v-avarii-u-zavoda-reut-v-belcah-pogib-chelovek")
+			msgCarousel := v.NewRichMediaMessage(6, 6, "#752f35")
 			v.SendMessage(u.ID, msgURL)
+			v.SendMessage(u.ID, msgCarousel)
 		case "news":
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "search":
