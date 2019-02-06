@@ -383,6 +383,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	kb.AddButton(btFeedback)
 	kb.AddButton(btDonate)
 	kb.AddButton(btHelp)
+	var isCarousel bool
 	switch m.(type) {
 	case *viber.TextMessage:
 		msg := v.NewTextMessage("")
@@ -397,13 +398,17 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "alerts":
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "top":
-			msg = v.NewTextMessage(txt + stubMsgText)
-			msgURL := v.NewURLMessage("test", "http://esp.md/sobytiya/2019/01/19/v-avarii-u-zavoda-reut-v-belcah-pogib-chelovek")
+			// msgURL := v.NewURLMessage("test", "http://esp.md/sobytiya/2019/01/19/v-avarii-u-zavoda-reut-v-belcah-pogib-chelovek")
 			msgCarousel := v.NewRichMediaMessage(6, 7, "#752f35")
 			msgCarousel.AddButton(v.NewTextButton(6, 2, viber.OpenURL, "http://esp.md/sobytiya/2019/02/03/na-belckom-avtovokzale-evakuirovali-lyudey-policiya-ocepila-perron-obnovleno", "03.02.2019 - 19:05\n"+"На бельцком автовокзале эвакуировали людей. Полиция оцепила перрон (обновлено)"))
 			msgCarousel.AddButton(v.NewImageButton(6, 4, viber.OpenURL, "http://esp.md/sobytiya/2019/02/03/na-belckom-avtovokzale-evakuirovali-lyudey-policiya-ocepila-perron-obnovleno", "http://esp.md/sites/default/files/vokzal-trevoga02.jpg"))
 			msgCarousel.AddButton(v.NewTextButton(6, 1, viber.OpenURL, "http://esp.md/sobytiya/2019/02/03/na-belckom-avtovokzale-evakuirovali-lyudey-policiya-ocepila-perron-obnovleno", "Подробнее..."))
-			v.SendMessage(u.ID, msgURL)
+			// Test
+			msgCarousel.AddButton(v.NewTextButton(6, 2, viber.OpenURL, "http://esp.md/sobytiya/2019/02/01/igor-dodon-ne-mozhet-vernutsya-iz-moskvy-ego-mogut-dostavit-pravitelstvennym⁄", "01.02.2019 - 14:22\n"+"Игорь Додон не может вернуться из Москвы. Его могут доставить правительственным спецбортом"))
+			msgCarousel.AddButton(v.NewImageButton(6, 4, viber.OpenURL, "http://esp.md/sobytiya/2019/02/01/igor-dodon-ne-mozhet-vernutsya-iz-moskvy-ego-mogut-dostavit-pravitelstvennym⁄", "http://esp.md/sites/default/files/samoliot.jpg"))
+			msgCarousel.AddButton(v.NewTextButton(6, 1, viber.OpenURL, "http://esp.md/sobytiya/2019/02/01/igor-dodon-ne-mozhet-vernutsya-iz-moskvy-ego-mogut-dostavit-pravitelstvennym⁄", "Подробнее..."))
+			isCarousel = true
+			// v.SendMessage(u.ID, msgURL)
 			v.SendMessage(u.ID, msgCarousel)
 		case "news":
 			msg = v.NewTextMessage(txt + stubMsgText)
@@ -418,7 +423,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "donate":
 			msg = v.NewTextMessage(txt + stubMsgText)
 		default:
-			msg = v.NewTextMessage(noCmdText)
+			if !isCarousel {
+				msg = v.NewTextMessage(noCmdText)
+			}
 		}
 		msg.SetKeyboard(kb)
 		v.SendMessage(u.ID, msg)
