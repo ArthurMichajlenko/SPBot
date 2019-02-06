@@ -403,6 +403,12 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "top":
+			var top News
+			urlTop:=botConfig.QueryTopViews
+				top, err := NewsQuery(urlTop, -1)
+				if err != nil {
+					log.Println(err)
+				}
 			// msgURL := v.NewURLMessage("test", "http://esp.md/sobytiya/2019/01/19/v-avarii-u-zavoda-reut-v-belcah-pogib-chelovek")
 			isCarousel = true
 			msgCarousel := v.NewRichMediaMessage(6, 7, "#752f35")
