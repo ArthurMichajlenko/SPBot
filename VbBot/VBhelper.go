@@ -416,7 +416,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			for _, topItem := range top.Nodes {
 				msgCarouselView.AddButton(v.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselView.AddButton(v.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
-				msgCarouselView.AddButton(v.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, "Подробнее..."))
+				msgCarouselView.AddButton(v.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 			}
 			v.SendMessage(u.ID, msgCarouselView)
 			urlTop = botConfig.QueryTopComments
@@ -428,7 +428,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			for _, topItem := range top.Nodes {
 				msgCarouselComment.AddButton(v.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselComment.AddButton(v.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
-				msgCarouselComment.AddButton(v.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, "Подробнее..."))
+				msgCarouselComment.AddButton(v.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 			}
 			v.SendMessage(u.ID, msgCarouselComment)
 		case "news":
