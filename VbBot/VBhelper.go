@@ -400,8 +400,29 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "alerts":
-			isCarousel = false
-			msg = v.NewTextMessage(txt + stubMsgText)
+			isCarousel = true
+			msgCarouselCity:=v.NewRichMediaMessage(6,7,"#752f35")
+			var city News
+			numPage := 0
+			urlCity := botConfig.QueryCityDisp
+			city, err := NewsQuery(urlCity, numPage)
+			if err != nil {
+				log.Println(err)
+			}
+			v.SendTextMessage(u.ID, "Городские оповещения")
+			for _, cityItem := range city.Nodes {
+				msgCarouselCity.AddButton(v.NewTextButton(6,2,viber.OpenURL,cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
+				msgCarouselCity.AddButton(v.NewImageButton(6,4,viber.OpenURL,cityItem.Node.NodePath,cityItem.Node.NodeCover["src"]))
+				msgCarouselCity.AddButton(v.NewTextButton(6,1,viber.OpenURL,cityItem.Node.NodePath,`<font color="#ffffff>Подробнее...</font>`).SetBgColor("#752f35"))
+			}
+			urlCity=botConfig.QueryCityAfisha
+			city,err=NewsQuery(urlCity,numPage)
+			for _, cityItem := range city.Nodes {
+				msgCarouselCity.AddButton(v.NewTextButton(6,2,viber.OpenURL,cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
+				msgCarouselCity.AddButton(v.NewImageButton(6,4,viber.OpenURL,cityItem.Node.NodePath,cityItem.Node.NodeCover["src"]))
+				msgCarouselCity.AddButton(v.NewTextButton(6,1,viber.OpenURL,cityItem.Node.NodePath,`<font color="#ffffff>Подробнее...</font>`).SetBgColor("#752f35"))
+			}
+			v.SendMessage(u.ID, msgCarouselCity)
 		case "top":
 			isCarousel = true
 			msgCarouselView := v.NewRichMediaMessage(6, 7, "#752f35")
