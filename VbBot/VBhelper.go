@@ -453,8 +453,21 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			v.SendMessage(u.ID, msgCarouselComment)
 		case "news":
-			isCarousel = false
-			msg = v.NewTextMessage(txt + stubMsgText)
+			isCarousel = true
+			msgCarouselLastHour := v.NewRichMediaMessage(6, 7, "#752f35")
+			var lastHour News
+			urlLastHour := botConfig.QueryNews1H
+			lastHour, err := NewsQuery(urlLastHour, 0)
+			if err != nil {
+				log.Println(err)
+			}
+			v.SendTextMessage(u.ID, "Последние новости")
+			for _, lastHourItem := range lastHour.Nodes {
+				msgCarouselLastHour.AddButton(v.NewTextButton(6, 2, viber.OpenURL, lastHourItem.Node.NodePath, lastHourItem.Node.NodeDate+"\n"+lastHourItem.Node.NodeTitle))
+				msgCarouselLastHour.AddButton(v.NewImageButton(6, 4, viber.OpenURL, lastHourItem.Node.NodePath, lastHourItem.Node.NodeCover["src"]))
+				msgCarouselLastHour.AddButton(v.NewTextButton(6, 2, viber.OpenURL, lastHourItem.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+			}
+			v.SendMessage(u.ID, msgCarouselLastHour)
 		case "search":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
