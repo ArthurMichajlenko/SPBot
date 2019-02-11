@@ -413,14 +413,14 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			for _, cityItem := range city.Nodes {
 				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
-				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`).SetBgColor("#752f35"))
+				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 			}
 			urlCity = botConfig.QueryCityAfisha
 			city, err = NewsQuery(urlCity, numPage)
 			for _, cityItem := range city.Nodes {
 				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
-				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`).SetBgColor("#752f35"))
+				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 			}
 			v.SendMessage(u.ID, msgCarouselCity)
 		case "top":
@@ -467,11 +467,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				if i < 5 {
 					msgCarouselLast240.AddButton(v.NewTextButton(6, 2, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeDate+"\n"+last24Item.Node.NodeTitle))
 					msgCarouselLast240.AddButton(v.NewImageButton(6, 4, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeCover["src"]))
-					msgCarouselLast240.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+					msgCarouselLast240.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 				} else {
 					msgCarouselLast241.AddButton(v.NewTextButton(6, 2, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeDate+"\n"+last24Item.Node.NodeTitle))
 					msgCarouselLast241.AddButton(v.NewImageButton(6, 4, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeCover["src"]))
-					msgCarouselLast241.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+					msgCarouselLast241.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 				}
 			}
 			v.SendMessage(u.ID, msgCarouselLast240)
