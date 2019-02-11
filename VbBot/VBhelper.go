@@ -454,20 +454,28 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msgCarouselComment)
 		case "news":
 			isCarousel = true
-			msgCarouselLastHour := v.NewRichMediaMessage(6, 7, "#752f35")
-			var lastHour News
-			urlLastHour := botConfig.QueryNews1H
-			lastHour, err := NewsQuery(urlLastHour, 0)
+			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, "#752f35")
+			msgCarouselLast241 := v.NewRichMediaMessage(6, 7, "#752f35")
+			var last24 News
+			urlLast24 := botConfig.QueryNews24H
+			last24, err := NewsQuery(urlLast24, 0)
 			if err != nil {
 				log.Println(err)
 			}
 			v.SendTextMessage(u.ID, "Последние новости")
-			for _, lastHourItem := range lastHour.Nodes {
-				msgCarouselLastHour.AddButton(v.NewTextButton(6, 2, viber.OpenURL, lastHourItem.Node.NodePath, lastHourItem.Node.NodeDate+"\n"+lastHourItem.Node.NodeTitle))
-				msgCarouselLastHour.AddButton(v.NewImageButton(6, 4, viber.OpenURL, lastHourItem.Node.NodePath, lastHourItem.Node.NodeCover["src"]))
-				msgCarouselLastHour.AddButton(v.NewTextButton(6, 2, viber.OpenURL, lastHourItem.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+			for i, last24Item := range last24.Nodes {
+				if i < 5 {
+					msgCarouselLast240.AddButton(v.NewTextButton(6, 2, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeDate+"\n"+last24Item.Node.NodeTitle))
+					msgCarouselLast240.AddButton(v.NewImageButton(6, 4, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeCover["src"]))
+					msgCarouselLast240.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+				} else {
+					msgCarouselLast241.AddButton(v.NewTextButton(6, 2, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeDate+"\n"+last24Item.Node.NodeTitle))
+					msgCarouselLast241.AddButton(v.NewImageButton(6, 4, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeCover["src"]))
+					msgCarouselLast241.AddButton(v.NewTextButton(6, 1, viber.OpenURL, last24Item.Node.NodePath, `<font color="#ffffff>Подробнее...</font>`))
+				}
 			}
-			v.SendMessage(u.ID, msgCarouselLastHour)
+			v.SendMessage(u.ID, msgCarouselLast240)
+			v.SendMessage(u.ID, msgCarouselLast241)
 		case "search":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
