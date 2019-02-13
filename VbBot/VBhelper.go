@@ -19,6 +19,7 @@ import (
 )
 
 var isCarousel bool
+var page int
 
 // Config bots configurations.
 type Config struct {
@@ -452,17 +453,34 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				msgCarouselComment.AddButton(v.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor("#752f35"))
 			}
 			v.SendMessage(u.ID, msgCarouselComment)
-		case "news":
+		case "news", "newsprev", "newsnext":
 			isCarousel = true
 			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, "#752f35")
 			msgCarouselLast241 := v.NewRichMediaMessage(6, 7, "#752f35")
+			msgNavig := v.NewRichMediaMessage(6, 1, "#752f35")
+			if txt == "news" {
+				v.SendTextMessage(u.ID, "Последние новости")
+				page = 0
+				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+			} else if txt == "newsnext" {
+				page++
+				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
+				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+			} else {
+				if page != 0 {
+					page--
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+				} else {
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+				}
+			}
 			var last24 News
 			urlLast24 := botConfig.QueryNews24H
-			last24, err := NewsQuery(urlLast24, 0)
+			last24, err := NewsQuery(urlLast24, page)
 			if err != nil {
 				log.Println(err)
 			}
-			v.SendTextMessage(u.ID, "Последние новости")
 			for i, last24Item := range last24.Nodes {
 				if i < 5 {
 					msgCarouselLast240.AddButton(v.NewTextButton(6, 2, viber.OpenURL, last24Item.Node.NodePath, last24Item.Node.NodeDate+"\n"+last24Item.Node.NodeTitle))
@@ -476,6 +494,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			v.SendMessage(u.ID, msgCarouselLast240)
 			v.SendMessage(u.ID, msgCarouselLast241)
+			v.SendMessage(u.ID, msgNavig)
 		case "search":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
