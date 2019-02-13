@@ -520,8 +520,14 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "donate":
-			isCarousel = false
-			msg = v.NewTextMessage(txt + stubMsgText)
+			isCarousel = true
+			msg := v.NewTextMessage(`Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`)
+			kb:=v.NewKeyboard("#ffffff", false)
+			kb.AddButton(v.NewTextButton(3,2,viber.OpenURL,"http://esp.md/content/podpiska-na-sp",`<font color="#ffffff">Подписаться на газету "СП"</font>`).SetBgColor("#752f35").SetSilent())
+			kb.AddButton(v.NewTextButton(3,2,viber.OpenURL,"http://esp.md/donate",`<font color="#ffffff">Поддержать "СП" материально</font>`).SetBgColor("#752f35").SetSilent())
+			kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor("#752f35").SetSilent())
+			msg.SetKeyboard(kb)
+			v.SendMessage(u.ID,msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ", "menu", "меню":
 			msg = v.NewTextMessage("Выберете комманду")
 		default:
