@@ -19,6 +19,7 @@ import (
 )
 
 var isCarousel bool
+var isSearch bool
 var page int
 
 // Config bots configurations.
@@ -356,25 +357,25 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kb := v.NewKeyboard("", true)
 	kb.DefaultHeight = false
-	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">Help</font>`)
+	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">Помощь</font>`)
 	btHelp.SetBgColor("#752f35")
-	btDonate := v.NewTextButton(2, 1, "reply", "donate", `<font color="#ffffff">Donate</font>`)
+	btDonate := v.NewTextButton(2, 1, "reply", "donate", `<font color="#ffffff">Поддержи "СП"</font>`)
 	btDonate.SetBgColor("#752f35")
-	btSearch := v.NewTextButton(2, 1, "reply", "search", `<font color="#ffffff">Search</font>`)
+	btSearch := v.NewTextButton(2, 1, "reply", "search", `<font color="#ffffff">Поиск</font>`)
 	btSearch.SetBgColor("#752f35")
-	btFeedback := v.NewTextButton(2, 1, "reply", "feedback", `<font color="#ffffff">Feedback</font>`)
+	btFeedback := v.NewTextButton(2, 1, "reply", "feedback", `<font color="#ffffff">Спросить/сообщить новость</font>`).TextSizeSmall()
 	btFeedback.SetBgColor("#752f35")
-	btGames := v.NewTextButton(2, 1, "reply", "games", `<font color="#ffffff">Games</font>`)
+	btGames := v.NewTextButton(2, 1, "reply", "games", `<font color="#ffffff">Игры</font>`)
 	btGames.SetBgColor("#752f35")
-	btHolidays := v.NewTextButton(2, 1, "reply", "holidays", `<font color="#ffffff">Holidays</font>`)
+	btHolidays := v.NewTextButton(2, 1, "reply", "holidays", `<font color="#ffffff">Календарь праздников</font>`)
 	btHolidays.SetBgColor("#752f35")
-	btAlerts := v.NewTextButton(2, 1, "reply", "alerts", `<font color="#ffffff">Alerts</font>`)
+	btAlerts := v.NewTextButton(2, 1, "reply", "alerts", `<font color="#ffffff">Городские оповещения</font>`).TextSizeSmall()
 	btAlerts.SetBgColor("#752f35")
-	btNews := v.NewTextButton(2, 1, "reply", "news", `<font color="#ffffff">News</font>`)
+	btNews := v.NewTextButton(2, 1, "reply", "news", `<font color="#ffffff">Последние новости</font>`)
 	btNews.SetBgColor("#752f35")
-	btTop := v.NewTextButton(2, 1, "reply", "top", `<font color="#ffffff">Top</font>`)
+	btTop := v.NewTextButton(2, 1, "reply", "top", `<font color="#ffffff">Самое популярное</font>`)
 	btTop.SetBgColor("#752f35")
-	btSubscriptions := v.NewTextButton(2, 1, "reply", "subscriptions", `<font color="#ffffff">Subscriptions</font>`)
+	btSubscriptions := v.NewTextButton(2, 1, "reply", "subscriptions", `<font color="#ffffff">Управление подписками</font>`)
 	btSubscriptions.SetBgColor("#752f35").TextSizeSmall()
 	kb.AddButton(btNews)
 	kb.AddButton(btAlerts)
@@ -464,11 +465,15 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
 			} else if txt == "newsnext" {
 				page++
-				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
-				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+				if page==800 {
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
+				} else {
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
+				}
 			} else {
+				page--
 				if page != 0 {
-					page--
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor("#752f35").SetSilent())
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor("#752f35").SetSilent())
 				} else {
@@ -510,6 +515,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "donate":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
+		case "hi", "hello", "хай", "привет", "рш", "руддщ":
+			msg = v.NewTextMessage("Выберете комманду")
 		default:
 			if !isCarousel {
 				msg = v.NewTextMessage(noCmdText)
