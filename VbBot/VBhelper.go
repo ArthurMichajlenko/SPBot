@@ -609,7 +609,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		default:
-			if !isCarousel {
+			if !isCarousel && !isSearch{
 				msg = v.NewTextMessage(noCmdText)
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
