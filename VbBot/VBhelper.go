@@ -357,8 +357,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
-	kb := v.NewKeyboard("", true)
-	kb.DefaultHeight = false
+	kbMain := v.NewKeyboard("", true)
+	kbMain.DefaultHeight = false
 	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">Помощь</font>`)
 	btHelp.SetBgColor("#752f35")
 	btDonate := v.NewTextButton(2, 1, "reply", "donate", `<font color="#ffffff">Поддержи "СП"</font>`)
@@ -379,16 +379,16 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	btTop.SetBgColor("#752f35")
 	btSubscriptions := v.NewTextButton(2, 1, "reply", "subscriptions", `<font color="#ffffff">Управление подписками</font>`)
 	btSubscriptions.SetBgColor("#752f35").TextSizeSmall()
-	kb.AddButton(btNews)
-	kb.AddButton(btAlerts)
-	kb.AddButton(btTop)
-	kb.AddButton(btSearch)
-	kb.AddButton(btHolidays)
-	kb.AddButton(btGames)
-	kb.AddButton(btSubscriptions)
-	kb.AddButton(btFeedback)
-	kb.AddButton(btDonate)
-	kb.AddButton(btHelp)
+	kbMain.AddButton(btNews)
+	kbMain.AddButton(btAlerts)
+	kbMain.AddButton(btTop)
+	kbMain.AddButton(btSearch)
+	kbMain.AddButton(btHolidays)
+	kbMain.AddButton(btGames)
+	kbMain.AddButton(btSubscriptions)
+	kbMain.AddButton(btFeedback)
+	kbMain.AddButton(btDonate)
+	kbMain.AddButton(btHelp)
 	switch m.(type) {
 	case *viber.TextMessage:
 		msg := v.NewTextMessage("")
@@ -577,25 +577,29 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ", "menu", "меню":
 			msg = v.NewTextMessage("Выберете комманду")
+			msg.SetKeyboard(kbMain)
+			v.SendMessage(u.ID, msg)
 		default:
 			if !isCarousel {
 				msg = v.NewTextMessage(noCmdText)
+				msg.SetKeyboard(kbMain)
+				v.SendMessage(u.ID, msg)
 			} else {
 				isCarousel = false
 				msg = v.NewTextMessage("Главное меню")
+				msg.SetKeyboard(kbMain)
+				v.SendMessage(u.ID, msg)
 			}
 			if isSearch {
 				searchString = txt
-				msg:=v.NewTextMessage("Начинаем поиск")
+				msg := v.NewTextMessage("Начинаем поиск")
 				kb := v.NewKeyboard("#ffffff", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor("#752f35").SetSilent())
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor("#752f35").SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
 		}
-		msg.SetKeyboard(kb)
-		v.SendMessage(u.ID, msg)
 	case *viber.URLMessage:
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
