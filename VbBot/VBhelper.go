@@ -22,6 +22,7 @@ import (
 var isCarousel bool
 var isSearch bool
 var page int
+var searchString string
 
 // Config bots configurations.
 type Config struct {
@@ -508,9 +509,10 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msgCarouselLast241)
 			msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor("#752f35").SetSilent())
 			v.SendMessage(u.ID, msgNavig)
-		case "search":
-			isCarousel = false
-			msg = v.NewTextMessage(txt + stubMsgText)
+		case "search", "searchbegin", "searchprev", "searchnext":
+			isCarousel = true
+			isSearch = true
+			v.SendTextMessage(u.ID, "Введите что искать")
 		case "feedback":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
@@ -581,6 +583,15 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			} else {
 				isCarousel = false
 				msg = v.NewTextMessage("Главное меню")
+			}
+			if isSearch {
+				searchString = txt
+				msg:=v.NewTextMessage("Начинаем поиск")
+				kb := v.NewKeyboard("#ffffff", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor("#752f35").SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor("#752f35").SetSilent())
+				msg.SetKeyboard(kb)
+				v.SendMessage(u.ID,msg)
 			}
 		}
 		msg.SetKeyboard(kb)
