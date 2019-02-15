@@ -152,6 +152,26 @@ type TgMessageOwner struct {
 	LastName  string
 }
 
+//VbUser Viber User. BoltDb
+type VbUser struct {
+	ID                int
+	UserID            string `storm:"unique"`
+	Username          string
+	LastDate          int
+	Subscribe9        bool
+	Subscribe20       bool
+	SubscribeLast     bool
+	SubscribeCity     bool
+	SubscribeTop      bool
+	SubscribeHolidays bool
+}
+
+//VbMessageOwner info about who send message
+type VbMessageOwner struct {
+	UserID   string
+	Username string
+}
+
 // LoadHolidays returns holidays reading from file.
 func LoadHolidays(file string) ([]Holidays, error) {
 	var holidays []Holidays
