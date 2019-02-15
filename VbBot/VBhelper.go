@@ -398,9 +398,13 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "help":
 			isCarousel = false
 			msg = v.NewTextMessage(helpMsgText)
+			msg.SetKeyboard(kbMain)
+			v.SendMessage(u.ID, msg)
 		case "start":
 			isCarousel = false
 			msg = v.NewTextMessage(startMsgText + "\n" + startMsgEndText)
+			msg.SetKeyboard(kbMain)
+			v.SendMessage(u.ID, msg)
 		case "subscriptions":
 			isCarousel = false
 			msg = v.NewTextMessage(txt + stubMsgText)
@@ -517,6 +521,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = true
 			msgCarouselSearch := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselSearch1 := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgNavig := v.NewRichMediaMessage(6, 2, "#ffffff")
+			notFound := false
 			if txt == "searchbegin" {
 				var search News
 				page = 0
@@ -525,7 +531,10 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 					log.Println(err)
 				}
 				if len(search.Nodes) == 0 {
-					v.SendTextMessage(u.ID, "По Вашему запросу ничего не найдено")
+					notFound = true
+					msg = v.NewTextMessage("По Вашему запросу ничего не найдено")
+					msg.SetKeyboard(kbMain)
+					v.SendMessage(u.ID, msg)
 				} else {
 					for i, searchItem := range search.Nodes {
 						if i < 5 {
@@ -538,9 +547,67 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 							msgCarouselSearch1.AddButton(v.NewTextButton(6, 1, viber.OpenURL, searchItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 						}
 					}
-					v.SendMessage(u.ID,msgCarouselSearch)
-					v.SendMessage(u.ID,msgCarouselSearch1)
+					v.SendMessage(u.ID, msgCarouselSearch)
+					v.SendMessage(u.ID, msgCarouselSearch1)
 				}
+				msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
+			} else if txt == "searchnext" {
+				page++
+				search, err := SearchQuery(searchString, page)
+				if err != nil {
+					log.Println(err)
+				}
+				for i, searchItem := range search.Nodes {
+					if i < 5 {
+						msgCarouselSearch.AddButton(v.NewTextButton(6, 2, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeDate+"\n"+searchItem.Node.NodeTitle))
+						msgCarouselSearch.AddButton(v.NewImageButton(6, 4, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeCover["src"]))
+						msgCarouselSearch.AddButton(v.NewTextButton(6, 1, viber.OpenURL, searchItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					} else {
+						msgCarouselSearch1.AddButton(v.NewTextButton(6, 2, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeDate+"\n"+searchItem.Node.NodeTitle))
+						msgCarouselSearch1.AddButton(v.NewImageButton(6, 4, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeCover["src"]))
+						msgCarouselSearch1.AddButton(v.NewTextButton(6, 1, viber.OpenURL, searchItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					}
+				}
+				v.SendMessage(u.ID, msgCarouselSearch)
+				v.SendMessage(u.ID, msgCarouselSearch1)
+				if len(search.Nodes) == 0 || len(search.Nodes) < 10 {
+					msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "searchprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
+				} else {
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
+				}
+			} else {
+				page--
+				if page < 0 {
+					page = 0
+				}
+				search, err := SearchQuery(searchString, page)
+				if err != nil {
+					log.Println(err)
+				}
+				for i, searchItem := range search.Nodes {
+					if i < 5 {
+						msgCarouselSearch.AddButton(v.NewTextButton(6, 2, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeDate+"\n"+searchItem.Node.NodeTitle))
+						msgCarouselSearch.AddButton(v.NewImageButton(6, 4, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeCover["src"]))
+						msgCarouselSearch.AddButton(v.NewTextButton(6, 1, viber.OpenURL, searchItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					} else {
+						msgCarouselSearch1.AddButton(v.NewTextButton(6, 2, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeDate+"\n"+searchItem.Node.NodeTitle))
+						msgCarouselSearch1.AddButton(v.NewImageButton(6, 4, viber.OpenURL, searchItem.Node.NodePath, searchItem.Node.NodeCover["src"]))
+						msgCarouselSearch1.AddButton(v.NewTextButton(6, 1, viber.OpenURL, searchItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					}
+				}
+				v.SendMessage(u.ID, msgCarouselSearch)
+				v.SendMessage(u.ID, msgCarouselSearch1)
+				if page != 0 {
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
+					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
+				} else {
+					msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
+				}
+			}
+			if !notFound {
+				msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				v.SendMessage(u.ID, msgNavig)
 			}
 		case "feedback":
 			isCarousel = false
@@ -597,7 +664,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		case "donate":
 			isCarousel = true
-			msg := v.NewTextMessage(`Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`)
+			msg = v.NewTextMessage(`Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`)
 			kb := v.NewKeyboard("#ffffff", false)
 			kb.AddButton(v.NewTextButton(3, 2, viber.OpenURL, "http://esp.md/content/podpiska-na-sp", `<font color="#ffffff">Подписаться на газету "СП"</font>`).SetBgColor(spColorBG).SetSilent())
 			kb.AddButton(v.NewTextButton(3, 2, viber.OpenURL, "http://esp.md/donate", `<font color="#ffffff">Поддержать "СП" материально</font>`).SetBgColor(spColorBG).SetSilent())
@@ -609,7 +676,18 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		default:
-			if !isCarousel && !isSearch{
+			if isSearch {
+				searchString = txt
+				msg = v.NewTextMessage("Начинаем поиск")
+				kb := v.NewKeyboard("#ffffff", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg.SetKeyboard(kb)
+				v.SendMessage(u.ID, msg)
+				isSearch = false
+				break
+			}
+			if !isCarousel {
 				msg = v.NewTextMessage(noCmdText)
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
@@ -618,16 +696,6 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				msg = v.NewTextMessage("Главное меню")
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
-			}
-			if isSearch {
-				searchString = txt
-				msg := v.NewTextMessage("Начинаем поиск")
-				kb := v.NewKeyboard("#ffffff", false)
-				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
-				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID, msg)
-				isSearch = false
 			}
 		}
 	case *viber.URLMessage:
