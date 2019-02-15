@@ -21,7 +21,13 @@ import (
 	"github.com/mileusna/viber"
 )
 
-var botConfig Config
+var (
+	botConfig Config
+	//NoWork is Holidays work or not
+	NoWork = false
+	//HolidayList slice of holidays
+	HolidayList []Holidays
+)
 
 func main() {
 	// Load botConfig
@@ -58,5 +64,11 @@ func main() {
 	}
 	log.Println(vb)
 	log.Println(vAccount)
+	HolidayList, err := LoadHolidays(botConfig.FileHolidays)
+	if err != nil {
+		log.Println(err)
+		NoWork = true
+	}
+	log.Println(HolidayList)
 	fmt.Scanln()
 }

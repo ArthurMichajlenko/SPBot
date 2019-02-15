@@ -634,6 +634,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "holidays":
 			isCarousel = false
+			if NoWork {
+				v.SendTextMessage(u.ID,"Holidays File error")
+			} else {
+				v.SendTextMessage(u.ID,"Test")				
+			}
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "games", "games10", "games1rand":
 			isCarousel = true
