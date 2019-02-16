@@ -13,7 +13,6 @@
 package main
 
 import (
-	// "fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -100,5 +99,4 @@ func main() {
 			log.Println("error: ", errEv)
 		}
 	}
-	// fmt.Scanln()
 }
