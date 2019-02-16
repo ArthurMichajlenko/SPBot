@@ -84,20 +84,20 @@ func main() {
 	//Get Updates from chanells
 	for {
 		select {
-		case event:=<- watcher.Events:
+		case event := <-watcher.Events:
 			log.Println("event: ", event)
-			if event.Op&fsnotify.Write==fsnotify.Write {
+			if event.Op&fsnotify.Write == fsnotify.Write {
 				log.Println("modified file: ", event.Name)
 			}
-			HolidayList,err=LoadHolidays(botConfig.FileHolidays)
+			HolidayList, err = LoadHolidays(botConfig.FileHolidays)
 			if err != nil {
 				log.Println(err)
-				NoWork=true
+				NoWork = true
 			} else {
-				NoWork=false
+				NoWork = false
 			}
-		case errEv:=<-watcher.Errors:
-			log.Println("error: ",errEv)
+		case errEv := <-watcher.Errors:
+			log.Println("error: ", errEv)
 		}
 	}
 	log.Println(HolidayList)
