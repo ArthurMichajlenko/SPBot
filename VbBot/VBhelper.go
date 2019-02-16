@@ -635,11 +635,16 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "holidays":
 			isCarousel = false
 			if NoWork {
-				v.SendTextMessage(u.ID,"Holidays File error")
+				v.SendTextMessage(u.ID, "Извините. Пока не доступно.")
 			} else {
-				v.SendTextMessage(u.ID,"Test")
+				msg := "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+				for _, hd := range HolidayList {
+					if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
+						msg += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+					}
+				}
+				v.SendTextMessage(u.ID, msg)
 			}
-			msg = v.NewTextMessage(txt + stubMsgText)
 		case "games", "games10", "games1rand":
 			isCarousel = true
 			msgCarouselGames := v.NewRichMediaMessage(6, 7, spColorBG)

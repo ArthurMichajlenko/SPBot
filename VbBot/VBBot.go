@@ -67,7 +67,7 @@ func main() {
 	log.Println(vb)
 	log.Println(vAccount)
 	//Holidays file handler
-	HolidayList, err := LoadHolidays(botConfig.FileHolidays)
+	HolidayList, err = LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 		NoWork = true
@@ -100,6 +100,5 @@ func main() {
 			log.Println("error: ", errEv)
 		}
 	}
-	log.Println(HolidayList)
 	// fmt.Scanln()
 }
