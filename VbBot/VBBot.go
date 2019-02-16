@@ -13,10 +13,12 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/fsnotify/fsnotify"
 
 	"github.com/mileusna/viber"
 )
@@ -64,11 +66,40 @@ func main() {
 	}
 	log.Println(vb)
 	log.Println(vAccount)
+	//Holidays file handler
 	HolidayList, err := LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
 		log.Println(err)
 		NoWork = true
 	}
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Println(err)
+	}
+	defer watcher.Close()
+	err = watcher.Add(botConfig.FileHolidays)
+	if err != nil {
+		log.Println(err)
+	}
+	//Get Updates from chanells
+	for {
+		select {
+		case event:=<- watcher.Events:
+			log.Println("event: ", event)
+			if event.Op&fsnotify.Write==fsnotify.Write {
+				log.Println("modified file: ", event.Name)
+			}
+			HolidayList,err=LoadHolidays(botConfig.FileHolidays)
+			if err != nil {
+				log.Println(err)
+				NoWork=true
+			} else {
+				NoWork=false
+			}
+		case errEv:=<-watcher.Errors:
+			log.Println("error: ",errEv)
+		}
+	}
 	log.Println(HolidayList)
-	fmt.Scanln()
+	// fmt.Scanln()
 }
