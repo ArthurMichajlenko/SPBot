@@ -132,10 +132,9 @@ type AttachFile struct {
 
 //VbUser Viber User. BoltDb
 type VbUser struct {
-	ID                int    `storm:"increment"`
-	UserID            string `storm:"unique"`
+	ID                string `storm:"unique"`
 	Username          string
-	LastDate          int
+	LastDate          time.Time
 	Subscribe9        bool
 	Subscribe20       bool
 	SubscribeLast     bool
@@ -146,7 +145,7 @@ type VbUser struct {
 
 //VbMessageOwner info about who send message
 type VbMessageOwner struct {
-	UserID   string
+	ID       string
 	Username string
 }
 
@@ -339,6 +338,31 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	kbMain.AddButton(btFeedback)
 	kbMain.AddButton(btDonate)
 	kbMain.AddButton(btHelp)
+	//Subscribe/Unsubscribe
+	subscribe9 := `<font color="#ffffff">Утренний дайджест
+	<b>Подписаться</b></font>`
+	unsubscribe9 := `<font color="#ffffff">Утренний дайджест
+	<b><i>Отписаться</i></b></font>`
+	subscribe20 := `<font color="#ffffff">Вечерний дайджест
+	<b>Подписаться</b></font>`
+	unsubscribe20 := `<font color="#ffffff">Вечерний дайджест
+	<b><i>Отписаться</i></b></font>`
+	subscribeLast := `<font color="#ffffff">Последние новости
+	<b>Подписаться</b></font>`
+	unsubscribeLast := `<font color="#ffffff">Последние новости
+	<b><i>Отписаться</i></b></font>`
+	subscribeCity := `<font color="#ffffff">Городские уведомления
+	<b>Подписаться</b></font>`
+	unsubscribeCity := `<font color="#ffffff">Городские уведомления
+	<b><i>Отписаться</i></b></font>`
+	subscribeTop := `<font color="#ffffff">Самое популярное
+	<b>Подписаться</b></font>`
+	unsubscribeTop := `<font color="#ffffff">Самое популярное
+	<b><i>Отписаться</i></b></font>`
+	subscribeHolidays := `<font color="#ffffff">Календарь праздников
+	<b>Подписаться</b></font>`
+	unsubscribeHolidays := `<font color="#ffffff">Календарь праздников
+	<b><i>Отписаться</i></b></font>`
 	//Bolt
 	var vbbuser VbUser
 	db, err := storm.Open("vbuser.db")
@@ -365,7 +389,46 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msg)
 		case "subscriptions":
 			isCarousel = false
-			msg = v.NewTextMessage(txt + stubMsgText)
+			kbSub := v.NewKeyboard("", false)
+			db.One("ID", u.ID, &vbbuser)
+			if vbbuser.Subscribe9 {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG))
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", subscribe9).SetBgColor(spColorBG))
+			}
+			if vbbuser.Subscribe20 {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", unsubscribe20).SetBgColor(spColorBG))
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", subscribe20).SetBgColor(spColorBG))
+			}
+			if vbbuser.SubscribeLast {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrlast", unsubscribeLast).SetBgColor(spColorBG))
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrlast", subscribeLast).SetBgColor(spColorBG))
+			}
+			if vbbuser.SubscribeCity {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrcity", unsubscribeCity).SetBgColor(spColorBG).TextSizeSmall())
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrcity", subscribeCity).SetBgColor(spColorBG).TextSizeSmall())
+			}
+			if vbbuser.SubscribeTop {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrtop", unsubscribeTop).SetBgColor(spColorBG))
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrtop", subscribeTop).SetBgColor(spColorBG))
+			}
+			if vbbuser.SubscribeHolidays {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrholi", unsubscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
+			} else {
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrholi", subscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
+			}
+			kbSub.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG))
+			msg = v.NewTextMessage("Ваши подписки")
+			msg.SetKeyboard(kbSub)
+			v.SendMessage(u.ID, msg)
+		case "subscr9":
+			db.One("ID", u.ID, &vbbuser)
+			sub9 := !vbbuser.Subscribe9
+			db.UpdateField(&vbbuser, "Subscribe9", sub9)
 		case "alerts":
 			isCarousel = true
 			msgCarouselCity := v.NewRichMediaMessage(6, 7, spColorBG)
@@ -674,5 +737,20 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
 	case *viber.PictureMessage:
 		v.SendTextMessage(u.ID, "Nice pic")
+	}
+	err = db.One("ID", u.ID, &vbbuser)
+	if err == nil {
+		db.UpdateField(&vbbuser, "LastDate", t)
+	} else {
+		vbbuser.ID = u.ID
+		vbbuser.Username = u.Name
+		vbbuser.LastDate = t
+		vbbuser.Subscribe9 = false
+		vbbuser.Subscribe20 = false
+		vbbuser.SubscribeLast = false
+		vbbuser.SubscribeCity = false
+		vbbuser.SubscribeTop = false
+		vbbuser.SubscribeHolidays = false
+		db.Save(&vbbuser)
 	}
 }
