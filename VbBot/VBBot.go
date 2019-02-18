@@ -55,16 +55,17 @@ func main() {
 		log.Println("WebHook resp=> ", webHookResp)
 	}
 
-	userID := "bnzFlKadhfEx/nOKdHXrCw==" // My User ID
 	// send text message
-	token, err := vb.SendTextMessage(userID, "Hello, World!\nПривет Мир")
-	if err != nil {
-		log.Println("Viber error:", err)
-	} else {
-		log.Println("Message sent, message token:", token)
-	}
+	// userID := "bnzFlKadhfEx/nOKdHXrCw==" // My User ID
+	// token, err := vb.SendTextMessage(userID, "Hello, World!\nПривет Мир")
+	// if err != nil {
+	// 	log.Println("Viber error:", err)
+	// } else {
+	// 	log.Println("Message sent, message token:", token)
+	// }
 	log.Println(vb)
 	log.Println(vAccount)
+
 	//Holidays file handler
 	HolidayList, err = LoadHolidays(botConfig.FileHolidays)
 	if err != nil {
