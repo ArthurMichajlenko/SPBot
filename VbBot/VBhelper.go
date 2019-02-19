@@ -626,7 +626,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = true
 			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselLast241 := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgNavig := v.NewRichMediaMessage(6, 2, "#ffffff")
+			msgNavig := v.NewRichMediaMessage(6, 3, "#ffffff")
 			if txt == "news" {
 				v.SendTextMessage(u.ID, "Последние новости")
 				page = 0
@@ -667,7 +667,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			v.SendMessage(u.ID, msgCarouselLast240)
 			v.SendMessage(u.ID, msgCarouselLast241)
-			msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+			msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			v.SendMessage(u.ID, msgNavig)
 		case "search":
 			isSearch = true
@@ -676,7 +676,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = true
 			msgCarouselSearch := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselSearch1 := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgNavig := v.NewRichMediaMessage(6, 2, "#ffffff")
+			msgNavig := v.NewRichMediaMessage(6, 3, "#ffffff")
 			notFound := false
 			if txt == "searchbegin" {
 				var search News
@@ -761,7 +761,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				}
 			}
 			if !notFound {
-				msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				v.SendMessage(u.ID, msgNavig)
 			}
 		case "feedback":
