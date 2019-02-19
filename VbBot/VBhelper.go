@@ -402,166 +402,166 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", subscribe20).SetBgColor(spColorBG))
 			}
 			if vbbuser.SubscribeLast {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrL", unsubscribeLast).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", unsubscribeLast).SetBgColor(spColorBG))
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrL", subscribeLast).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", subscribeLast).SetBgColor(spColorBG))
 			}
 			if vbbuser.SubscribeCity {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrC", unsubscribeCity).SetBgColor(spColorBG).TextSizeSmall())
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrc", unsubscribeCity).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrC", subscribeCity).SetBgColor(spColorBG).TextSizeSmall())
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrc", subscribeCity).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.SubscribeTop {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrT", unsubscribeTop).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", unsubscribeTop).SetBgColor(spColorBG))
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrT", subscribeTop).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", subscribeTop).SetBgColor(spColorBG))
 			}
 			if vbbuser.SubscribeHolidays {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrH", unsubscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrh", unsubscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrH", subscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrh", subscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			kbSub.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG))
 			msg = v.NewTextMessage("Ваши подписки")
 			msg.SetKeyboard(kbSub)
 			v.SendMessage(u.ID, msg)
-		case "subscr9","conform9":
+		case "subscr9", "conform9":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscr9" {
-				msg:=v.NewTextMessage("Получать дайджест за сутки - утром в 9:00")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscr9" {
+				msg := v.NewTextMessage("Получать дайджест за сутки - утром в 9:00")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.Subscribe9 {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conform9",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conform9", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conform9",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conform9", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				sub9 := !vbbuser.Subscribe9
 				db.UpdateField(&vbbuser, "Subscribe9", sub9)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
-		case "subscr20","conform20":
+		case "subscr20", "conform20":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscr20" {
-				msg:=v.NewTextMessage("Получать дайджест за сутки - утром в 20:00")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscr20" {
+				msg := v.NewTextMessage("Получать дайджест за сутки - утром в 20:00")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.Subscribe20 {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conform20",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conform20", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conform20",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conform20", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				sub20 := !vbbuser.Subscribe20
 				db.UpdateField(&vbbuser, "Subscribe20", sub20)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
-		case "subscrL","conformL":
+		case "subscrl", "conforml":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscrL" {
-				msg:=v.NewTextMessage("Получать новости по мере их публикации.\nСообщения будут приходить часто.")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscrl" {
+				msg := v.NewTextMessage("Получать новости по мере их публикации.\nСообщения будут приходить часто.")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.SubscribeLast {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformL",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conforml", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformL",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conforml", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				subL := !vbbuser.SubscribeLast
 				db.UpdateField(&vbbuser, "SubscribeLast", subL)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
-		case "subscrC","conformC":
+		case "subscrc", "conformc":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscrC" {
-				msg:=v.NewTextMessage("Городские уведомления.")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscrc" {
+				msg := v.NewTextMessage("Городские уведомления.")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.SubscribeCity {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformC",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformc", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformC",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformc", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				subC := !vbbuser.SubscribeCity
 				db.UpdateField(&vbbuser, "SubscribeCity", subC)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
-		case "subscrT","conformT":
+		case "subscrt", "conformt":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscrT" {
-				msg:=v.NewTextMessage("Самое популярное.")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscrt" {
+				msg := v.NewTextMessage("Самое популярное.")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.SubscribeTop {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformT",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformt", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformT",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformt", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				subT := !vbbuser.SubscribeTop
 				db.UpdateField(&vbbuser, "SubscribeTop", subT)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
-		case "subscrH","conformH":
+		case "subscrh", "conformh":
 			db.One("ID", u.ID, &vbbuser)
-			if txt=="subscrH" {
-				msg:=v.NewTextMessage("Календарь праздников.")
-				kb:=v.NewKeyboard("",false)
+			if txt == "subscrh" {
+				msg := v.NewTextMessage("Календарь праздников.")
+				kb := v.NewKeyboard("", false)
 				if vbbuser.SubscribeHolidays {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformH",`<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformh", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
-					kb.AddButton(v.NewTextButton(6,1,viber.Reply,"conformH",`<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
+					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformh", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG).SetSilent())
 				}
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			} else {
 				subH := !vbbuser.SubscribeHolidays
-				db.UpdateField(&vbbuser, "SubscribeCity", subH)
-				msg:=v.NewTextMessage("Спасибо")
-				kb:=v.NewKeyboard("",false)
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"subscriptions",`<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-				kb.AddButton(v.NewTextButton(6,1,viber.Reply,"menu",`<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+				db.UpdateField(&vbbuser, "SubscribeHolidays", subH)
+				msg := v.NewTextMessage("Спасибо")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
+				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				msg.SetKeyboard(kb)
-				v.SendMessage(u.ID,msg)
+				v.SendMessage(u.ID, msg)
 			}
 		case "alerts":
 			isCarousel = true

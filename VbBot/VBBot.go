@@ -15,6 +15,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/fsnotify/fsnotify"
@@ -36,6 +37,15 @@ func main() {
 	botConfig, err = LoadConfigBots("config.json")
 	if err != nil {
 		log.Panic(err)
+	}
+	//Log
+	if !botConfig.Debug {
+		logfile, err := os.OpenFile(botConfig.Bots.Viber.LogFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			log.Println(err)
+		}
+		defer logfile.Close()
+		log.SetOutput(logfile)
 	}
 	// Start webhook
 	vb := viber.New(botConfig.Bots.Viber.VBApikey, "IumasLink", "")
