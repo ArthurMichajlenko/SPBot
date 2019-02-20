@@ -644,6 +644,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg := v.NewTextMessage(msgText)
 			msg.SetKeyboard(kb)
 			v.SendMessage(u.ID, msg)
+			//only test github
 		case "news", "newsprev", "newsnext":
 			isCarousel = true
 			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, spColorBG)
