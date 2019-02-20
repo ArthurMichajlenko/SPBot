@@ -289,7 +289,8 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 
 // msgReceived will be called everttime when user send a message
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
-	noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
+	// noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
+	noCmdText := `Главное меню`
 	stubMsgText := ` Извините, пока не реализовано`
 	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:

@@ -18,6 +18,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/asdine/storm"
+	"github.com/robfig/cron"
+
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/mileusna/viber"
@@ -91,6 +94,49 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
+	// Cron for subscriptions
+	c := cron.New()
+	//Top subscribe
+	c.AddFunc("0 55 17 * * 0", func() {
+		var vbbusers []VbUser
+		msgCarouselComment := vb.NewRichMediaMessage(6, 7, spColorBG)
+		msgCarouselView := vb.NewRichMediaMessage(6, 7, spColorBG)
+		var topc News
+		var topv News
+		urlTopC := botConfig.QueryTopComments
+		urlTopV := botConfig.QueryTopViews
+		topc, err := NewsQuery(urlTopC, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		topv, err = NewsQuery(urlTopV, -1)
+		if err != nil {
+			log.Println(err)
+		}
+		db, err := storm.Open("vbuser.db")
+		if err != nil {
+			log.Println(err)
+		}
+		defer db.Close()
+		db.Find("SubscribeTop", true, &vbbusers)
+		for _, subUser := range vbbusers {
+			vb.SendTextMessage(subUser.ID, "Самые читаемые")
+			for _, topItem := range topv.Nodes {
+				msgCarouselView.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
+				msgCarouselView.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
+				msgCarouselView.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+			}
+			vb.SendMessage(subUser.ID,msgCarouselView)
+			vb.SendTextMessage(subUser.ID, "Самые комментируемые")
+			for _, topItem := range topc.Nodes {
+				msgCarouselComment.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
+				msgCarouselComment.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
+				msgCarouselComment.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+			}
+			vb.SendMessage(subUser.ID,msgCarouselComment)
+		}
+	})
+	c.Start()
 	//Get Updates from chanells
 	for {
 		select {
