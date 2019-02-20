@@ -113,6 +113,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
+		//test github
 		db, err := storm.Open("vbuser.db")
 		if err != nil {
 			log.Println(err)
