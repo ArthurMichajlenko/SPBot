@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/asdine/storm"
 	"github.com/robfig/cron"
@@ -139,16 +140,25 @@ func main() {
 	//Holidays subscribe
 	c.AddFunc("0 02 10 * * 1", func() {
 		var vbbusers []VbUser
+		var msgText string
+		if NoWork {
+			return
+		}
 		db, err := storm.Open("vbuser.db")
 		if err != nil {
 			log.Println(err)
 		}
 		defer db.Close()
 		db.Find("SubscribeHolidays", true, &vbbusers)
-		if NoWork {
-			return
+		for _, subUser := range vbbusers {
+			msgText = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+			for _, hd := range HolidayList {
+				if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
+					msgText += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+				}
+			}
+			vb.SendMessage(subUser.ID, vb.NewTextMessage(msgText))
 		}
-		
 	})
 	c.Start()
 	//Get Updates from chanells
