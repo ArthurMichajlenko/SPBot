@@ -126,15 +126,29 @@ func main() {
 				msgCarouselView.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
 				msgCarouselView.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
-			vb.SendMessage(subUser.ID,msgCarouselView)
+			vb.SendMessage(subUser.ID, msgCarouselView)
 			vb.SendTextMessage(subUser.ID, "Самые комментируемые")
 			for _, topItem := range topc.Nodes {
 				msgCarouselComment.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselComment.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
 				msgCarouselComment.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
-			vb.SendMessage(subUser.ID,msgCarouselComment)
+			vb.SendMessage(subUser.ID, msgCarouselComment)
 		}
+	})
+	//Holidays subscribe
+	c.AddFunc("0 02 10 * * 1", func() {
+		var vbbusers []VbUser
+		db, err := storm.Open("vbuser.db")
+		if err != nil {
+			log.Println(err)
+		}
+		defer db.Close()
+		db.Find("SubscribeHolidays", true, &vbbusers)
+		if NoWork {
+			return
+		}
+		
 	})
 	c.Start()
 	//Get Updates from chanells
