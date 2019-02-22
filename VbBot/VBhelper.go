@@ -907,6 +907,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
 	case *viber.PictureMessage:
 		v.SendTextMessage(u.ID, "Nice pic")
+	case *viber.VideoMessage:
+		v.SendTextMessage(u.ID,"Nice video")
 	}
 	err = db.One("ID", u.ID, &vbbuser)
 	if err == nil {
