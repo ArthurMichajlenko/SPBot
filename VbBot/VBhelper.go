@@ -22,6 +22,7 @@ import (
 )
 
 var isCarousel bool
+var isFeedback bool
 var isSearch bool
 var page int
 var searchString string
@@ -693,8 +694,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msgCarouselLast241)
 			msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			v.SendMessage(u.ID, msgNavig)
-			if page==0 {
-				v.SendTextMessage(u.ID,"Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав комманду subscriptions")
+			if page == 0 {
+				v.SendTextMessage(u.ID, "Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав комманду subscriptions")
 			}
 		case "search":
 			isSearch = true
@@ -793,6 +794,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		case "feedback":
 			isCarousel = false
+			isFeedback = true
 			msg = v.NewTextMessage(txt + stubMsgText)
 		case "holidays":
 			isCarousel = false
@@ -908,7 +910,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	case *viber.PictureMessage:
 		v.SendTextMessage(u.ID, "Nice pic")
 	case *viber.VideoMessage:
-		v.SendTextMessage(u.ID,"Nice video")
+		v.SendTextMessage(u.ID, "Nice video")
 	}
 	err = db.One("ID", u.ID, &vbbuser)
 	if err == nil {
