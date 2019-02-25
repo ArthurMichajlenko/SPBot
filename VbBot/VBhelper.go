@@ -21,12 +21,17 @@ import (
 	"github.com/mileusna/viber"
 )
 
-var isCarousel bool
-var isFeedback bool
-var isSearch bool
-var page int
-var searchString string
 var spColorBG = "#752f35"
+var (
+	page           int
+	isCarousel     bool
+	isFeedback     bool
+	isSearch       bool
+	searchString   string
+	emailBody      string
+	emailSubject   string
+	attachmentURLs []string
+)
 
 // Config bots configurations.
 type Config struct {
@@ -292,7 +297,10 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t time.Time) {
 	// noCmdText := `Извините, я не понял. Попробуйте набрать "help"`
 	noCmdText := `Главное меню`
-	stubMsgText := ` Извините, пока не реализовано`
+	// stubMsgText := ` Извините, пока не реализовано`
+	feedbackText := `Введите текст сообщения...
+	ВНИМАНИЕ: Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)
+	Вы можете добавить к сообщению до 5 файлов (фото и/или видео).`
 	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
 	helpMsgText := `Что я умею:
 	help - выводит это сообщение.
@@ -792,10 +800,22 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 				v.SendMessage(u.ID, msgNavig)
 			}
-		case "feedback":
+		case "feedback", "sendfeedback":
 			isCarousel = false
 			isFeedback = true
-			msg = v.NewTextMessage(txt + stubMsgText)
+			emailSubject = "Viber\n"
+			emailSubject += "Сообщение от: ID:" + u.ID + " Username:" + u.Name + "\n"
+			emailSubject += "Дата:" + t.String()
+			v.SendTextMessage(u.ID, feedbackText)
+			if txt == "sendfeedback" {
+				go func(emailSubject string, emailBody string, attachmentURLs []string, fileName []string, contentType []string) {
+					err := SendFeedback(emailSubject, emailBody, attachmentURLs, fileName, contentType)
+					if err != nil {
+						log.Printf("Send feedback err: %#+v", err)
+					}
+				}(emailSubject, emailBody, nil, nil, nil)
+				isFeedback = false
+			}
 		case "holidays":
 			isCarousel = false
 			var msgText string
@@ -882,8 +902,18 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		default:
+			if isFeedback {
+				emailBody = m.(*viber.TextMessage).Text
+				msg := v.NewTextMessage("Вы можете прикрепить до 5 файлов к сообщению")
+				kb := v.NewKeyboard("", false)
+				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "sendfeedback", `<font color="#ffffff">Отправить</font>`).SetBgColor(spColorBG))
+				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
+				msg.SetKeyboard(kb)
+				v.SendMessage(u.ID, msg)
+				break
+			}
 			if isSearch {
-				searchString = txt
+				searchString = m.(*viber.TextMessage).Text
 				msg = v.NewTextMessage("Начинаем поиск")
 				kb := v.NewKeyboard("#ffffff", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor(spColorBG).SetSilent())
