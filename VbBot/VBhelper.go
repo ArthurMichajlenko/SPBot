@@ -23,14 +23,15 @@ import (
 
 var spColorBG = "#752f35"
 var (
-	page           int
-	isCarousel     bool
-	isFeedback     bool
-	isSearch       bool
-	searchString   string
-	emailBody      string
-	emailSubject   string
-	attachmentURLs []string
+	page            int
+	isCarousel      bool
+	isFeedback      bool
+	isSearch        bool
+	searchString    string
+	emailBody       string
+	emailSubject    string
+	attachmentURLs  []string
+	attachmentCount int
 )
 
 // Config bots configurations.
@@ -803,6 +804,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "feedback", "sendfeedback":
 			isCarousel = false
 			isFeedback = true
+			attachmentCount = 5
 			emailSubject = "Viber\n"
 			emailSubject += "Сообщение от: ID:" + u.ID + " Username:" + u.Name + "\n"
 			emailSubject += "Дата:" + t.String()
@@ -898,13 +900,16 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg.SetKeyboard(kb)
 			v.SendMessage(u.ID, msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ", "menu", "ьутг", "меню":
+			isFeedback = false
+			isSearch = false
+			isCarousel = false
 			msg = v.NewTextMessage("Выберете комманду")
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		default:
 			if isFeedback {
 				emailBody = m.(*viber.TextMessage).Text
-				msg := v.NewTextMessage("Вы можете прикрепить до 5 файлов к сообщению")
+				msg := v.NewTextMessage("Вы можете прикрепить до " + strconv.Itoa(attachmentCount) + " файлов к сообщению")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "sendfeedback", `<font color="#ffffff">Отправить</font>`).SetBgColor(spColorBG))
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
@@ -938,6 +943,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
 	case *viber.PictureMessage:
+		if isFeedback {
+			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
+		}
 		v.SendTextMessage(u.ID, "Nice pic")
 	case *viber.VideoMessage:
 		v.SendTextMessage(u.ID, "Nice video")
