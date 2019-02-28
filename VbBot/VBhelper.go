@@ -30,6 +30,8 @@ var (
 	searchString    string
 	emailBody       string
 	emailSubject    string
+	fileName        []string
+	contentType     []string
 	attachmentURLs  []string
 	attachmentCount int
 )
@@ -802,20 +804,22 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msgNavig)
 			}
 		case "feedback", "sendfeedback":
-			isCarousel = false
-			isFeedback = true
-			attachmentCount = 5
-			emailSubject = "Viber\n"
-			emailSubject += "Сообщение от: ID:" + u.ID + " Username:" + u.Name + "\n"
-			emailSubject += "Дата:" + t.String()
-			v.SendTextMessage(u.ID, feedbackText)
-			if txt == "sendfeedback" {
+			if txt == "feedback" {
+				isCarousel = false
+				isFeedback = true
+				attachmentCount = 5
+				attachmentURLs = nil
+				emailSubject = "Viber\n"
+				emailSubject += "Сообщение от: ID:" + u.ID + " Username:" + u.Name + "\n"
+				emailSubject += "Дата:" + t.String()
+				v.SendTextMessage(u.ID, feedbackText)
+			} else {
 				go func(emailSubject string, emailBody string, attachmentURLs []string, fileName []string, contentType []string) {
 					err := SendFeedback(emailSubject, emailBody, attachmentURLs, fileName, contentType)
 					if err != nil {
 						log.Printf("Send feedback err: %#+v", err)
 					}
-				}(emailSubject, emailBody, nil, nil, nil)
+				}(emailSubject, emailBody, attachmentURLs, fileName, contentType)
 				isFeedback = false
 			}
 		case "holidays":
@@ -943,12 +947,37 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		url := m.(*viber.URLMessage).Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
 	case *viber.PictureMessage:
-		if isFeedback {
+		msg := v.NewTextMessage("")
+		kb := v.NewKeyboard("", false)
+		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "sendfeedback", `<font color="#ffffff">Отправить</font>`).SetBgColor(spColorBG))
+		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
+		msg.SetKeyboard(kb)
+		if isFeedback && attachmentCount > 0 {
 			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
+			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount))
+			contentType = append(contentType, "image")
+			attachmentCount--
+			msg.Text="Вы можете прикрепить еще "+strconv.Itoa(attachmentCount)+" файла/ов"
+		} else {
+			msg.Text="Вы исчерпали лимит вложений"
 		}
-		v.SendTextMessage(u.ID, "Nice pic")
+		v.SendMessage(u.ID, msg)
 	case *viber.VideoMessage:
-		v.SendTextMessage(u.ID, "Nice video")
+		msg := v.NewTextMessage("")
+		kb := v.NewKeyboard("", false)
+		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "sendfeedback", `<font color="#ffffff">Отправить</font>`).SetBgColor(spColorBG))
+		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
+		msg.SetKeyboard(kb)
+		if isFeedback && attachmentCount > 0 {
+			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
+			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount))
+			contentType = append(contentType, "video")
+			attachmentCount--
+			msg.Text="Вы можете прикрепить еще "+strconv.Itoa(attachmentCount)+" файла/ов"
+		} else {
+			msg.Text="Вы исчерпали лимит вложений"
+		}
+		v.SendMessage(u.ID, msg)
 	}
 	err = db.One("ID", u.ID, &vbbuser)
 	if err == nil {
