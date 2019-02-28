@@ -821,6 +821,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 					}
 				}(emailSubject, emailBody, attachmentURLs, fileName, contentType)
 				isFeedback = false
+				msg := v.NewTextMessage("Спасибо")
+				msg.SetKeyboard(kbMain)
+				v.SendMessage(u.ID, msg)
 			}
 		case "holidays":
 			isCarousel = false
@@ -954,12 +957,12 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		msg.SetKeyboard(kb)
 		if isFeedback && attachmentCount > 0 {
 			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
-			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount))
-			contentType = append(contentType, "image")
+			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount)+".jpg")
+			contentType = append(contentType, "image/jpeg")
 			attachmentCount--
-			msg.Text="Вы можете прикрепить еще "+strconv.Itoa(attachmentCount)+" файла/ов"
+			msg.Text = "Вы можете прикрепить еще " + strconv.Itoa(attachmentCount) + " файла/ов"
 		} else {
-			msg.Text="Вы исчерпали лимит вложений"
+			msg.Text = "Вы исчерпали лимит вложений"
 		}
 		v.SendMessage(u.ID, msg)
 	case *viber.VideoMessage:
@@ -969,13 +972,13 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
 		msg.SetKeyboard(kb)
 		if isFeedback && attachmentCount > 0 {
-			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
-			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount))
-			contentType = append(contentType, "video")
+			attachmentURLs = append(attachmentURLs, m.(*viber.VideoMessage).Media)
+			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount)+".mp4")
+			contentType = append(contentType, "video/mp4")
 			attachmentCount--
-			msg.Text="Вы можете прикрепить еще "+strconv.Itoa(attachmentCount)+" файла/ов"
+			msg.Text = "Вы можете прикрепить еще " + strconv.Itoa(attachmentCount) + " файла/ов"
 		} else {
-			msg.Text="Вы исчерпали лимит вложений"
+			msg.Text = "Вы исчерпали лимит вложений"
 		}
 		v.SendMessage(u.ID, msg)
 	}
