@@ -809,6 +809,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				isFeedback = true
 				attachmentCount = 5
 				attachmentURLs = nil
+				fileName = nil
+				contentType = nil
 				emailSubject = "Viber\n"
 				emailSubject += "Сообщение от: ID:" + u.ID + " Username:" + u.Name + "\n"
 				emailSubject += "Дата:" + t.String()
