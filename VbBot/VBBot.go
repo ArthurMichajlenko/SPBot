@@ -58,6 +58,7 @@ func main() {
 		log.Println(err)
 	}
 	vb.Message = msgReceived
+	vb.ConversationStarted=msgConversationStarted
 	vb.Sender.Avatar = vAccount.Icon
 	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)

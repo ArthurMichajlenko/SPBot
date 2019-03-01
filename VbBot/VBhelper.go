@@ -16,7 +16,6 @@ import (
 
 	"github.com/asdine/storm"
 
-	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/jordan-wright/email"
 	"github.com/mileusna/viber"
 )
@@ -130,13 +129,6 @@ type Holidays struct {
 	Month   string
 	Holiday string
 	Date    time.Time
-}
-
-//AttachFile properties attached file
-type AttachFile struct {
-	FileName    []string
-	ContentType []string
-	BotFile     tgbotapi.File
 }
 
 //VbUser Viber User. BoltDb
@@ -999,4 +991,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		vbbuser.SubscribeHolidays = false
 		db.Save(&vbbuser)
 	}
+}
+
+//msgConversationStarted call when user opens conversation
+func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time)  viber.Message {
+	return v.NewTextMessage("Добро пожаловать!")
 }
