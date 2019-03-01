@@ -58,7 +58,7 @@ func main() {
 		log.Println(err)
 	}
 	vb.Message = msgReceived
-	vb.ConversationStarted=msgConversationStarted
+	vb.ConversationStarted = msgConversationStarted
 	vb.Sender.Avatar = vAccount.Icon
 	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)
@@ -309,8 +309,8 @@ func main() {
 				msgCarouselCityD.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
 				msgCarouselCityD.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
-			vb.SendMessage(subUser.ID,msgCarouselCityA)
-			vb.SendMessage(subUser.ID,msgCarouselCityD)
+			vb.SendMessage(subUser.ID, msgCarouselCityA)
+			vb.SendMessage(subUser.ID, msgCarouselCityD)
 		}
 	})
 	c.Start()

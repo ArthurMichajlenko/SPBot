@@ -900,13 +900,24 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			msg.SetKeyboard(kb)
 			v.SendMessage(u.ID, msg)
-		case "hi", "hello", "хай", "привет", "рш", "руддщ", "menu", "ьутг", "меню":
+		case "menu":
 			isFeedback = false
 			isSearch = false
 			isCarousel = false
 			msg = v.NewTextMessage("Выберете комманду")
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
+		case "hi", "hello", "хай", "привет", "рш", "руддщ":
+			if !isFeedback {
+				isFeedback = false
+				isSearch = false
+				isCarousel = false
+				msg = v.NewTextMessage("Привет!\nВыберете комманду")
+				msg.SetKeyboard(kbMain)
+				v.SendMessage(u.ID, msg)
+				break
+			}
+			fallthrough
 		default:
 			if isFeedback {
 				emailBody = m.(*viber.TextMessage).Text
@@ -994,6 +1005,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 }
 
 //msgConversationStarted call when user opens conversation
-func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time)  viber.Message {
-	return v.NewTextMessage("Добро пожаловать!")
+func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
+	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет Вам получать полезную и важную информацию в телефоне удобным для Вас образом.`
+	return v.NewTextMessage(welcomeMessage)
 }
