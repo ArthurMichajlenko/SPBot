@@ -1015,9 +1015,9 @@ func msgConversationStarted(v *viber.Viber, u viber.User, conversationType strin
 func msgSubscribed(v *viber.Viber, u viber.User, token uint64, t time.Time) {
 	subscribeMessage := v.NewTextMessage(`Добро пожаловать! Вы можете подписаться на новости с сайта "СП". Вы сможете настроить рассылку так, как Вам нравиться.
 	Более подробно узнать о возможностях бота Вы можете отправив комманду "help" или нажав кнопку "Помощь" главного меню`)
-	kb:=v.NewKeyboard("", false)
+	kb := v.NewKeyboard("", false)
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 	subscribeMessage.SetKeyboard(kb)
-	v.SendMessage(u.ID,subscribeMessage)
+	v.SendMessage(u.ID, subscribeMessage)
 }
