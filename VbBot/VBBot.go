@@ -52,7 +52,7 @@ func main() {
 		log.SetOutput(logfile)
 	}
 	// Start webhook
-	vb := viber.New(botConfig.Bots.Viber.VBApikey, "IumasLink", "")
+	vb := viber.New(botConfig.Bots.Viber.VBApikey, "SPBeta", "")
 	vAccount, err := vb.AccountInfo()
 	if err != nil {
 		log.Println(err)
@@ -63,7 +63,8 @@ func main() {
 	vb.Sender.Avatar = vAccount.Icon
 	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)
-	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
+	// go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
+	go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), botConfig.Bots.Viber.VBPathCERT, botConfig.Bots.Viber.VBPathKey, nil)
 	webHookResp, err := vb.SetWebhook(botConfig.Bots.Viber.VBWebhook+":"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
 	if err != nil {
 		log.Println("WebHook error=> ", err)
