@@ -17,7 +17,7 @@
             "log_file": "fbbot.log"
         },
         "viber": {
-            "vb_apikey": "48799744e527d2c8-d447e6da2f634a31-8a717c2c7cd69d51",
+            "vb_apikey": "4952d26ff7e7d4a8-108d31e76b6057b9-3631353732b4f6c3",
             "vb_webhook": "https://dev.infinitloop.md",
             "vb_port": 8444,
             "vb_path_cert": "",

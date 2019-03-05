@@ -22,3 +22,5 @@ tguser.db
 SPBot
 VbBot
 !/VbBot
+.DS_Store
+VbBot/vbuser.db

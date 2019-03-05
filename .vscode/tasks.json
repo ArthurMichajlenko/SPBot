@@ -32,9 +32,45 @@
             }
         },
         {
+            "label": "Go Build TG Linux",
+            "type": "shell",
+            "command": "go build",
+            "options": {
+                "env": {
+                    "GOOS": "linux",
+                    "GOARCH": "amd64"
+                }
+            },
+            "problemMatcher": [
+                "$go"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Go Build VB",
             "type": "shell",
             "command": "cd VbBot && go build",
+            "problemMatcher": [
+                "$go"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Go Build VB Linux",
+            "type": "shell",
+            "command": "cd VbBot && go build",
+            "options": {
+                "env": {
+                    "GOOS": "linux",
+                    "GOARCH": "amd64"
+                }
+            },
             "problemMatcher": [
                 "$go"
             ],
