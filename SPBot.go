@@ -291,7 +291,8 @@ func main() {
 				tgMsg.Text = msgHead
 				for _, hd := range holidays {
 					if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
-						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+						day, _ := strconv.Atoi(hd.Day)
+						tgMsg.Text += "*" + strconv.Itoa(day) + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 					}
 				}
 			}
