@@ -154,7 +154,7 @@ func main() {
 		defer db.Close()
 		db.Find("SubscribeHolidays", true, &vbbusers)
 		for _, subUser := range vbbusers {
-			msgText = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+			msgText = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный Повод\" на ближайшую неделю:\n\n"
 			for _, hd := range HolidayList {
 				day, _ := strconv.Atoi(hd.Day)
 				if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
