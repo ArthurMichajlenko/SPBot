@@ -754,7 +754,7 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = "Вы можете подписаться на новости, выполнив комманду /subscriptions"
+				tgMsg.Text = "Вы можете подписаться на новости, выполнив команду /subscriptions"
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard
@@ -793,7 +793,7 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 				tgMsg.Text = "Выберите игру"
 			case "/donate":
-				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
+				tgMsg.Text = `Мы предлагаем поддержать независимую команду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
 				buttonDonate := tgbotapi.NewInlineKeyboardButtonURL("Поддержать \"СП\" материально", "http://esp.md/donate")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Вернуться в главное меню", "help")

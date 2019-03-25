@@ -699,7 +699,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			v.SendMessage(u.ID, msgNavig)
 			if page == 0 {
-				v.SendTextMessage(u.ID, "Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав комманду subscriptions")
+				v.SendTextMessage(u.ID, "Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав команду subscriptions")
 			}
 		case "search":
 			isSearch = true
@@ -894,7 +894,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		case "donate":
 			isCarousel = true
-			msg = v.NewTextMessage(`Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`)
+			msg = v.NewTextMessage(`Мы предлагаем поддержать независимую команду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`)
 			kb := v.NewKeyboard("#ffffff", false)
 			kb.AddButton(v.NewTextButton(3, 2, viber.OpenURL, "http://esp.md/content/podpiska-na-sp", `<font color="#ffffff">Подписаться на газету "СП"</font>`).SetBgColor(spColorBG).SetSilent())
 			kb.AddButton(v.NewTextButton(3, 2, viber.OpenURL, "http://esp.md/donate", `<font color="#ffffff">Поддержать "СП" материально</font>`).SetBgColor(spColorBG).SetSilent())
@@ -905,7 +905,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isFeedback = false
 			isSearch = false
 			isCarousel = false
-			msg = v.NewTextMessage("Выберете комманду")
+			msg = v.NewTextMessage("Выберете команду")
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ":
@@ -913,7 +913,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				isFeedback = false
 				isSearch = false
 				isCarousel = false
-				msg = v.NewTextMessage("Привет!\nВыберете комманду")
+				msg = v.NewTextMessage("Привет!\nВыберете команду")
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
 				break
@@ -1014,7 +1014,7 @@ func msgConversationStarted(v *viber.Viber, u viber.User, conversationType strin
 //msgSubscribed call when user subscribe on bot
 func msgSubscribed(v *viber.Viber, u viber.User, token uint64, t time.Time) {
 	subscribeMessage := v.NewTextMessage(`Добро пожаловать! Вы можете подписаться на новости с сайта "СП". Вы сможете настроить рассылку так, как вам нравиться.
-	Более подробно узнать о возможностях бота Вы можете отправив комманду "help" или нажав кнопку "Помощь" главного меню`)
+	Более подробно узнать о возможностях бота Вы можете отправив команду "help" или нажав кнопку "Помощь" главного меню`)
 	kb := v.NewKeyboard("", false)
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
