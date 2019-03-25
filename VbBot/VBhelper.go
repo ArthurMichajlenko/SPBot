@@ -357,9 +357,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	<b>Подписаться</b></font>`
 	unsubscribeLast := `<font color="#ffffff">Последние новости
 	<b><i>Отписаться</i></b></font>`
-	subscribeCity := `<font color="#ffffff">Городские уведомления
+	subscribeCity := `<font color="#ffffff">Городские оповещения
 	<b>Подписаться</b></font>`
-	unsubscribeCity := `<font color="#ffffff">Городские уведомления
+	unsubscribeCity := `<font color="#ffffff">Городские оповещения
 	<b><i>Отписаться</i></b></font>`
 	subscribeTop := `<font color="#ffffff">Самое популярное
 	<b>Подписаться</b></font>`
@@ -503,7 +503,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "subscrc", "conformc":
 			db.One("ID", u.ID, &vbbuser)
 			if txt == "subscrc" {
-				msg := v.NewTextMessage("Городские уведомления.")
+				msg := v.NewTextMessage("Городские оповещения.")
 				kb := v.NewKeyboard("", false)
 				if vbbuser.SubscribeCity {
 					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conformc", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
@@ -620,7 +620,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			if err != nil {
 				log.Println(err)
 			}
-			v.SendTextMessage(u.ID, "Самые читаемые")
+			v.SendTextMessage(u.ID, "Самые читаемые за последние семь дней")
 			for _, topItem := range top.Nodes {
 				msgCarouselView.AddButton(v.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselView.AddButton(v.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
@@ -632,7 +632,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			if err != nil {
 				log.Println(err)
 			}
-			v.SendTextMessage(u.ID, "Самые комментируемые")
+			v.SendTextMessage(u.ID, "Самые комментируемые за последние семь дней")
 			for _, topItem := range top.Nodes {
 				msgCarouselComment.AddButton(v.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselComment.AddButton(v.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))

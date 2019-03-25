@@ -124,14 +124,14 @@ func main() {
 		defer db.Close()
 		db.Find("SubscribeTop", true, &vbbusers)
 		for _, subUser := range vbbusers {
-			vb.SendTextMessage(subUser.ID, "Самые читаемые")
+			vb.SendTextMessage(subUser.ID, "Самые читаемые за последние семь дней")
 			for _, topItem := range topv.Nodes {
 				msgCarouselView.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselView.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))
 				msgCarouselView.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, topItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
 			vb.SendMessage(subUser.ID, msgCarouselView)
-			vb.SendTextMessage(subUser.ID, "Самые комментируемые")
+			vb.SendTextMessage(subUser.ID, "Самые комментируемые за последние семь дней")
 			for _, topItem := range topc.Nodes {
 				msgCarouselComment.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
 				msgCarouselComment.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeCover["src"]))

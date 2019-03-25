@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
 	"github.com/robfig/cron"
@@ -264,7 +264,7 @@ func main() {
 			if (len(citya.Nodes) == 0) && (len(cityd.Nodes) == 0) {
 				tgMsg.Text = ""
 			} else {
-				tgMsg.Text = "Городские новости"
+				tgMsg.Text = "Городские оповещения"
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range citya.Nodes {
@@ -634,7 +634,7 @@ func main() {
 				bt20 := "Вечером"
 				btL := "Последние новости"
 				btT := "Самое популярное"
-				btC := "Городские уведомления"
+				btC := "Городские оповещения"
 				btH := "Календарь праздников"
 				btF := "Главное меню"
 				db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
@@ -682,7 +682,7 @@ func main() {
 					*Последние новости* - получать новости сразу по мере их 
 					публикации _(сообщения будут приходить часто)_
 					*Самое популярное* - самые читаемые и комментируемые материалы за 7 дней
-					*Городские уведомления* - предупреждения городских служб, анонсы мероприятий в Бельцах и т.п.
+					*Городские оповещения* - предупреждения городских служб, анонсы мероприятий в Бельцах и т.п.
 					*Календарь праздников* - молдавские, международные и религиозные праздники на ближайшую неделю
 					
 						Для изменения состояния подписки нажмите на 
@@ -721,7 +721,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text = "*Самые читаемые*"
+				tgMsg.Text = "*Самые читаемые за последние семь дней*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -732,7 +732,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text = "*Самые комментируемые*"
+				tgMsg.Text = "*Самые комментируемые за последние семь дней*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
