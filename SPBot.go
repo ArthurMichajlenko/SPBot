@@ -761,7 +761,7 @@ func main() {
 			case "/search":
 				multipartSearch = true
 				numPageSearch = 0
-				tgMsg.Text = "Введите что искать"
+				tgMsg.Text = "Введите слово или фразу для поиска"
 			case "/feedback":
 				multipartFeedback = true
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))

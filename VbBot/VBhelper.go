@@ -703,7 +703,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		case "search":
 			isSearch = true
-			v.SendTextMessage(u.ID, "Введите что искать")
+			v.SendTextMessage(u.ID, "Введите слово или фразу для поиска")
 		case "searchbegin", "searchprev", "searchnext":
 			isCarousel = true
 			msgCarouselSearch := v.NewRichMediaMessage(6, 7, spColorBG)
