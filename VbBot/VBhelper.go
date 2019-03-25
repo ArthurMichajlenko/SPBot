@@ -294,14 +294,14 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	noCmdText := `Главное меню`
 	// stubMsgText := ` Извините, пока не реализовано`
 	feedbackText := `Введите текст сообщения...
-	ВНИМАНИЕ: Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)
+	ВНИМАНИЕ: Обязательно укажите ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)
 	Вы можете добавить к сообщению до 5 файлов (фото и/или видео).`
-	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
+	startMsgText := `Добро пожаловать! Предлагаем вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как вам удобно.`
 	helpMsgText := `Что я умею:
 	Поздоровавшись с ботом (Hi, Hello, Привет) Вы увидите Главное меню
 	help - выводит это сообщение (кнопка "Помощь" главного меню).
 	start - подключение к боту.
-	subscriptions - управление Вашими подписками (кнопка "Управление подписками" главного меню).
+	subscriptions - управление вашими подписками (кнопка "Управление подписками" главного меню).
 	alerts - городские оповещения (кнопка "Городские оповещения" главного меню).
 	top - самое популярное в "СП" (кнопка "Самое популярное" главного меню).
 	news - последние материалы на сайте "СП" (кнопка "Последние новости" главного меню).
@@ -310,7 +310,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	holidays - календарь праздников (кнопка "Календарь праздников" главного меню).
 	games - игры (кнопка "Игры" главного меню).
 	donate - поддержать "СП" (кнопка "Поддержи "СП"" главного меню).`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
+	startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kbMain := v.NewKeyboard("", true)
 	kbMain.DefaultHeight = false
@@ -640,7 +640,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			v.SendMessage(u.ID, msgCarouselComment)
 			if !vbbuser.SubscribeTop {
-				msgText = `Хотите подписаться на самое популярное в "СП"? мы будем присылать Вам такие подборки каждое воскресенье в 10:00.`
+				msgText = `Хотите подписаться на самое популярное в "СП"? мы будем присылать вам такие подборки каждое воскресенье в 10:00.`
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "conformt", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG))
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
 			} else {
@@ -719,7 +719,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				}
 				if len(search.Nodes) == 0 {
 					notFound = true
-					msg = v.NewTextMessage("По Вашему запросу ничего не найдено")
+					msg = v.NewTextMessage("По вашему запросу ничего не найдено")
 					msg.SetKeyboard(kbMain)
 					v.SendMessage(u.ID, msg)
 				} else {
@@ -836,7 +836,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				}
 			}
 			if !vbbuser.SubscribeHolidays {
-				msgText += "Предлагаем Вам подписаться на рассылку праздников. Мы будем присылать Вам даты на неделю каждый понедельник в 10:00"
+				msgText += "Предлагаем вам подписаться на рассылку праздников. Мы будем присылать вам даты на неделю каждый понедельник в 10:00"
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "conformh", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG))
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
 			} else {
@@ -1007,13 +1007,13 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
-	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет Вам получать полезную и важную информацию в телефоне удобным для Вас образом.`
+	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.`
 	return v.NewTextMessage(welcomeMessage)
 }
 
 //msgSubscribed call when user subscribe on bot
 func msgSubscribed(v *viber.Viber, u viber.User, token uint64, t time.Time) {
-	subscribeMessage := v.NewTextMessage(`Добро пожаловать! Вы можете подписаться на новости с сайта "СП". Вы сможете настроить рассылку так, как Вам нравиться.
+	subscribeMessage := v.NewTextMessage(`Добро пожаловать! Вы можете подписаться на новости с сайта "СП". Вы сможете настроить рассылку так, как вам нравиться.
 	Более подробно узнать о возможностях бота Вы можете отправив комманду "help" или нажав кнопку "Помощь" главного меню`)
 	kb := v.NewKeyboard("", false)
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())

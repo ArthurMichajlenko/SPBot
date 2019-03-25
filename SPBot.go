@@ -97,11 +97,11 @@ func main() {
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
-	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
+	startMsgText := `Добро пожаловать! Предлагаем вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как вам удобно.`
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscriptions - управление Вашими подписками.
+	/subscriptions - управление вашими подписками.
 	/alerts - городские оповещения.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -110,7 +110,7 @@ func main() {
 	/holidays - календарь праздников.
 	/games - игры.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
+	startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
@@ -439,7 +439,7 @@ func main() {
 						log.Println(err)
 					}
 					if len(search.Nodes) == 0 {
-						tgCbMsg.Text = "По Вашему запросу ничего не найдено"
+						tgCbMsg.Text = "По вашему запросу ничего не найдено"
 						// tgBot.Send(tgCbMsg)
 						multipartSearch = false
 						break
@@ -738,7 +738,7 @@ func main() {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать Вам такие подборки каждое воскресенье в 18:00_"
+				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать вам такие подборки каждое воскресенье в 18:00_"
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribetp")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
@@ -769,7 +769,7 @@ func main() {
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
+				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
 			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
@@ -780,7 +780,7 @@ func main() {
 							tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 						}
 					}
-					tgMsg.Text += "_Предлагаем Вам подписаться на рассылку праздников. Мы будем присылать Вам даты на неделю каждый понедельник в 10:00_"
+					tgMsg.Text += "_Предлагаем вам подписаться на рассылку праздников. Мы будем присылать вам даты на неделю каждый понедельник в 10:00_"
 					buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribehd")
 					buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
