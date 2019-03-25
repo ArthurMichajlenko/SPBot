@@ -156,8 +156,9 @@ func main() {
 		for _, subUser := range vbbusers {
 			msgText = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
 			for _, hd := range HolidayList {
+				day, _ := strconv.Atoi(hd.Day)
 				if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
-					msgText += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+					msgText += "*" + strconv.Itoa(day) + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 				}
 			}
 			vb.SendMessage(subUser.ID, vb.NewTextMessage(msgText))
