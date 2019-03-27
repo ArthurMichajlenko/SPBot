@@ -166,29 +166,29 @@ func LoadHolidays(file string) ([]Holidays, error) {
 		holiday.Date = time.Date(year, time.Month(mon), day, 0, 0, 0, 0, loc)
 		switch row[1] {
 		case "01":
-			holiday.Month = "Января"
+			holiday.Month = "января"
 		case "02":
-			holiday.Month = "Февраля"
+			holiday.Month = "февраля"
 		case "03":
-			holiday.Month = "Марта"
+			holiday.Month = "марта"
 		case "04":
-			holiday.Month = "Апреля"
+			holiday.Month = "апреля"
 		case "05":
-			holiday.Month = "Мая"
+			holiday.Month = "мая"
 		case "06":
-			holiday.Month = "Июня"
+			holiday.Month = "июня"
 		case "07":
-			holiday.Month = "Июля"
+			holiday.Month = "июля"
 		case "08":
-			holiday.Month = "Августа"
+			holiday.Month = "августа"
 		case "09":
-			holiday.Month = "Сентября"
+			holiday.Month = "сентября"
 		case "10":
-			holiday.Month = "Октября"
+			holiday.Month = "октября"
 		case "11":
-			holiday.Month = "Ноября"
+			holiday.Month = "ноября"
 		case "12":
-			holiday.Month = "Декабря"
+			holiday.Month = "декабря"
 		default:
 			holiday.Month = ""
 		}
