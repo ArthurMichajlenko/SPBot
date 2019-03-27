@@ -18,7 +18,7 @@ import (
 	"github.com/Syfaro/telegram-bot-api"
 )
 
-// Config bots configurations.
+// Config bots configurations. 
 type Config struct {
 	Bots             Bots     `json:"bots"`
 	Feedback         Feedback `json:"feedback"`
