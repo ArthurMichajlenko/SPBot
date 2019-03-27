@@ -180,7 +180,7 @@ func LoadHolidays(file string) ([]Holidays, error) {
 		case "07":
 			holiday.Month = "Июля"
 		case "08":
-			holiday.Month = "Август"а
+			holiday.Month = "Августа"
 		case "09":
 			holiday.Month = "Сентября"
 		case "10":
