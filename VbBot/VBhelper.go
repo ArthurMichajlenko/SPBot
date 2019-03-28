@@ -100,7 +100,7 @@ type Email struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	EmailFrom  string `json:"email_from"`
-	EmailTo    string `json:"email_to"`
+	EmailTo    []string `json:"email_to"`
 }
 
 // News from query esp.md.
@@ -265,7 +265,7 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 	smtpAuth := smtp.PlainAuth("", botConfig.Feedback.Email.Username, botConfig.Feedback.Email.Password, botConfig.Feedback.Email.SMTPServer)
 	email := email.NewEmail()
 	email.From = botConfig.Feedback.Email.EmailFrom
-	email.To = append(email.To, botConfig.Feedback.Email.EmailTo)
+	email.To = botConfig.Feedback.Email.EmailTo
 	email.Subject = subject
 	email.Text = []byte(text)
 	if attachmentURLs == nil {
