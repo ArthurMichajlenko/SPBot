@@ -197,8 +197,9 @@ func main() {
 	c.AddFunc("0 02 09 * * *", func() {
 		var tgUser []TgUser
 		var news News
+		numPageNews = 0
 		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, 0)
+		news, err := NewsQuery(urlNews, numPageNews)
 		if err != nil {
 			log.Println(err)
 		}
@@ -216,14 +217,20 @@ func main() {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
+			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
+			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+			tgMsg.ReplyMarkup = keyboard
+			tgBot.Send(tgMsg)
 		}
 	})
 	// 20:00 subscribe
 	c.AddFunc("0 02 20 * * *", func() {
 		var tgUser []TgUser
 		var news News
+		numPageNews = 0
 		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, 0)
+		news, err := NewsQuery(urlNews, numPageNews)
 		if err != nil {
 			log.Println(err)
 		}
@@ -241,6 +248,11 @@ func main() {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
+			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
+			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+			tgMsg.ReplyMarkup = keyboard
+			tgBot.Send(tgMsg)
 		}
 	})
 	//City subscribe
