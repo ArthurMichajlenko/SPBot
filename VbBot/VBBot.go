@@ -304,6 +304,7 @@ func main() {
 		defer db.Close()
 		db.Find("SubscribeCity", true, &vbbusers)
 		for _, subUser := range vbbusers {
+			vb.SendTextMessage(subUser.ID, "Городские оповещения")
 			for _, newsItem := range cityA.Nodes {
 				msgCarouselCityA.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeDate+"\n"+newsItem.Node.NodeTitle))
 				msgCarouselCityA.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
