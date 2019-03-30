@@ -281,11 +281,13 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range citya.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				srcDate := topItem.Node.NodeDate
+				tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 			for _, topItem := range cityd.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				srcDate := topItem.Node.NodeDate
+				tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 		}
@@ -711,7 +713,8 @@ func main() {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					srcDate := cityItem.Node.NodeDate
+					tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				urlCity = botConfig.QueryCityAfisha
@@ -720,7 +723,8 @@ func main() {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					srcDate := cityItem.Node.NodeDate
+					tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Оформив подиску на городские оповещения, Вы будете получать сюда предупреждения городских служб, анонсы мероприятий в Бельцах и т.д._"

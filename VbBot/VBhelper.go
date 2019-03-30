@@ -584,14 +584,16 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			v.SendTextMessage(u.ID, "Городские оповещения")
 			for _, cityItem := range city.Nodes {
-				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
+				srcDate := cityItem.Node.NodeDate
+				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
 				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
 			urlCity = botConfig.QueryCityAfisha
 			city, err = NewsQuery(urlCity, numPage)
 			for _, cityItem := range city.Nodes {
-				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeDate+"\n"+cityItem.Node.NodeTitle))
+				srcDate := cityItem.Node.NodeDate
+				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
 				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}

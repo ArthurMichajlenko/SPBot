@@ -306,12 +306,14 @@ func main() {
 		for _, subUser := range vbbusers {
 			vb.SendTextMessage(subUser.ID, "Городские оповещения")
 			for _, newsItem := range cityA.Nodes {
-				msgCarouselCityA.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeDate+"\n"+newsItem.Node.NodeTitle))
+				srcDate := newsItem.Node.NodeDate
+				msgCarouselCityA.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+newsItem.Node.NodeTitle))
 				msgCarouselCityA.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
 				msgCarouselCityA.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
 			for _, newsItem := range cityD.Nodes {
-				msgCarouselCityD.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeDate+"\n"+newsItem.Node.NodeTitle))
+				srcDate := newsItem.Node.NodeDate
+				msgCarouselCityD.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+newsItem.Node.NodeTitle))
 				msgCarouselCityD.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
 				msgCarouselCityD.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
