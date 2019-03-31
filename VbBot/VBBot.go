@@ -207,8 +207,9 @@ func main() {
 	c.AddFunc("0 02 09 * * *", func() {
 		var vbbusers []VbUser
 		var lastNews News
+		Page=0
 		urlLast := botConfig.QueryNews24H
-		lastNews, err = NewsQuery(urlLast, 0)
+		lastNews, err = NewsQuery(urlLast, Page)
 		if err != nil {
 			log.Println(err)
 		}
@@ -244,8 +245,9 @@ func main() {
 	c.AddFunc("0 02 20 * * *", func() {
 		var vbbusers []VbUser
 		var lastNews News
+		Page=0
 		urlLast := botConfig.QueryNews24H
-		lastNews, err = NewsQuery(urlLast, 0)
+		lastNews, err = NewsQuery(urlLast, Page)
 		if err != nil {
 			log.Println(err)
 		}

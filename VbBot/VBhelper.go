@@ -21,8 +21,9 @@ import (
 )
 
 var spColorBG = "#752f35"
+// Page number page of results
+var Page            int
 var (
-	page            int
 	isCarousel      bool
 	isFeedback      bool
 	isSearch        bool
@@ -457,7 +458,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "subscr20", "conform20":
 			db.One("ID", u.ID, &vbbuser)
 			if txt == "subscr20" {
-				msg := v.NewTextMessage("Получать дайджест за сутки - утром в 20:00")
+				msg := v.NewTextMessage("Получать дайджест за сутки - вечером в 20:00")
 				kb := v.NewKeyboard("", false)
 				if vbbuser.Subscribe20 {
 					kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "conform20", `<font color="#ffffff">Отписаться</font>`).SetBgColor(spColorBG).SetSilent())
@@ -659,20 +660,19 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgNavig := v.NewRichMediaMessage(6, 3, "#ffffff")
 			if txt == "news" {
 				v.SendTextMessage(u.ID, "Последние новости")
-				page = 0
+				Page = 0
 				msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
-
 			} else if txt == "newsnext" {
-				page++
-				if page == 800 {
+				Page++
+				if Page == 800 {
 					msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 				}
 			} else {
-				page--
-				if page != 0 {
+				Page--
+				if Page != 0 {
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
@@ -681,7 +681,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			var last24 News
 			urlLast24 := botConfig.QueryNews24H
-			last24, err := NewsQuery(urlLast24, page)
+			last24, err := NewsQuery(urlLast24, Page)
 			if err != nil {
 				log.Println(err)
 			}
@@ -700,7 +700,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msgCarouselLast241)
 			msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			v.SendMessage(u.ID, msgNavig)
-			if page == 0 {
+			if Page == 0 {
 				v.SendTextMessage(u.ID, "Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав команду subscriptions")
 			}
 		case "search":
@@ -714,8 +714,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			notFound := false
 			if txt == "searchbegin" {
 				var search News
-				page = 0
-				search, err := SearchQuery(searchString, page)
+				Page = 0
+				search, err := SearchQuery(searchString, Page)
 				if err != nil {
 					log.Println(err)
 				}
@@ -741,8 +741,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				}
 				msgNavig.AddButton(v.NewTextButton(6, 2, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 			} else if txt == "searchnext" {
-				page++
-				search, err := SearchQuery(searchString, page)
+				Page++
+				search, err := SearchQuery(searchString, Page)
 				if err != nil {
 					log.Println(err)
 				}
@@ -766,11 +766,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 				}
 			} else {
-				page--
-				if page < 0 {
-					page = 0
+				Page--
+				if Page < 0 {
+					Page = 0
 				}
-				search, err := SearchQuery(searchString, page)
+				search, err := SearchQuery(searchString, Page)
 				if err != nil {
 					log.Println(err)
 				}
@@ -787,7 +787,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				}
 				v.SendMessage(u.ID, msgCarouselSearch)
 				v.SendMessage(u.ID, msgCarouselSearch1)
-				if page != 0 {
+				if Page != 0 {
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchprev", `<font color="#ffffff">Назад</font>`).SetBgColor(spColorBG).SetSilent())
 					msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 				} else {
@@ -852,7 +852,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgCarouselGames := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselGames1 := v.NewRichMediaMessage(6, 7, spColorBG)
 			if txt == "games" {
-				msg := v.NewTextMessage("Выберите игру")
+				msg := v.NewTextMessage("Выбирите игру")
 				kb := v.NewKeyboard("#ffffff", false)
 				kb.AddButton(v.NewTextButton(3, 2, viber.Reply, "games10", `<font color="#ffffff">Последние 10</font>`).SetBgColor(spColorBG).SetSilent())
 				kb.AddButton(v.NewTextButton(3, 2, viber.Reply, "games1rand", `<font color="#ffffff">Случайная</font>`).SetBgColor(spColorBG).SetSilent())
@@ -907,7 +907,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isFeedback = false
 			isSearch = false
 			isCarousel = false
-			msg = v.NewTextMessage("Выберете команду")
+			msg = v.NewTextMessage("Выбирете команду")
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ":
@@ -915,7 +915,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				isFeedback = false
 				isSearch = false
 				isCarousel = false
-				msg = v.NewTextMessage("Привет!\nВыберете команду")
+				msg = v.NewTextMessage("Привет!\nВыбирете команду")
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
 				break
@@ -1009,7 +1009,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
-	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.`
+	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
+	Чтобы начать работу с ботом отправьте боту любое сообщение,например поздароваться с ботом (Hi, Hello, Привет).`
 	return v.NewTextMessage(welcomeMessage)
 }
 
