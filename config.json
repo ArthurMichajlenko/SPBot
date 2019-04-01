@@ -32,7 +32,10 @@
             "username": "spbotbeltsy@gmail.com",
             "password": "UfptnfCG",
             "email_from": "spbotbeltsy@gmail.com",
-            "email_to": "michajlenko1967@outlook.com"
+            "email_to": [
+                "michajlenko1967@outlook.com",
+                "michajlenko1967@gmail.com"
+            ]
         }
     },
     "file_holidays": "holidays.txt",
