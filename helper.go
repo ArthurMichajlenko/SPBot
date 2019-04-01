@@ -15,7 +15,7 @@ import (
 
 	"github.com/jordan-wright/email"
 
-	"github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/Syfaro/telegram-bot-api"
 )
 
 // Config bots configurations.
@@ -78,12 +78,12 @@ type Feedback struct {
 
 // Email botConfig email parameters.
 type Email struct {
-	SMTPServer string `json:"smtp_server"`
-	SMTPPort   string `json:"smtp_port"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	EmailFrom  string `json:"email_from"`
-	EmailTo    string `json:"email_to"`
+	SMTPServer string   `json:"smtp_server"`
+	SMTPPort   string   `json:"smtp_port"`
+	Username   string   `json:"username"`
+	Password   string   `json:"password"`
+	EmailFrom  string   `json:"email_from"`
+	EmailTo    []string `json:"email_to"`
 }
 
 // News from query esp.md.
@@ -166,29 +166,29 @@ func LoadHolidays(file string) ([]Holidays, error) {
 		holiday.Date = time.Date(year, time.Month(mon), day, 0, 0, 0, 0, loc)
 		switch row[1] {
 		case "01":
-			holiday.Month = "Январь"
+			holiday.Month = "января"
 		case "02":
-			holiday.Month = "Февраль"
+			holiday.Month = "февраля"
 		case "03":
-			holiday.Month = "Март"
+			holiday.Month = "марта"
 		case "04":
-			holiday.Month = "Апрель"
+			holiday.Month = "апреля"
 		case "05":
-			holiday.Month = "Май"
+			holiday.Month = "мая"
 		case "06":
-			holiday.Month = "Июнь"
+			holiday.Month = "июня"
 		case "07":
-			holiday.Month = "Июль"
+			holiday.Month = "июля"
 		case "08":
-			holiday.Month = "Август"
+			holiday.Month = "августа"
 		case "09":
-			holiday.Month = "Сентябрь"
+			holiday.Month = "сентября"
 		case "10":
-			holiday.Month = "Октябрь"
+			holiday.Month = "октября"
 		case "11":
-			holiday.Month = "Ноябрь"
+			holiday.Month = "ноября"
 		case "12":
-			holiday.Month = "Декабрь"
+			holiday.Month = "декабря"
 		default:
 			holiday.Month = ""
 		}
@@ -220,7 +220,7 @@ func SubButtons(update *tgbotapi.Update, user *TgUser) tgbotapi.EditMessageReply
 	bt20 := "Вечером"
 	btL := "Последние новости"
 	btT := "Самое популярное"
-	btC := "Городские уведомления"
+	btC := "Городские оповещения"
 	btH := "Календарь праздников"
 	btF := "Продолжить..."
 	if user.Subscribe9 {
@@ -309,7 +309,7 @@ func SendFeedback(subject string, text string, attachmentURLs []string, fileName
 	smtpAuth := smtp.PlainAuth("", botConfig.Feedback.Email.Username, botConfig.Feedback.Email.Password, botConfig.Feedback.Email.SMTPServer)
 	email := email.NewEmail()
 	email.From = botConfig.Feedback.Email.EmailFrom
-	email.To = append(email.To, botConfig.Feedback.Email.EmailTo)
+	email.To = botConfig.Feedback.Email.EmailTo
 	email.Subject = subject
 	email.Text = []byte(text)
 	if attachmentURLs == nil {

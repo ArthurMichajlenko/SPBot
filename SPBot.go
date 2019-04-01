@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Syfaro/telegram-bot-api"
+	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
 	"github.com/robfig/cron"
@@ -97,11 +97,11 @@ func main() {
 	// Standart messages
 	noCmdText := `Извините, я не понял. Попробуйте набрать "/help"`
 	stubMsgText := `_Извините, пока не реализовано_`
-	startMsgText := `Добро пожаловать! Предлагаем Вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как Вам удобно.`
+	startMsgText := `Добро пожаловать! Предлагаем вам подписаться на новости на сайте "СП". Вы сможете настроить рассылку так, как вам удобно.`
 	helpMsgText := `Что я умею:
 	/help - выводит это сообщение.
 	/start - подключение к боту.
-	/subscriptions - управление Вашими подписками.
+	/subscriptions - управление вашими подписками.
 	/alerts - городские оповещения.
 	/top - самое популярное в "СП".
 	/news - последние материалы на сайте "СП".
@@ -110,7 +110,7 @@ func main() {
 	/holidays - календарь праздников.
 	/games - игры.
 	/donate - поддержать "СП".`
-	startMsgEndText := `Спасибо за Ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
+	startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	var ptgUpdates = new(tgbotapi.UpdatesChannel)
 	tgUpdates := *ptgUpdates
@@ -187,7 +187,8 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				srcDate := topItem.Node.NodeDate
+				tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 		}
@@ -196,8 +197,9 @@ func main() {
 	c.AddFunc("0 02 09 * * *", func() {
 		var tgUser []TgUser
 		var news News
+		numPageNews = 0
 		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, 0)
+		news, err := NewsQuery(urlNews, numPageNews)
 		if err != nil {
 			log.Println(err)
 		}
@@ -215,14 +217,20 @@ func main() {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
+			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
+			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+			tgMsg.ReplyMarkup = keyboard
+			tgBot.Send(tgMsg)
 		}
 	})
 	// 20:00 subscribe
 	c.AddFunc("0 02 20 * * *", func() {
 		var tgUser []TgUser
 		var news News
+		numPageNews = 0
 		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, 0)
+		news, err := NewsQuery(urlNews, numPageNews)
 		if err != nil {
 			log.Println(err)
 		}
@@ -240,6 +248,11 @@ func main() {
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
+			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
+			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
+			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
+			tgMsg.ReplyMarkup = keyboard
+			tgBot.Send(tgMsg)
 		}
 	})
 	//City subscribe
@@ -264,15 +277,17 @@ func main() {
 			if (len(citya.Nodes) == 0) && (len(cityd.Nodes) == 0) {
 				tgMsg.Text = ""
 			} else {
-				tgMsg.Text = "Городские новости"
+				tgMsg.Text = "Городские оповещения"
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range citya.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				srcDate := topItem.Node.NodeDate
+				tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 			for _, topItem := range cityd.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+				srcDate := topItem.Node.NodeDate
+				tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 		}
@@ -284,14 +299,15 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			msgHead := "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+			msgHead := "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный Повод\" на ближайшую неделю:\n\n"
 			if noWork {
 				tgMsg.Text = ""
 			} else {
 				tgMsg.Text = msgHead
 				for _, hd := range holidays {
 					if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
-						tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
+						day, _ := strconv.Atoi(hd.Day)
+						tgMsg.Text += "*" + strconv.Itoa(day) + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 					}
 				}
 			}
@@ -439,7 +455,7 @@ func main() {
 						log.Println(err)
 					}
 					if len(search.Nodes) == 0 {
-						tgCbMsg.Text = "По Вашему запросу ничего не найдено"
+						tgCbMsg.Text = "По вашему запросу ничего не найдено"
 						// tgBot.Send(tgCbMsg)
 						multipartSearch = false
 						break
@@ -634,7 +650,7 @@ func main() {
 				bt20 := "Вечером"
 				btL := "Последние новости"
 				btT := "Самое популярное"
-				btC := "Городские уведомления"
+				btC := "Городские оповещения"
 				btH := "Календарь праздников"
 				btF := "Главное меню"
 				db.One("ChatID", tgUpdate.Message.Chat.ID, &tgbUser)
@@ -682,7 +698,7 @@ func main() {
 					*Последние новости* - получать новости сразу по мере их 
 					публикации _(сообщения будут приходить часто)_
 					*Самое популярное* - самые читаемые и комментируемые материалы за 7 дней
-					*Городские уведомления* - предупреждения городских служб, анонсы мероприятий в Бельцах и т.п.
+					*Городские оповещения* - предупреждения городских служб, анонсы мероприятий в Бельцах и т.п.
 					*Календарь праздников* - молдавские, международные и религиозные праздники на ближайшую неделю
 					
 						Для изменения состояния подписки нажмите на 
@@ -697,7 +713,8 @@ func main() {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					srcDate := cityItem.Node.NodeDate
+					tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				urlCity = botConfig.QueryCityAfisha
@@ -706,7 +723,8 @@ func main() {
 					log.Println(err)
 				}
 				for _, cityItem := range city.Nodes {
-					tgMsg.Text = cityItem.Node.NodeDate + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
+					srcDate := cityItem.Node.NodeDate
+					tgMsg.Text = strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3] + "\n[" + cityItem.Node.NodeTitle + "]" + "(" + cityItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
 				tgMsg.Text = "_Оформив подиску на городские оповещения, Вы будете получать сюда предупреждения городских служб, анонсы мероприятий в Бельцах и т.д._"
@@ -721,7 +739,7 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text = "*Самые читаемые*"
+				tgMsg.Text = "*Самые читаемые за последние семь дней*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
@@ -732,13 +750,13 @@ func main() {
 				if err != nil {
 					log.Println(err)
 				}
-				tgMsg.Text = "*Самые комментируемые*"
+				tgMsg.Text = "*Самые комментируемые за последние семь дней*"
 				tgBot.Send(tgMsg)
 				for _, topItem := range top.Nodes {
 					tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать Вам такие подборки каждое воскресенье в 18:00_"
+				tgMsg.Text = "_Хотите подписаться на самое популярное в \"СП\"? Мы будем присылать вам такие подборки каждое воскресенье в 18:00_"
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribetp")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
@@ -754,14 +772,14 @@ func main() {
 					tgMsg.Text = newsItem.Node.NodeDate + "\n[" + newsItem.Node.NodeTitle + "]" + "(" + newsItem.Node.NodePath + ")"
 					tgBot.Send(tgMsg)
 				}
-				tgMsg.Text = "Вы можете подписаться на новости, выполнив комманду /subscriptions"
+				tgMsg.Text = "Вы можете подписаться на новости, выполнив команду /subscriptions"
 				buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
 				keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
 				tgMsg.ReplyMarkup = keyboard
 			case "/search":
 				multipartSearch = true
 				numPageSearch = 0
-				tgMsg.Text = "Введите что искать"
+				tgMsg.Text = "Введите слово или фразу для поиска"
 			case "/feedback":
 				multipartFeedback = true
 				messageOwner.ID = strconv.Itoa(int(tgUpdate.Message.Chat.ID))
@@ -769,18 +787,18 @@ func main() {
 				messageOwner.FirstName = tgUpdate.Message.Chat.FirstName
 				messageOwner.LastName = tgUpdate.Message.Chat.LastName
 				messageDate = tgUpdate.Message.Time()
-				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите Ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
+				tgMsg.Text = "Введите текст сообщения... \n*Внимание:* _Обязательно укажите ваше имя, фамилию и номер телефона (без этого сообщение не будет рассмотрено)_"
 			case "/holidays":
 				if noWork {
 					tgMsg.Text = stubMsgText
 				} else {
-					tgMsg.Text = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный повод\" на ближайшую неделю:\n\n"
+					tgMsg.Text = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный Повод\" на ближайшую неделю:\n\n"
 					for _, hd := range holidays {
 						if (hd.Date.Unix() >= time.Now().AddDate(0, 0, -1).Unix()) && (hd.Date.Unix() <= time.Now().AddDate(0, 0, 7).Unix()) {
 							tgMsg.Text += "*" + hd.Day + " " + hd.Month + "*" + "\n" + hd.Holiday + "\n\n"
 						}
 					}
-					tgMsg.Text += "_Предлагаем Вам подписаться на рассылку праздников. Мы будем присылать Вам даты на неделю каждый понедельник в 10:00_"
+					tgMsg.Text += "_Предлагаем вам подписаться на рассылку праздников. Мы будем присылать вам даты на неделю каждый понедельник в 10:00_"
 					buttonSubscribe := tgbotapi.NewInlineKeyboardButtonData("Подписаться", "subscribehd")
 					buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Нет, спасибо", "help")
 					keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonSubscribe, buttonHelp))
@@ -793,7 +811,7 @@ func main() {
 				tgMsg.ReplyMarkup = keyboard
 				tgMsg.Text = "Выберите игру"
 			case "/donate":
-				tgMsg.Text = `Мы предлагаем поддержать независимую комманду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
+				tgMsg.Text = `Мы предлагаем поддержать независимую команду "СП", подписавшись на нашу газету (печатная или PDF-версии) или сделав финансовый вклад в нашу работу.`
 				buttonSubscribe := tgbotapi.NewInlineKeyboardButtonURL("Подписаться на газету \"СП\"", "http://esp.md/content/podpiska-na-sp")
 				buttonDonate := tgbotapi.NewInlineKeyboardButtonURL("Поддержать \"СП\" материально", "http://esp.md/donate")
 				buttonHelp := tgbotapi.NewInlineKeyboardButtonData("Вернуться в главное меню", "help")
