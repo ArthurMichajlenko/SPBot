@@ -21,8 +21,9 @@ import (
 )
 
 var spColorBG = "#752f35"
+
 // Page number page of results
-var Page            int
+var Page int
 var (
 	isCarousel      bool
 	isFeedback      bool
@@ -96,11 +97,11 @@ type Feedback struct {
 
 // Email botConfig email parameters.
 type Email struct {
-	SMTPServer string `json:"smtp_server"`
-	SMTPPort   string `json:"smtp_port"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	EmailFrom  string `json:"email_from"`
+	SMTPServer string   `json:"smtp_server"`
+	SMTPPort   string   `json:"smtp_port"`
+	Username   string   `json:"username"`
+	Password   string   `json:"password"`
+	EmailFrom  string   `json:"email_from"`
 	EmailTo    []string `json:"email_to"`
 }
 
@@ -311,8 +312,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	holidays - календарь праздников (кнопка "Календарь праздников" главного меню).
 	games - игры (кнопка "Игры" главного меню).
 	donate - поддержать "СП" (кнопка "Поддержи "СП"" главного меню).`
-	startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
-	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
+	// startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".
+	startMsgEndText := `Вы можете отписаться от нашей рассылки в любой момент в меню "subscriptions".`
+	// Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
 	kbMain := v.NewKeyboard("", true)
 	kbMain.DefaultHeight = false
 	btHelp := v.NewTextButton(6, 1, "reply", "help", `<font color="#ffffff">Помощь</font>`)
@@ -392,7 +394,32 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "start":
 			isCarousel = false
 			msg = v.NewTextMessage(startMsgText + "\n" + startMsgEndText)
-			msg.SetKeyboard(kbMain)
+			kbStart := v.NewKeyboard("", false)
+			kbStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "substart", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG))
+			kbStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
+			msg.SetKeyboard(kbStart)
+			v.SendMessage(u.ID, msg)
+		case "substart":
+			isCarousel = false
+			kbSubStart := v.NewKeyboard("", false)
+			db.One("ID", u.ID, &vbbuser)
+			if vbbuser.Subscribe9 {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG))
+			} else {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscr9", subscribe9).SetBgColor(spColorBG))
+			}
+			if vbbuser.Subscribe20 {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscr20", unsubscribe20).SetBgColor(spColorBG))
+			} else {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscr20", subscribe20).SetBgColor(spColorBG))
+			}
+			if vbbuser.SubscribeLast {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscrl", unsubscribeLast).SetBgColor(spColorBG))
+			} else {
+				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscrl", subscribeLast).SetBgColor(spColorBG))
+			}
+			msg = v.NewTextMessage("Выберите подписку:" + "\n" + " Утром -получать дайджест за сутки утром - в 9:00" + "\n" + " Вечером -получать дайджест за сутки вечером - в 20:00" + "\n" + " Последние новости -получать новости сразу по мере их публикации (сообщения будут приходить часто)")
+			msg.SetKeyboard(kbSubStart)
 			v.SendMessage(u.ID, msg)
 		case "subscriptions":
 			isCarousel = false
@@ -586,7 +613,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendTextMessage(u.ID, "Городские оповещения")
 			for _, cityItem := range city.Nodes {
 				srcDate := cityItem.Node.NodeDate
-				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
+				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2]+strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
 				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
@@ -594,7 +621,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			city, err = NewsQuery(urlCity, numPage)
 			for _, cityItem := range city.Nodes {
 				srcDate := cityItem.Node.NodeDate
-				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0] + "." + strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2] + strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
+				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2]+strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
 				msgCarouselCity.AddButton(v.NewImageButton(6, 4, viber.OpenURL, cityItem.Node.NodePath, cityItem.Node.NodeCover["src"]))
 				msgCarouselCity.AddButton(v.NewTextButton(6, 1, viber.OpenURL, cityItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 			}
@@ -1007,17 +1034,20 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
 	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
-	Чтобы начать работу с ботом отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`
-	return v.NewTextMessage(welcomeMessage)
+	Чтобы начать работу с ботом нажмите кнопку "Начать общение" или отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`
+	kb := v.NewKeyboard("", false)
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG))
+	msg := v.NewTextMessage(welcomeMessage)
+	msg.SetKeyboard(kb)
+	return msg
 }
 
 //msgSubscribed call when user subscribe on bot
 func msgSubscribed(v *viber.Viber, u viber.User, token uint64, t time.Time) {
-	subscribeMessage := v.NewTextMessage(`Добро пожаловать! Вы можете подписаться на новости с сайта "СП". Вы сможете настроить рассылку так, как вам нравиться.
-	Более подробно узнать о возможностях бота Вы можете отправив команду "help" или нажав кнопку "Помощь" главного меню`)
+	subscribeMessage := v.NewTextMessage(`Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
+	Чтобы начать работу с ботом нажмите кнопку "Начать общение" или отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`)
 	kb := v.NewKeyboard("", false)
-	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
-	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG).SetSilent())
 	subscribeMessage.SetKeyboard(kb)
 	v.SendMessage(u.ID, subscribeMessage)
 }
