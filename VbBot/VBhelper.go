@@ -700,9 +700,6 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msgCarouselLast241)
 			msgNavig.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Главное меню</font>`).SetBgColor(spColorBG).SetSilent())
 			v.SendMessage(u.ID, msgNavig)
-			if Page == 0 {
-				v.SendTextMessage(u.ID, "Вы можете подписаться на новости, выбрав в главном меню \"Управление подписками\" или набрав команду subscriptions")
-			}
 		case "search":
 			isSearch = true
 			v.SendTextMessage(u.ID, "Введите слово или фразу для поиска")
@@ -1010,7 +1007,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
 	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
-	Чтобы начать работу с ботом отправьте боту любое сообщение,например поздароваться с ботом (Hi, Hello, Привет).`
+	Чтобы начать работу с ботом отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`
 	return v.NewTextMessage(welcomeMessage)
 }
 
