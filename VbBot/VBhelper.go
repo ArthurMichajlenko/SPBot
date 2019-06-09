@@ -205,6 +205,16 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	return holidays, err
 }
 
+//CheckNewsRange check if news date between 24 hours period
+func CheckNewsRange(newsDate string) bool {
+	layout := "02.01.2006 - 15:04MST"
+	t := time.Now()
+	zone, _ := t.Zone()
+	timeNews, _ := time.Parse(layout, newsDate+zone)
+	timeNews = timeNews.Local()
+	return t.After(timeNews.Add(-time.Hour*24)) && t.Before(timeNews)
+}
+
 // LoadConfigBots returns botConfig reading from json file.
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
@@ -876,7 +886,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgCarouselGames := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselGames1 := v.NewRichMediaMessage(6, 7, spColorBG)
 			if txt == "games" {
-				msg := v.NewTextMessage("Выбирите игру")
+				msg := v.NewTextMessage("Выберите игру")
 				kb := v.NewKeyboard("#ffffff", false)
 				kb.AddButton(v.NewTextButton(3, 2, viber.Reply, "games10", `<font color="#ffffff">Последние 10</font>`).SetBgColor(spColorBG).SetSilent())
 				kb.AddButton(v.NewTextButton(3, 2, viber.Reply, "games1rand", `<font color="#ffffff">Случайная</font>`).SetBgColor(spColorBG).SetSilent())
@@ -931,7 +941,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isFeedback = false
 			isSearch = false
 			isCarousel = false
-			msg = v.NewTextMessage("Выбирете команду")
+			msg = v.NewTextMessage("Выберите команду")
 			msg.SetKeyboard(kbMain)
 			v.SendMessage(u.ID, msg)
 		case "hi", "hello", "хай", "привет", "рш", "руддщ":
@@ -939,7 +949,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				isFeedback = false
 				isSearch = false
 				isCarousel = false
-				msg = v.NewTextMessage("Привет!\nВыбирете команду")
+				msg = v.NewTextMessage("Привет!\nВыберите команду")
 				msg.SetKeyboard(kbMain)
 				v.SendMessage(u.ID, msg)
 				break
@@ -1034,7 +1044,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
 	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
-	Чтобы начать работу с ботом нажмите кнопку "Начать общение" или отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`
+	Чтобы начать работу с ботом, нажмите кнопку "Начать общение" или отправьте боту любое сообщение, например, поздоровайтесь с ботом (Hi, Hello, Привет).`
 	kb := v.NewKeyboard("", false)
 	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG))
 	msg := v.NewTextMessage(welcomeMessage)

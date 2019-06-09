@@ -214,6 +214,9 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
+				if !CheckNewsRange(topItem.Node.NodeDate) {
+					break
+				}
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
@@ -245,6 +248,9 @@ func main() {
 			}
 			tgBot.Send(tgMsg)
 			for _, topItem := range news.Nodes {
+				if !CheckNewsRange(topItem.Node.NodeDate) {
+					break
+				}
 				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
