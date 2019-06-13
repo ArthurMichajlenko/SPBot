@@ -214,16 +214,28 @@ func main() {
 	})
 	//09:00 subscribe
 	c.AddFunc("0 02 09 * * *", func() {
+		Page = 0
 		var vbbusers []VbUser
 		var lastNews News
-		Page = 0
-		urlLast := botConfig.QueryNews24H
-		lastNews, err = NewsQuery(urlLast, Page)
-		if err != nil {
-			log.Println(err)
-		}
-		if len(lastNews.Nodes) == 0 {
-			return
+		var rangeNews []NodeNews
+	NewsBreak:
+		for {
+			urlLast := botConfig.QueryNews24H
+			lastNews, err = NewsQuery(urlLast, Page)
+			if err != nil {
+				log.Println(err)
+			}
+			if len(lastNews.Nodes) == 0 {
+				return
+			}
+			for _, itemRangeNews := range lastNews.Nodes {
+				if CheckNewsRange(itemRangeNews.Node.NodeDate) {
+					rangeNews = append(rangeNews, itemRangeNews.Node)
+				} else {
+					break NewsBreak
+				}
+			}
+			Page++
 		}
 		db, err := storm.Open("vbuser.db")
 		if err != nil {
@@ -232,23 +244,22 @@ func main() {
 		defer db.Close()
 		db.Find("Subscribe9", true, &vbbusers)
 		for _, subUser := range vbbusers {
+			// var rangeMsgCarousel []*viber.RichMediaMessage
+			// rangeMsgCarousel=append(rangeMsgCarousel,vb.NewRichMediaMessage(6,7,spColorBG))
 			msgCarouselNews := vb.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselNews1 := vb.NewRichMediaMessage(6, 7, spColorBG)
 			msgNavig := vb.NewRichMediaMessage(6, 3, "#ffffff")
-			msgNavig.AddButton(vb.NewTextButton(6, 2, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
+			// msgNavig.AddButton(vb.NewTextButton(6, 2, viber.Reply, "newsnext", `<font color="#ffffff">Вперед</font>`).SetBgColor(spColorBG).SetSilent())
 			vb.SendTextMessage(subUser.ID, "Материалы за последние сутки")
-			for i, newsItem := range lastNews.Nodes {
-				if !CheckNewsRange(newsItem.Node.NodeDate) {
-					break
-				}
+			for i, newsItem := range rangeNews {
 				if i < 5 {
-					msgCarouselNews.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeDate+"\n"+newsItem.Node.NodeTitle))
-					msgCarouselNews.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
-					msgCarouselNews.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					msgCarouselNews.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.NodePath, newsItem.NodeDate+"\n"+newsItem.NodeTitle))
+					msgCarouselNews.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.NodePath, newsItem.NodeCover["src"]))
+					msgCarouselNews.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 				} else {
-					msgCarouselNews1.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeDate+"\n"+newsItem.Node.NodeTitle))
-					msgCarouselNews1.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.Node.NodePath, newsItem.Node.NodeCover["src"]))
-					msgCarouselNews1.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.Node.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
+					msgCarouselNews1.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, newsItem.NodePath, newsItem.NodeDate+"\n"+newsItem.NodeTitle))
+					msgCarouselNews1.AddButton(vb.NewImageButton(6, 4, viber.OpenURL, newsItem.NodePath, newsItem.NodeCover["src"]))
+					msgCarouselNews1.AddButton(vb.NewTextButton(6, 1, viber.OpenURL, newsItem.NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
 				}
 			}
 			vb.SendMessage(subUser.ID, msgCarouselNews)
