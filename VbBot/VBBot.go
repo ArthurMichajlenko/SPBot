@@ -65,8 +65,8 @@ func main() {
 	http.Handle("/", vb)
 	log.Println("Hello, I am ", vAccount.Name)
 	// For development ListenAndServe, for work ListenAndServeTLS
-	go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
-	// go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), botConfig.Bots.Viber.VBPathCERT, botConfig.Bots.Viber.VBPathKey, nil)
+	// go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
+	go http.ListenAndServeTLS("0.0.0.0:"+strconv.Itoa(botConfig.Bots.Viber.VBPort), botConfig.Bots.Viber.VBPathCERT, botConfig.Bots.Viber.VBPathKey, nil)
 	webHookResp, err := vb.SetWebhook(botConfig.Bots.Viber.VBWebhook+":"+strconv.Itoa(botConfig.Bots.Viber.VBPort), nil)
 	if err != nil {
 		log.Println("WebHook error=> ", err)
