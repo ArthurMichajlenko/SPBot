@@ -195,13 +195,25 @@ func main() {
 	})
 	// 9:00 subscribe
 	c.AddFunc("0 02 09 * * *", func() {
+		numPageNews = 0
 		var tgUser []TgUser
 		var news News
-		numPageNews = 0
-		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, numPageNews)
-		if err != nil {
-			log.Println(err)
+		var rangeNews []NodeNews
+	NewsBreak:
+		for {
+			urlNews := botConfig.QueryNews24H
+			news, err := NewsQuery(urlNews, numPageNews)
+			if err != nil {
+				log.Println(err)
+			}
+			for _, itemRangeNews := range news.Nodes {
+				if CheckNewsRange(itemRangeNews.Node.NodeDate) {
+					rangeNews = append(rangeNews, itemRangeNews.Node)
+				} else {
+					break NewsBreak
+				}
+			}
+			numPageNews++
 		}
 		db.Find("Subscribe9", true, &tgUser)
 		for _, subUser := range tgUser {
@@ -213,26 +225,38 @@ func main() {
 				tgMsg.Text = "Материалы за последние сутки"
 			}
 			tgBot.Send(tgMsg)
-			for _, topItem := range news.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+			for _, topItem := range rangeNews {
+				if !CheckNewsRange(topItem.NodeDate) {
+					break
+				}
+				tgMsg.Text = topItem.NodeDate + "\n[" + topItem.NodeTitle + "]" + "(" + topItem.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
-			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
-			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
-			tgMsg.ReplyMarkup = keyboard
 			tgBot.Send(tgMsg)
 		}
 	})
 	// 20:00 subscribe
 	c.AddFunc("0 02 20 * * *", func() {
+		numPageNews = 0
 		var tgUser []TgUser
 		var news News
-		numPageNews = 0
-		urlNews := botConfig.QueryNews24H
-		news, err := NewsQuery(urlNews, numPageNews)
-		if err != nil {
-			log.Println(err)
+		var rangeNews []NodeNews
+	NewsBreak:
+		for {
+			urlNews := botConfig.QueryNews24H
+			news, err := NewsQuery(urlNews, numPageNews)
+			if err != nil {
+				log.Println(err)
+			}
+			for _, itemRangeNews := range news.Nodes {
+				if CheckNewsRange(itemRangeNews.Node.NodeDate) {
+					rangeNews = append(rangeNews, itemRangeNews.Node)
+				} else {
+					break NewsBreak
+				}
+			}
+			numPageNews++
 		}
 		db.Find("Subscribe20", true, &tgUser)
 		for _, subUser := range tgUser {
@@ -244,14 +268,14 @@ func main() {
 				tgMsg.Text = "Материалы за последние сутки"
 			}
 			tgBot.Send(tgMsg)
-			for _, topItem := range news.Nodes {
-				tgMsg.Text = topItem.Node.NodeDate + "\n[" + topItem.Node.NodeTitle + "]" + "(" + topItem.Node.NodePath + ")"
+			for _, topItem := range rangeNews {
+				if !CheckNewsRange(topItem.NodeDate) {
+					break
+				}
+				tgMsg.Text = topItem.NodeDate + "\n[" + topItem.NodeTitle + "]" + "(" + topItem.NodePath + ")"
 				tgBot.Send(tgMsg)
 			}
 			tgMsg.Text = "Вы можете управлять подпиской, выполнив команду /subscriptions"
-			buttonNewsNext := tgbotapi.NewInlineKeyboardButtonData("Следующие 10 новостей", "newsnext")
-			keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(buttonNewsNext))
-			tgMsg.ReplyMarkup = keyboard
 			tgBot.Send(tgMsg)
 		}
 	})
