@@ -205,7 +205,7 @@ func CheckNewsRange(newsDate string) bool {
 	zone, _ := t.Zone()
 	timeNews, _ := time.Parse(layout, newsDate+zone)
 	timeNews = timeNews.Local()
-	return t.After(timeNews.Add(-time.Hour*24)) && t.Before(timeNews)
+	return timeNews.After(t.Add(-time.Hour*24)) && timeNews.Before(t)
 }
 
 // LoadConfigBots returns botConfig reading from json file.
