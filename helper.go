@@ -198,6 +198,16 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	return holidays, err
 }
 
+//CheckNewsRange check if news date between 24 hours period
+func CheckNewsRange(newsDate string) bool {
+	layout := "02.01.2006 - 15:04MST"
+	t := time.Now()
+	zone, _ := t.Zone()
+	timeNews, _ := time.Parse(layout, newsDate+zone)
+	timeNews = timeNews.Local()
+	return timeNews.After(t.Add(-time.Hour*24)) && timeNews.Before(t)
+}
+
 // LoadConfigBots returns botConfig reading from json file.
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config

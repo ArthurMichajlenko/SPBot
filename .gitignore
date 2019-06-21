@@ -24,3 +24,4 @@ VbBot
 !/VbBot
 .DS_Store
 VbBot/vbuser.db
+VbBot/__debug_bin
