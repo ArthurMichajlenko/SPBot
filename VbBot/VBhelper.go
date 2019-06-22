@@ -436,19 +436,19 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			kbSub := v.NewKeyboard("", false)
 			db.One("ID", u.ID, &vbbuser)
 			if vbbuser.Subscribe9 {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", subscribe9).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", subscribe9).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.Subscribe20 {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", unsubscribe20).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", unsubscribe20).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", subscribe20).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr20", subscribe20).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.SubscribeLast {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", unsubscribeLast).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", unsubscribeLast).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", subscribeLast).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrl", subscribeLast).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.SubscribeCity {
 				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrc", unsubscribeCity).SetBgColor(spColorBG).TextSizeSmall())
@@ -456,9 +456,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrc", subscribeCity).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.SubscribeTop {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", unsubscribeTop).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", unsubscribeTop).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
-				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", subscribeTop).SetBgColor(spColorBG))
+				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrt", subscribeTop).SetBgColor(spColorBG).TextSizeSmall())
 			}
 			if vbbuser.SubscribeHolidays {
 				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscrh", unsubscribeHolidays).SetBgColor(spColorBG).TextSizeSmall())

@@ -202,9 +202,12 @@ func main() {
 	NewsBreak:
 		for {
 			urlNews := botConfig.QueryNews24H
-			news, err := NewsQuery(urlNews, numPageNews)
+			news, err = NewsQuery(urlNews, numPageNews)
 			if err != nil {
 				log.Println(err)
+			}
+			if len(news.Nodes) == 0 {
+				return
 			}
 			for _, itemRangeNews := range news.Nodes {
 				if CheckNewsRange(itemRangeNews.Node.NodeDate) {
@@ -219,11 +222,7 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if len(news.Nodes) == 0 {
-				tgMsg.Text = ""
-			} else {
-				tgMsg.Text = "Материалы за последние сутки"
-			}
+			tgMsg.Text = "Материалы за последние сутки"
 			tgBot.Send(tgMsg)
 			for _, topItem := range rangeNews {
 				if !CheckNewsRange(topItem.NodeDate) {
@@ -245,9 +244,12 @@ func main() {
 	NewsBreak:
 		for {
 			urlNews := botConfig.QueryNews24H
-			news, err := NewsQuery(urlNews, numPageNews)
+			news, err = NewsQuery(urlNews, numPageNews)
 			if err != nil {
 				log.Println(err)
+			}
+			if len(news.Nodes) == 0 {
+				return
 			}
 			for _, itemRangeNews := range news.Nodes {
 				if CheckNewsRange(itemRangeNews.Node.NodeDate) {
@@ -262,11 +264,7 @@ func main() {
 		for _, subUser := range tgUser {
 			tgMsg := tgbotapi.NewMessage(subUser.ChatID, "")
 			tgMsg.ParseMode = "Markdown"
-			if len(news.Nodes) == 0 {
-				tgMsg.Text = ""
-			} else {
-				tgMsg.Text = "Материалы за последние сутки"
-			}
+			tgMsg.Text = "Материалы за последние сутки"
 			tgBot.Send(tgMsg)
 			for _, topItem := range rangeNews {
 				if !CheckNewsRange(topItem.NodeDate) {
