@@ -405,7 +405,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			isCarousel = false
 			msg = v.NewTextMessage(startMsgText + "\n" + startMsgEndText)
 			kbStart := v.NewKeyboard("", false)
-			kbStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "substart", `<font color="#ffffff">Подписаться</font>`).SetBgColor(spColorBG))
+			kbStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "substart", `<font color="#ffffff">Подписаться на новостную рассылку</font>`).SetBgColor(spColorBG).TextSizeSmall())
 			kbStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
 			msg.SetKeyboard(kbStart)
 			v.SendMessage(u.ID, msg)
@@ -1043,10 +1043,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 
 //msgConversationStarted call when user opens conversation
 func msgConversationStarted(v *viber.Viber, u viber.User, conversationType string, context string, subscribed bool, token uint64, t time.Time) viber.Message {
-	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
-	Чтобы начать работу с ботом, нажмите кнопку "Начать общение" или отправьте боту любое сообщение, например, поздоровайтесь с ботом (Hi, Hello, Привет).`
+	welcomeMessage := `Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.`
 	kb := v.NewKeyboard("", false)
-	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG))
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "substart", `<font color="#ffffff">Подписаться на новостную рассылку</font>`).SetBgColor(spColorBG).TextSizeSmall())
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
+	// kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG))
 	msg := v.NewTextMessage(welcomeMessage)
 	msg.SetKeyboard(kb)
 	return msg
@@ -1054,10 +1055,11 @@ func msgConversationStarted(v *viber.Viber, u viber.User, conversationType strin
 
 //msgSubscribed call when user subscribe on bot
 func msgSubscribed(v *viber.Viber, u viber.User, token uint64, t time.Time) {
-	subscribeMessage := v.NewTextMessage(`Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.
-	Чтобы начать работу с ботом нажмите кнопку "Начать общение" или отправьте боту любое сообщение,например поздоровайтесь с ботом (Hi, Hello, Привет).`)
+	subscribeMessage := v.NewTextMessage(`Здравствуйте! Подключайтесь к новостному боту "СП" - умному ассистенту, который поможет вам получать полезную и важную информацию в телефоне удобным для вас образом.`)
 	kb := v.NewKeyboard("", false)
-	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG).SetSilent())
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "substart", `<font color="#ffffff">Подписаться на новостную рассылку</font>`).SetBgColor(spColorBG).TextSizeSmall())
+	kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "menu", `<font color="#ffffff">Нет, спасибо</font>`).SetBgColor(spColorBG))
+	// kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "start", `<font color="#ffffff">Начать общение</font>`).SetBgColor(spColorBG).SetSilent())
 	subscribeMessage.SetKeyboard(kb)
 	v.SendMessage(u.ID, subscribeMessage)
 }
