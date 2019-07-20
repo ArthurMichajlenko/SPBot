@@ -53,7 +53,7 @@ func main() {
 		log.SetOutput(logfile)
 	}
 	// Start webhook
-	vb := viber.New(botConfig.Bots.Viber.VBApikey, "SPBeta", "")
+	vb := viber.New(botConfig.Bots.Viber.VBApikey, "Новостной бот СП", "")
 	vAccount, err := vb.AccountInfo()
 	if err != nil {
 		log.Println(err)
