@@ -659,6 +659,45 @@ func main() {
 			}
 			msgSlice := strings.Split(tgUpdate.Message.Text, " ")
 			switch strings.ToLower(msgSlice[0]) {
+			case "/stat":
+				tgMsg.Text = "Statistics\n"
+				var tgUsers []TgUser
+				err := db.All(&tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "Количество зарегистрированных: " + strconv.Itoa(len(tgUsers))
+				tgMsg.Text += "\nПодписки:"
+				err = db.Find("SubscribeLast", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nПоследние новости (ежечасно): " + strconv.Itoa(len(tgUsers))
+				err = db.Find("Subscribe9", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nНовости за сутки в 9:00: " + strconv.Itoa(len(tgUsers))
+				err = db.Find("Subscribe20", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nНовости за сутки в 20:00: " + strconv.Itoa(len(tgUsers))
+				err = db.Find("SubscribeCity", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nГородские оповещения: " + strconv.Itoa(len(tgUsers))
+				err = db.Find("SubscribeTop", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nСамое популярное: " + strconv.Itoa(len(tgUsers))
+				err = db.Find("SubscribeHolidays", true, &tgUsers)
+				if err != nil {
+					log.Println(err)
+				}
+				tgMsg.Text += "\nКалендарь праздников: " + strconv.Itoa(len(tgUsers))
 			case "/help":
 				tgMsg.Text = helpMsgText
 			case "/start":
