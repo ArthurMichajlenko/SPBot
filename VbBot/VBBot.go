@@ -179,14 +179,14 @@ func main() {
 		urlLast := botConfig.QueryNews1H
 		lastNews, err = NewsQuery(urlLast, 0)
 		if err != nil {
-			log.Println(err)
+			log.Println("Query: ",err)
 		}
 		if len(lastNews.Nodes) == 0 {
 			return
 		}
 		db, err := storm.Open("vbuser.db")
 		if err != nil {
-			log.Println(err)
+			log.Println("Database: ",err)
 		}
 		defer db.Close()
 		db.Find("SubscribeLast", true, &vbbusers)
