@@ -214,7 +214,7 @@ func main() {
 		}
 	})
 	//09:00 subscribe
-	c.AddFunc("0 02 09 * * *", func() {
+	c.AddFunc("0 03 09 * * *", func() {
 		Page = 0
 		var vbbusers []VbUser
 		var lastNews News
@@ -277,7 +277,7 @@ func main() {
 		}
 	})
 	//20:00 subscribe
-	c.AddFunc("0 02 20 * * *", func() {
+	c.AddFunc("0 03 20 * * *", func() {
 		Page = 0
 		var vbbusers []VbUser
 		var lastNews News
