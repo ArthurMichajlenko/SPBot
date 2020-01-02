@@ -21,7 +21,8 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
-	"github.com/robfig/cron"
+	// "github.com/robfig/cron"
+	"gopkg.in/robfig/cron.v2"
 
 	"github.com/fsnotify/fsnotify"
 
