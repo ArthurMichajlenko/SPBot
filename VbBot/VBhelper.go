@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/asdine/storm"
+	// "github.com/asdine/storm"
 
 	"github.com/jordan-wright/email"
 	"github.com/mileusna/viber"
@@ -384,12 +384,12 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	<b><i>Отписаться</i></b></font>`
 	//Bolt
 	var vbbuser VbUser
-	db, err := storm.Open("vbuser.db")
-	if err != nil {
-		log.Println(err)
-	}
-	defer db.Close()
-	db.Init(&vbbuser)
+	// Db, err := storm.Open("vbuser.db")
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// defer Db.Close()
+	// Db.Init(&vbbuser)
 	//Received messages loop
 	switch m.(type) {
 	case *viber.TextMessage:
@@ -412,7 +412,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "substart":
 			isCarousel = false
 			kbSubStart := v.NewKeyboard("", false)
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if vbbuser.Subscribe9 {
 				kbSubStart.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG))
 			} else {
@@ -434,7 +434,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "subscriptions":
 			isCarousel = false
 			kbSub := v.NewKeyboard("", false)
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if vbbuser.Subscribe9 {
 				kbSub.AddButton(v.NewTextButton(3, 1, viber.Reply, "subscr9", unsubscribe9).SetBgColor(spColorBG).TextSizeSmall())
 			} else {
@@ -470,7 +470,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msg.SetKeyboard(kbSub)
 			v.SendMessage(u.ID, msg)
 		case "subscr9", "conform9":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscr9" {
 				msg := v.NewTextMessage("Получать дайджест за сутки - утром в 9:00")
 				kb := v.NewKeyboard("", false)
@@ -484,7 +484,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				sub9 := !vbbuser.Subscribe9
-				db.UpdateField(&vbbuser, "Subscribe9", sub9)
+				Db.UpdateField(&vbbuser, "Subscribe9", sub9)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -493,7 +493,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			}
 		case "subscr20", "conform20":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscr20" {
 				msg := v.NewTextMessage("Получать дайджест за сутки - вечером в 20:00")
 				kb := v.NewKeyboard("", false)
@@ -507,7 +507,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				sub20 := !vbbuser.Subscribe20
-				db.UpdateField(&vbbuser, "Subscribe20", sub20)
+				Db.UpdateField(&vbbuser, "Subscribe20", sub20)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -516,7 +516,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			}
 		case "subscrl", "conforml":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscrl" {
 				msg := v.NewTextMessage("Получать новости по мере их публикации.\nСообщения будут приходить часто.")
 				kb := v.NewKeyboard("", false)
@@ -530,7 +530,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				subL := !vbbuser.SubscribeLast
-				db.UpdateField(&vbbuser, "SubscribeLast", subL)
+				Db.UpdateField(&vbbuser, "SubscribeLast", subL)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -539,7 +539,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			}
 		case "subscrc", "conformc":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscrc" {
 				msg := v.NewTextMessage("Городские оповещения.")
 				kb := v.NewKeyboard("", false)
@@ -553,7 +553,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				subC := !vbbuser.SubscribeCity
-				db.UpdateField(&vbbuser, "SubscribeCity", subC)
+				Db.UpdateField(&vbbuser, "SubscribeCity", subC)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -562,7 +562,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			}
 		case "subscrt", "conformt":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscrt" {
 				msg := v.NewTextMessage("Самое популярное.")
 				kb := v.NewKeyboard("", false)
@@ -576,7 +576,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				subT := !vbbuser.SubscribeTop
-				db.UpdateField(&vbbuser, "SubscribeTop", subT)
+				Db.UpdateField(&vbbuser, "SubscribeTop", subT)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -585,7 +585,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			}
 		case "subscrh", "conformh":
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			if txt == "subscrh" {
 				msg := v.NewTextMessage("Календарь праздников.")
 				kb := v.NewKeyboard("", false)
@@ -599,7 +599,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				v.SendMessage(u.ID, msg)
 			} else {
 				subH := !vbbuser.SubscribeHolidays
-				db.UpdateField(&vbbuser, "SubscribeHolidays", subH)
+				Db.UpdateField(&vbbuser, "SubscribeHolidays", subH)
 				msg := v.NewTextMessage("Спасибо")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "subscriptions", `<font color="#ffffff">Просмотреть подписки</font>`).SetBgColor(spColorBG).SetSilent())
@@ -612,7 +612,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgCarouselCity := v.NewRichMediaMessage(6, 7, spColorBG)
 			var city News
 			numPage := 0
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			var msgText string
 			kb := v.NewKeyboard("", false)
 			urlCity := botConfig.QueryCityDisp
@@ -652,7 +652,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			msgCarouselView := v.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselComment := v.NewRichMediaMessage(6, 7, spColorBG)
 			var top News
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			var msgText string
 			kb := v.NewKeyboard("", false)
 			urlTop := botConfig.QueryTopViews
@@ -859,7 +859,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		case "holidays":
 			isCarousel = false
 			var msgText string
-			db.One("ID", u.ID, &vbbuser)
+			Db.One("ID", u.ID, &vbbuser)
 			kb := v.NewKeyboard("", false)
 			if NoWork {
 				msgText = "Извините. Пока не доступно."
@@ -1024,9 +1024,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		}
 		v.SendMessage(u.ID, msg)
 	}
-	err = db.One("ID", u.ID, &vbbuser)
+	err := Db.One("ID", u.ID, &vbbuser)
 	if err == nil {
-		db.UpdateField(&vbbuser, "LastDate", t)
+		Db.UpdateField(&vbbuser, "LastDate", t)
 	} else {
 		vbbuser.ID = u.ID
 		vbbuser.Username = u.Name
@@ -1037,7 +1037,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		vbbuser.SubscribeCity = false
 		vbbuser.SubscribeTop = false
 		vbbuser.SubscribeHolidays = false
-		db.Save(&vbbuser)
+		Db.Save(&vbbuser)
 	}
 }
 

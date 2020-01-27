@@ -2,18 +2,19 @@
     "bots": {
         "telegram": {
             "tg_apikey": "579669561:AAFMhNNt7L4HnDNEgPEU3rqrYmHZ3lWpJAo",
-            "tg_webhook": "https://dev.infinitloop.md",
+            "tg_webhook": "https://bot.esp.md/",
             "tg_port": 8443,
-            "tg_path_cert": "/etc/letsencrypt/live/dev.infinitloop.md/fullchain.pem",
-            "tg_path_key": "/etc/letsencrypt/live/dev.infinitloop.md/privkey.pem",
+            "tg_path_cert": "/home/espbot/conf/web/ssl.bot.esp.md.pem",
+            "tg_path_key": "/home/espbot/conf/web/ssl.bot.esp.md.key",
             "log_file": "tgbot.log"
         },
-        "facebook": {
-            "fb_apikey": "321",
-            "fb_webhook": "https://dev.infinitloop.md",
-            "fb_port": 8443,
-            "fb_path_cert": "",
-            "fb_path_key": ""
+        "viber": {
+            "vb_apikey": "4a0397557b67d28c-554a9aacd32110f1-f8e22fb7c91bc370",
+            "vb_webhook": "https://bot.esp.md/",
+            "vb_port": 8444,
+            "vb_path_cert": "/home/espbot/conf/web/ssl.bot.esp.md.pem",
+            "vb_path_key": "/home/espbot/conf/web/ssl.bot.esp.md.key",
+            "log_file": "vbbot.log"
         }
     },
     "feedback": {

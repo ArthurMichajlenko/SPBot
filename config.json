@@ -33,8 +33,8 @@
             "password": "UfptnfCG",
             "email_from": "spbotbeltsy@gmail.com",
             "email_to": [
-                "michajlenko1967@outlook.com",
-                "michajlenko1967@gmail.com"
+                "citatel@esp.md",
+                "artur@infinitloop.md"
             ]
         }
     },
@@ -47,5 +47,5 @@
     "query_city_disp": "http://esp.md/bot-news/lasthour/dispetcherskaya?page=",
     "query_city_afisha": "http://esp.md/bot-news/lasthour/afisha?page=",
     "query_games": "http://esp.md/bot-news/games?page=",
-    "debug": true
+    "debug": false
 }

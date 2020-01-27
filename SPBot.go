@@ -24,7 +24,9 @@ import (
 	tgbotapi "github.com/Syfaro/telegram-bot-api"
 	"github.com/asdine/storm"
 	"github.com/fsnotify/fsnotify"
-	"github.com/robfig/cron"
+	// "github.com/robfig/cron"
+	"gopkg.in/robfig/cron.v2"
+
 )
 
 var (
