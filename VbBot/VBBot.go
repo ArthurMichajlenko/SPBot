@@ -35,9 +35,25 @@ var (
 	NoWork = false
 	//HolidayList slice of holidays
 	HolidayList []Holidays
+	//Db Bolt database with users
+	Db *storm.DB
 )
 
+func init() {
+	var err error
+	var vbbuser VbUser
+	Db, err = storm.Open("vbuser.db")
+	if err != nil {
+		log.Println(err)
+	}
+	err = Db.Init(&vbbuser)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func main() {
+	defer Db.Close()
 	// Load botConfig
 	var err error
 	botConfig, err = LoadConfigBots("config.json")
@@ -118,12 +134,12 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println(err)
-		}
-		defer db.Close()
-		db.Find("SubscribeTop", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println(err)
+		// }
+		// defer Db.Close()
+		Db.Find("SubscribeTop", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			msgCarouselComment := vb.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselView := vb.NewRichMediaMessage(6, 7, spColorBG)
@@ -153,12 +169,12 @@ func main() {
 		if NoWork {
 			return
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println(err)
-		}
-		defer db.Close()
-		db.Find("SubscribeHolidays", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println(err)
+		// }
+		// defer Db.Close()
+		Db.Find("SubscribeHolidays", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			msgText = "Молдавские, международные и религиозные праздники из нашего календаря	\"Существенный Повод\" на ближайшую неделю:\n\n"
 			for _, hd := range HolidayList {
@@ -180,17 +196,17 @@ func main() {
 		urlLast := botConfig.QueryNews1H
 		lastNews, err = NewsQuery(urlLast, 0)
 		if err != nil {
-			log.Println("Query: ",err)
+			log.Println("Query: ", err)
 		}
 		if len(lastNews.Nodes) == 0 {
 			return
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println("Database: ",err)
-		}
-		defer db.Close()
-		db.Find("SubscribeLast", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println("Database: ", err)
+		// }
+		// defer Db.Close()
+		Db.Find("SubscribeLast", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			msgCarouselNews := vb.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselNews1 := vb.NewRichMediaMessage(6, 7, spColorBG)
@@ -239,12 +255,12 @@ func main() {
 			}
 			Page++
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println(err)
-		}
-		defer db.Close()
-		db.Find("Subscribe9", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println(err)
+		// }
+		// defer Db.Close()
+		Db.Find("Subscribe9", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			var rangeMsgCarousel []*viber.RichMediaMessage
 			msgNavig := vb.NewRichMediaMessage(6, 2, "#ffffff")
@@ -302,12 +318,12 @@ func main() {
 			}
 			Page++
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println(err)
-		}
-		defer db.Close()
-		db.Find("Subscribe20", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println(err)
+		// }
+		// defer Db.Close()
+		Db.Find("Subscribe20", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			var rangeMsgCarousel []*viber.RichMediaMessage
 			msgNavig := vb.NewRichMediaMessage(6, 2, "#ffffff")
@@ -358,12 +374,12 @@ func main() {
 		if (len(cityA.Nodes) == 0) && (len(cityD.Nodes) == 0) {
 			return
 		}
-		db, err := storm.Open("vbuser.db")
-		if err != nil {
-			log.Println(err)
-		}
-		defer db.Close()
-		db.Find("SubscribeCity", true, &vbbusers)
+		// Db, err := storm.Open("vbuser.db")
+		// if err != nil {
+		// 	log.Println(err)
+		// }
+		// defer Db.Close()
+		Db.Find("SubscribeCity", true, &vbbusers)
 		for _, subUser := range vbbusers {
 			msgCarouselCityA := vb.NewRichMediaMessage(6, 7, spColorBG)
 			msgCarouselCityD := vb.NewRichMediaMessage(6, 7, spColorBG)
