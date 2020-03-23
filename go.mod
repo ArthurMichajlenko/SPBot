@@ -9,9 +9,9 @@ require (
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible // indirect
-	github.com/golang/protobuf v1.3.4 // indirect
+	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/jordan-wright/email v0.0.0-20200307200233-de844847de93
+	github.com/jordan-wright/email v0.0.0-20200322182553-8eef2508c362
 	github.com/mileusna/viber v0.0.0-20180604154358-b816488ead81
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
