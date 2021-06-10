@@ -39,11 +39,11 @@ func main() {
 	var tgusers []TgUser
 	var vbusers []VbUser
 	log.Println("Start...")
-	dbTg, err := storm.Open("tguser.db")
+	dbTg, err := storm.Open("tguser_b.db")
 	if err != nil {
 		log.Println(err)
 	}
-	dbVb, err := storm.Open("vbuser.db")
+	dbVb, err := storm.Open("vbuser_b.db")
 	if err != nil {
 		log.Println(err)
 	}
@@ -57,7 +57,9 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println("Telegram")
 	log.Println(tgusers)
+	log.Println("Viber")
 	log.Println(vbusers)
 
 }
