@@ -151,10 +151,10 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	var holiday Holidays
 	var row []string
 	holidaysFile, err := os.Open(file)
-	defer holidaysFile.Close()
 	if err != nil {
 		return holidays, err
 	}
+	defer holidaysFile.Close()
 	scanner := bufio.NewScanner(holidaysFile)
 	for scanner.Scan() {
 		row = strings.Split(scanner.Text(), "|")
@@ -212,10 +212,10 @@ func CheckNewsRange(newsDate string) bool {
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
 	configFile, err := os.Open(file)
-	defer configFile.Close()
 	if err != nil {
 		log.Panic(err)
 	}
+	defer configFile.Close()
 	jsonParse := json.NewDecoder(configFile)
 	err = jsonParse.Decode(&botsconfig)
 	if err != nil {
