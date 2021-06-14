@@ -114,8 +114,9 @@ func main() {
 	/donate - поддержать "СП".`
 	startMsgEndText := `Спасибо за ваш выбор! Вы можете отписаться от нашей рассылки в любой момент в меню /subscriptions.
 	Взгляните на весь список команд, с помощью которых Вы можете управлять возможностями нашего бота.` + "\n" + helpMsgText
-	var ptgUpdates = new(tgbotapi.UpdatesChannel)
-	tgUpdates := *ptgUpdates
+	// var ptgUpdates = new(tgbotapi.UpdatesChannel)
+	// tgUpdates := *ptgUpdates
+	var tgUpdates tgbotapi.UpdatesChannel
 	if botConfig.Bots.Telegram.TgWebhook == "" {
 		// Initialize polling
 		tgBot.RemoveWebhook()
@@ -649,7 +650,7 @@ func main() {
 				continue
 			}
 			//Simple Message Handler
-			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, "")
+			tgMsg := tgbotapi.NewMessage(tgUpdate.Message.Chat.ID, " ")
 			tgMsg.ParseMode = "Markdown"
 			// If no command say to User
 			if !tgUpdate.Message.IsCommand() && !multipartFeedback && !multipartSearch {
