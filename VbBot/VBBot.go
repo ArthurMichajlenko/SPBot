@@ -141,8 +141,8 @@ func main() {
 		// defer Db.Close()
 		Db.Find("SubscribeTop", true, &vbbusers)
 		for _, subUser := range vbbusers {
-			msgCarouselComment := vb.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselView := vb.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselComment := vb.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselView := vb.NewRichMediaMessage(6, 7, spColorBGOp)
 			vb.SendTextMessage(subUser.ID, "Самые читаемые за последние семь дней")
 			for _, topItem := range topv.Nodes {
 				msgCarouselView.AddButton(vb.NewTextButton(6, 2, viber.OpenURL, topItem.Node.NodePath, topItem.Node.NodeDate+"\n"+topItem.Node.NodeTitle))
@@ -208,8 +208,8 @@ func main() {
 		// defer Db.Close()
 		Db.Find("SubscribeLast", true, &vbbusers)
 		for _, subUser := range vbbusers {
-			msgCarouselNews := vb.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselNews1 := vb.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselNews := vb.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselNews1 := vb.NewRichMediaMessage(6, 7, spColorBGOp)
 			vb.SendTextMessage(subUser.ID, "Последние новости")
 			for i, newsItem := range lastNews.Nodes {
 				srcDate := newsItem.Node.NodeDate
@@ -267,7 +267,7 @@ func main() {
 			vb.SendTextMessage(subUser.ID, "Материалы за последние сутки")
 			c := 0
 			cc := 0
-			rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBG))
+			rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBGOp))
 			rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 2, viber.OpenURL, rangeNews[0].NodePath, rangeNews[0].NodeDate+"\n"+rangeNews[0].NodeTitle))
 			rangeMsgCarousel[cc].AddButton(vb.NewImageButton(6, 4, viber.OpenURL, rangeNews[0].NodePath, rangeNews[0].NodeCover["src"]))
 			rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 1, viber.OpenURL, rangeNews[0].NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
@@ -280,7 +280,7 @@ func main() {
 				} else {
 					c = 0
 					cc++
-					rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBG))
+					rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBGOp))
 					rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 2, viber.OpenURL, rangeNews[m].NodePath, rangeNews[m].NodeDate+"\n"+rangeNews[m].NodeTitle))
 					rangeMsgCarousel[cc].AddButton(vb.NewImageButton(6, 4, viber.OpenURL, rangeNews[m].NodePath, rangeNews[m].NodeCover["src"]))
 					rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 1, viber.OpenURL, rangeNews[m].NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
@@ -330,7 +330,7 @@ func main() {
 			vb.SendTextMessage(subUser.ID, "Материалы за последние сутки")
 			c := 0
 			cc := 0
-			rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBG))
+			rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBGOp))
 			rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 2, viber.OpenURL, rangeNews[0].NodePath, rangeNews[0].NodeDate+"\n"+rangeNews[0].NodeTitle))
 			rangeMsgCarousel[cc].AddButton(vb.NewImageButton(6, 4, viber.OpenURL, rangeNews[0].NodePath, rangeNews[0].NodeCover["src"]))
 			rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 1, viber.OpenURL, rangeNews[0].NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
@@ -343,7 +343,7 @@ func main() {
 				} else {
 					c = 0
 					cc++
-					rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBG))
+					rangeMsgCarousel = append(rangeMsgCarousel, vb.NewRichMediaMessage(6, 7, spColorBGOp))
 					rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 2, viber.OpenURL, rangeNews[m].NodePath, rangeNews[m].NodeDate+"\n"+rangeNews[m].NodeTitle))
 					rangeMsgCarousel[cc].AddButton(vb.NewImageButton(6, 4, viber.OpenURL, rangeNews[m].NodePath, rangeNews[m].NodeCover["src"]))
 					rangeMsgCarousel[cc].AddButton(vb.NewTextButton(6, 1, viber.OpenURL, rangeNews[m].NodePath, `<font color="#ffffff">Подробнее...</font>`).SetBgColor(spColorBG))
@@ -381,8 +381,8 @@ func main() {
 		// defer Db.Close()
 		Db.Find("SubscribeCity", true, &vbbusers)
 		for _, subUser := range vbbusers {
-			msgCarouselCityA := vb.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselCityD := vb.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselCityA := vb.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselCityD := vb.NewRichMediaMessage(6, 7, spColorBGOp)
 			vb.SendTextMessage(subUser.ID, "Городские оповещения")
 			for _, newsItem := range cityA.Nodes {
 				srcDate := newsItem.Node.NodeDate

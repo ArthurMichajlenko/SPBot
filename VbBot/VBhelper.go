@@ -22,6 +22,8 @@ import (
 
 var spColorBG = "#752f35"
 
+var spColorBGOp = "#ffffff"
+
 // Page number page of results
 var Page int
 var (
@@ -158,10 +160,10 @@ func LoadHolidays(file string) ([]Holidays, error) {
 	var holiday Holidays
 	var row []string
 	holidaysFile, err := os.Open(file)
-	defer holidaysFile.Close()
 	if err != nil {
 		return holidays, err
 	}
+	defer holidaysFile.Close()
 	scanner := bufio.NewScanner(holidaysFile)
 	for scanner.Scan() {
 		row = strings.Split(scanner.Text(), "|")
@@ -219,10 +221,10 @@ func CheckNewsRange(newsDate string) bool {
 func LoadConfigBots(file string) (Config, error) {
 	var botsconfig Config
 	configFile, err := os.Open(file)
-	defer configFile.Close()
 	if err != nil {
 		log.Panic(err)
 	}
+	defer configFile.Close()
 	jsonParse := json.NewDecoder(configFile)
 	err = jsonParse.Decode(&botsconfig)
 	if err != nil {
@@ -391,10 +393,11 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 	// defer Db.Close()
 	// Db.Init(&vbbuser)
 	//Received messages loop
-	switch m.(type) {
+	switch m := m.(type) {
 	case *viber.TextMessage:
-		msg := v.NewTextMessage("")
-		txt := strings.ToLower(m.(*viber.TextMessage).Text)
+		// msg := v.NewTextMessage("")
+		var msg *viber.TextMessage
+		txt := strings.ToLower(m.Text)
 		switch txt {
 		case "help":
 			isCarousel = false
@@ -609,7 +612,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		case "alerts":
 			isCarousel = true
-			msgCarouselCity := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselCity := v.NewRichMediaMessage(6, 7, spColorBGOp)
 			var city News
 			numPage := 0
 			Db.One("ID", u.ID, &vbbuser)
@@ -629,6 +632,9 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 			urlCity = botConfig.QueryCityAfisha
 			city, err = NewsQuery(urlCity, numPage)
+			if err != nil {
+				log.Println(err)
+			}
 			for _, cityItem := range city.Nodes {
 				srcDate := cityItem.Node.NodeDate
 				msgCarouselCity.AddButton(v.NewTextButton(6, 2, viber.OpenURL, cityItem.Node.NodePath, strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[1]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[0]+"."+strings.Split(strings.SplitAfter(srcDate, " ")[1], "/")[2]+strings.SplitAfter(srcDate, " ")[3]+"\n"+cityItem.Node.NodeTitle))
@@ -649,8 +655,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msg)
 		case "top":
 			isCarousel = true
-			msgCarouselView := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselComment := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselView := v.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselComment := v.NewRichMediaMessage(6, 7, spColorBGOp)
 			var top News
 			Db.One("ID", u.ID, &vbbuser)
 			var msgText string
@@ -692,8 +698,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msg)
 		case "news", "newsprev", "newsnext":
 			isCarousel = true
-			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselLast241 := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselLast240 := v.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselLast241 := v.NewRichMediaMessage(6, 7, spColorBGOp)
 			msgNavig := v.NewRichMediaMessage(6, 3, "#ffffff")
 			if txt == "news" {
 				v.SendTextMessage(u.ID, "Последние новости")
@@ -742,8 +748,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendTextMessage(u.ID, "Введите слово или фразу для поиска")
 		case "searchbegin", "searchprev", "searchnext":
 			isCarousel = true
-			msgCarouselSearch := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselSearch1 := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselSearch := v.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselSearch1 := v.NewRichMediaMessage(6, 7, spColorBGOp)
 			msgNavig := v.NewRichMediaMessage(6, 3, "#ffffff")
 			notFound := false
 			if txt == "searchbegin" {
@@ -883,8 +889,8 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			v.SendMessage(u.ID, msg)
 		case "games", "games10", "games1rand":
 			isCarousel = true
-			msgCarouselGames := v.NewRichMediaMessage(6, 7, spColorBG)
-			msgCarouselGames1 := v.NewRichMediaMessage(6, 7, spColorBG)
+			msgCarouselGames := v.NewRichMediaMessage(6, 7, spColorBGOp)
+			msgCarouselGames1 := v.NewRichMediaMessage(6, 7, spColorBGOp)
 			if txt == "games" {
 				msg := v.NewTextMessage("Выберите игру")
 				kb := v.NewKeyboard("#ffffff", false)
@@ -957,7 +963,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			fallthrough
 		default:
 			if isFeedback {
-				emailBody = m.(*viber.TextMessage).Text
+				emailBody = m.Text
 				msg := v.NewTextMessage("Вы можете прикрепить до " + strconv.Itoa(attachmentCount) + " файлов к сообщению")
 				kb := v.NewKeyboard("", false)
 				kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "sendfeedback", `<font color="#ffffff">Отправить</font>`).SetBgColor(spColorBG))
@@ -967,7 +973,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 				break
 			}
 			if isSearch {
-				searchString = m.(*viber.TextMessage).Text
+				searchString = m.Text
 				msg = v.NewTextMessage("Начинаем поиск")
 				kb := v.NewKeyboard("#ffffff", false)
 				kb.AddButton(v.NewTextButton(6, 1, viber.Reply, "searchbegin", `<font color="#ffffff">Искать</font>`).SetBgColor(spColorBG).SetSilent())
@@ -989,7 +995,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 			}
 		}
 	case *viber.URLMessage:
-		url := m.(*viber.URLMessage).Media
+		url := m.Media
 		v.SendTextMessage(u.ID, "You send me this URL:"+url)
 	case *viber.PictureMessage:
 		msg := v.NewTextMessage("")
@@ -998,7 +1004,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
 		msg.SetKeyboard(kb)
 		if isFeedback && attachmentCount > 0 {
-			attachmentURLs = append(attachmentURLs, m.(*viber.PictureMessage).Media)
+			attachmentURLs = append(attachmentURLs, m.Media)
 			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount)+".jpg")
 			contentType = append(contentType, "image/jpeg")
 			attachmentCount--
@@ -1014,7 +1020,7 @@ func msgReceived(v *viber.Viber, u viber.User, m viber.Message, token uint64, t 
 		kb.AddButton(v.NewTextButton(3, 1, viber.Reply, "menu", `<font color="#ffffff">Отменить</font>`).SetBgColor(spColorBG))
 		msg.SetKeyboard(kb)
 		if isFeedback && attachmentCount > 0 {
-			attachmentURLs = append(attachmentURLs, m.(*viber.VideoMessage).Media)
+			attachmentURLs = append(attachmentURLs, m.Media)
 			fileName = append(fileName, "File"+strconv.Itoa(6-attachmentCount)+".mp4")
 			contentType = append(contentType, "video/mp4")
 			attachmentCount--
